@@ -46,6 +46,10 @@ CREATE TABLE IF NOT EXISTS news (
     excerpt         TEXT NULL,
     content         LONGTEXT NULL,
     image           VARCHAR(255) NULL,
+    video_url       VARCHAR(255) NULL,
+    layout_type     ENUM('standard','gallery','video','side_image') NOT NULL DEFAULT 'standard',
+    focal_x         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки X, %',
+    focal_y         TINYINT UNSIGNED NULL COMMENT 'фокальная точка обложки Y, %',
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
@@ -71,6 +75,20 @@ CREATE TABLE IF NOT EXISTS news_translations (
     meta_description VARCHAR(500) NULL,
     UNIQUE KEY uq_news_translations (news_id, lang),
     CONSTRAINT fk_news_translations_news FOREIGN KEY (news_id) REFERENCES news(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Галерея фотографий новости (этап 12.1)
+CREATE TABLE IF NOT EXISTS news_images (
+    id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    news_id     INT UNSIGNED NOT NULL,
+    path        VARCHAR(255) NOT NULL,
+    alt_text    VARCHAR(255) NULL,
+    focal_x     TINYINT UNSIGNED NULL COMMENT 'фокальная точка X, %',
+    focal_y     TINYINT UNSIGNED NULL COMMENT 'фокальная точка Y, %',
+    sort_order  INT NOT NULL DEFAULT 0,
+    created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_news_images_news (news_id, sort_order),
+    CONSTRAINT fk_news_images_news FOREIGN KEY (news_id) REFERENCES news (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
@@ -380,7 +398,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_05_block5_multilang_header_widgets.sql'),
     ('2026_07_05_soft_deletes.sql'),
     ('2026_07_05_mail_queue.sql'),
-    ('2026_07_05_security_block11.sql')
+    ('2026_07_05_security_block11.sql'),
+    ('2026_07_05_news_media.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

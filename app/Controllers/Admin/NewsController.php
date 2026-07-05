@@ -42,9 +42,10 @@ final class NewsController
 
         $id = News::create($data);
         $this->saveTranslations($id);
+        $this->handleGallery($id);
 
         Flash::success('Новость создана.');
-        header('Location: /admin/news');
+        header('Location: /admin/news/' . $id . '/edit');
         exit;
     }
 
@@ -60,6 +61,7 @@ final class NewsController
         View::render('admin/news/form', [
             'news' => $news,
             'translations' => NewsTranslation::forNews((int) $news['id']),
+            'gallery' => \App\Models\NewsImage::forNews((int) $news['id']),
             'error' => null,
         ]);
     }
@@ -90,6 +92,7 @@ final class NewsController
 
         News::update($id, $data);
         $this->saveTranslations($id);
+        $this->handleGallery($id);
 
         Flash::success('Новость обновлена.');
         header('Location: /admin/news');
@@ -146,8 +149,20 @@ final class NewsController
         $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
         $publishedAtInput = trim((string) ($_POST['published_at'] ?? ''));
 
+        $videoUrl = trim((string) ($_POST['video_url'] ?? ''));
+        $layoutType = in_array($_POST['layout_type'] ?? 'standard', News::LAYOUTS, true) ? (string) $_POST['layout_type'] : 'standard';
+        $focalX = self::clampPercent($_POST['focal_x'] ?? null);
+        $focalY = self::clampPercent($_POST['focal_y'] ?? null);
+
         if ($title === '') {
             return [['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status], 'Укажите заголовок новости.'];
+        }
+
+        if ($videoUrl !== '' && !\App\Core\Video::isYoutube($videoUrl)) {
+            return [
+                ['title' => $title, 'slug' => $slugInput, 'excerpt' => $excerpt, 'content' => $content, 'status' => $status, 'video_url' => $videoUrl, 'layout_type' => $layoutType],
+                'Ссылка на видео должна быть YouTube-адресом (youtube.com/watch, youtu.be и т.п.).',
+            ];
         }
 
         $slug = $slugInput !== '' ? Slug::make($slugInput) : Slug::make($title);
@@ -165,6 +180,10 @@ final class NewsController
             'excerpt' => $excerpt !== '' ? $excerpt : null,
             'content' => $content,
             'image' => $image,
+            'video_url' => $videoUrl !== '' ? $videoUrl : null,
+            'layout_type' => $layoutType,
+            'focal_x' => $focalX,
+            'focal_y' => $focalY,
             'meta_title' => $metaTitle !== '' ? $metaTitle : null,
             'meta_description' => $metaDescription !== '' ? $metaDescription : null,
             'status' => $status,
@@ -173,5 +192,72 @@ final class NewsController
         ];
 
         return [$data, null];
+    }
+
+    private static function clampPercent(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        $n = (int) $value;
+        return max(0, min(100, $n));
+    }
+
+    /**
+     * Обрабатывает галерею новости: удаление отмеченных фото, правку alt/порядка/
+     * фокальной точки существующих и загрузку новых файлов (news_gallery[]).
+     */
+    private function handleGallery(int $newsId): void
+    {
+        // 1. Правки/удаления существующих.
+        foreach ((array) ($_POST['gallery'] ?? []) as $imgId => $meta) {
+            $imgId = (int) $imgId;
+            if ($imgId <= 0) {
+                continue;
+            }
+            if (!empty($meta['delete'])) {
+                $path = \App\Models\NewsImage::delete($imgId, $newsId);
+                if ($path !== null) {
+                    \App\Core\MediaCleaner::purgeUnreferenced([$path]);
+                }
+                continue;
+            }
+            \App\Models\NewsImage::updateMeta(
+                $imgId,
+                $newsId,
+                trim((string) ($meta['alt'] ?? '')) ?: null,
+                (int) ($meta['sort'] ?? 0),
+                self::clampPercent($meta['focal_x'] ?? null),
+                self::clampPercent($meta['focal_y'] ?? null)
+            );
+        }
+
+        // 2. Новые загрузки (множественный input news_gallery[]).
+        if (empty($_FILES['news_gallery']) || !is_array($_FILES['news_gallery']['name'] ?? null)) {
+            return;
+        }
+
+        $existing = \App\Models\NewsImage::forNews($newsId);
+        $sort = count($existing);
+
+        $names = $_FILES['news_gallery']['name'];
+        foreach ($names as $i => $name) {
+            if (($_FILES['news_gallery']['error'][$i] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                continue;
+            }
+            $single = [
+                'name' => $_FILES['news_gallery']['name'][$i],
+                'type' => $_FILES['news_gallery']['type'][$i],
+                'tmp_name' => $_FILES['news_gallery']['tmp_name'][$i],
+                'error' => $_FILES['news_gallery']['error'][$i],
+                'size' => $_FILES['news_gallery']['size'][$i],
+            ];
+            try {
+                $file = \App\Core\Uploader::store($single, 'public', Auth::id());
+                \App\Models\NewsImage::create($newsId, \App\Models\FileEntry::publicUrl($file), null, $sort++);
+            } catch (\Throwable $e) {
+                Flash::error('Не удалось загрузить фото галереи: ' . $e->getMessage());
+            }
+        }
     }
 }

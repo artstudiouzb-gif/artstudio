@@ -11,6 +11,10 @@ require __DIR__ . '/../layout/header.php';
 /** @var array|null $news */
 /** @var array $translations */
 /** @var string|null $error */
+/** @var array $gallery */
+$gallery = $gallery ?? [];
+$layout = $news['layout_type'] ?? 'standard';
+$layoutLabels = ['standard' => 'Стандартный', 'gallery' => 'Галерея', 'video' => 'Видео', 'side_image' => 'Изображение сбоку'];
 
 $action = $isEdit ? '/admin/news/' . (int) $news['id'] . '/edit' : '/admin/news/create';
 $publishedAtValue = '';
@@ -101,6 +105,56 @@ $languages = Language::active();
         <div class="form-field">
             <label for="image_url">...либо ссылка на изображение</label>
             <input type="text" id="image_url" name="image_url" value="<?= htmlspecialchars($news['image'] ?? '', ENT_QUOTES) ?>">
+        </div>
+
+        <div class="form-field">
+            <label>Фокальная точка обложки (%, для кадрирования на мобильных)</label>
+            <div style="display:flex;gap:12px;">
+                <input type="number" name="focal_x" min="0" max="100" placeholder="X (0–100)" value="<?= htmlspecialchars((string) ($news['focal_x'] ?? ''), ENT_QUOTES) ?>" style="max-width:160px;">
+                <input type="number" name="focal_y" min="0" max="100" placeholder="Y (0–100)" value="<?= htmlspecialchars((string) ($news['focal_y'] ?? ''), ENT_QUOTES) ?>" style="max-width:160px;">
+            </div>
+            <span class="form-hint">Оставьте пустым для центрирования (50/50).</span>
+        </div>
+
+        <div class="form-field">
+            <label for="layout_type">Тип отображения новости</label>
+            <select id="layout_type" name="layout_type">
+                <?php foreach ($layoutLabels as $lt => $ltLabel): ?>
+                    <option value="<?= $lt ?>" <?= $layout === $lt ? 'selected' : '' ?>><?= htmlspecialchars($ltLabel, ENT_QUOTES) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="form-field">
+            <label for="video_url">Ссылка на видео (YouTube)</label>
+            <input type="text" id="video_url" name="video_url" value="<?= htmlspecialchars($news['video_url'] ?? '', ENT_QUOTES) ?>" placeholder="https://youtu.be/...">
+            <span class="form-hint">Для типа «Видео»: обложка берётся с YouTube, плеер загружается только по клику.</span>
+        </div>
+
+        <div class="form-field">
+            <label>Галерея фотографий</label>
+            <?php if (!empty($gallery)): ?>
+                <div class="news-gallery-admin" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:12px;">
+                    <?php foreach ($gallery as $gi): ?>
+                        <div style="border:1px solid var(--admin-border,#e1e3e8);border-radius:8px;padding:10px;">
+                            <img src="<?= htmlspecialchars((string) $gi['path'], ENT_QUOTES) ?>" alt="" style="width:100%;height:120px;object-fit:cover;border-radius:6px;margin-bottom:8px;">
+                            <input type="text" name="gallery[<?= (int) $gi['id'] ?>][alt]" value="<?= htmlspecialchars((string) ($gi['alt_text'] ?? ''), ENT_QUOTES) ?>" placeholder="alt-текст" style="width:100%;margin-bottom:6px;">
+                            <div style="display:flex;gap:6px;margin-bottom:6px;">
+                                <input type="number" name="gallery[<?= (int) $gi['id'] ?>][sort]" value="<?= (int) $gi['sort_order'] ?>" title="порядок" style="width:70px;">
+                                <input type="number" name="gallery[<?= (int) $gi['id'] ?>][focal_x]" min="0" max="100" value="<?= htmlspecialchars((string) ($gi['focal_x'] ?? ''), ENT_QUOTES) ?>" placeholder="fx" style="width:60px;">
+                                <input type="number" name="gallery[<?= (int) $gi['id'] ?>][focal_y]" min="0" max="100" value="<?= htmlspecialchars((string) ($gi['focal_y'] ?? ''), ENT_QUOTES) ?>" placeholder="fy" style="width:60px;">
+                            </div>
+                            <label style="font-size:13px;display:flex;gap:6px;align-items:center;">
+                                <input type="checkbox" name="gallery[<?= (int) $gi['id'] ?>][delete]" value="1"> удалить
+                            </label>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php elseif (!$isEdit): ?>
+                <span class="form-hint">Сохраните новость, затем можно будет управлять галереей.</span>
+            <?php endif; ?>
+            <input type="file" name="news_gallery[]" accept="image/*" multiple>
+            <span class="form-hint">Можно выбрать несколько фото. Они сжимаются и конвертируются в WebP автоматически.</span>
         </div>
 
         <div class="form-field">

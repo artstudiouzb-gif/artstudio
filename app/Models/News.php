@@ -5,9 +5,48 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Video;
 
 final class News
 {
+    public const LAYOUTS = ['standard', 'gallery', 'video', 'side_image'];
+
+    public static function normalizeLayout(mixed $layout): string
+    {
+        $layout = is_string($layout) ? $layout : 'standard';
+        return in_array($layout, self::LAYOUTS, true) ? $layout : 'standard';
+    }
+
+    /**
+     * Централизованный выбор обложки новости (задача 68). Приоритет:
+     *   1) явно заданное изображение (news.image),
+     *   2) обложка YouTube-видео (news.video_url),
+     *   3) первое фото из галереи (news_images),
+     *   4) логотип сайта (settings.logo_url).
+     * Возвращает URL или null, если ничего нет.
+     */
+    public static function getCoverImage(array $row): ?string
+    {
+        $image = trim((string) ($row['image'] ?? ''));
+        if ($image !== '') {
+            return $image;
+        }
+
+        $ytId = Video::youtubeId($row['video_url'] ?? null);
+        if ($ytId !== null) {
+            return Video::youtubeThumbnail($ytId);
+        }
+
+        if (!empty($row['id'])) {
+            $galleryPath = NewsImage::firstPath((int) $row['id']);
+            if ($galleryPath !== null) {
+                return $galleryPath;
+            }
+        }
+
+        $logo = trim((string) Setting::get('logo_url', ''));
+        return $logo !== '' ? $logo : null;
+    }
     public static function all(): array
     {
         $stmt = Database::pdo()->query('SELECT * FROM news WHERE deleted_at IS NULL ORDER BY created_at DESC');
@@ -125,8 +164,8 @@ final class News
     public static function create(array $data): int
     {
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO news (title, slug, excerpt, content, image, meta_title, meta_description, status, published_at, author_id, created_at)
-             VALUES (:title, :slug, :excerpt, :content, :image, :meta_title, :meta_description, :status, :published_at, :author_id, NOW())'
+            'INSERT INTO news (title, slug, excerpt, content, image, video_url, layout_type, focal_x, focal_y, meta_title, meta_description, status, published_at, author_id, created_at)
+             VALUES (:title, :slug, :excerpt, :content, :image, :video_url, :layout_type, :focal_x, :focal_y, :meta_title, :meta_description, :status, :published_at, :author_id, NOW())'
         );
         $stmt->execute([
             ':title' => $data['title'],
@@ -134,6 +173,10 @@ final class News
             ':excerpt' => $data['excerpt'],
             ':content' => $data['content'],
             ':image' => $data['image'],
+            ':video_url' => $data['video_url'] ?? null,
+            ':layout_type' => self::normalizeLayout($data['layout_type'] ?? 'standard'),
+            ':focal_x' => $data['focal_x'] ?? null,
+            ':focal_y' => $data['focal_y'] ?? null,
             ':meta_title' => $data['meta_title'] ?? null,
             ':meta_description' => $data['meta_description'] ?? null,
             ':status' => $data['status'],
@@ -148,7 +191,9 @@ final class News
     {
         $stmt = Database::pdo()->prepare(
             'UPDATE news SET title = :title, slug = :slug, excerpt = :excerpt, content = :content,
-             image = :image, meta_title = :meta_title, meta_description = :meta_description,
+             image = :image, video_url = :video_url, layout_type = :layout_type,
+             focal_x = :focal_x, focal_y = :focal_y,
+             meta_title = :meta_title, meta_description = :meta_description,
              status = :status, published_at = :published_at WHERE id = :id'
         );
         $stmt->execute([
@@ -157,6 +202,10 @@ final class News
             ':excerpt' => $data['excerpt'],
             ':content' => $data['content'],
             ':image' => $data['image'],
+            ':video_url' => $data['video_url'] ?? null,
+            ':layout_type' => self::normalizeLayout($data['layout_type'] ?? 'standard'),
+            ':focal_x' => $data['focal_x'] ?? null,
+            ':focal_y' => $data['focal_y'] ?? null,
             ':meta_title' => $data['meta_title'] ?? null,
             ':meta_description' => $data['meta_description'] ?? null,
             ':status' => $data['status'],

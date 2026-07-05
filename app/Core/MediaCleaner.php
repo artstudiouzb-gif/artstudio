@@ -42,6 +42,16 @@ final class MediaCleaner
             }
         }
 
+        // Фотографии галереи новости (этап 12.1). Вызывать ДО force-delete,
+        // пока строки news_images ещё существуют.
+        if (!empty($news['id'])) {
+            foreach (\App\Models\NewsImage::forNews((int) $news['id']) as $img) {
+                foreach (self::extractPaths((string) $img['path']) as $p) {
+                    $paths[$p] = true;
+                }
+            }
+        }
+
         return array_keys($paths);
     }
 
