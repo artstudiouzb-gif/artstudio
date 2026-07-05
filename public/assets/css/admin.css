@@ -109,6 +109,31 @@ body {
     cursor: pointer;
 }
 .admin-main { flex: 1; padding: 40px; max-width: 1100px; }
+
+/* Адаптив админ-панели (задача 63.1): на планшете/телефоне сайдбар
+   превращается в верхнюю горизонтальную навигацию, отступы сжимаются. */
+@media (max-width: 860px) {
+    .admin-shell { flex-direction: column; }
+    .admin-sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px;
+        padding: 12px 14px;
+    }
+    .admin-sidebar__brand { padding: 0 12px 0 0; font-size: 16px; }
+    .admin-sidebar nav { flex-direction: row; flex-wrap: wrap; flex: 1 1 100%; gap: 2px; }
+    .admin-sidebar nav a { padding: 8px 12px; border-radius: 6px; }
+    .admin-sidebar__logout { padding: 0; margin-left: auto; }
+    .admin-sidebar__logout button { width: auto; padding: 8px 14px; }
+    .admin-main { padding: 20px 16px; max-width: none; }
+    .admin-main__header { flex-wrap: wrap; gap: 10px; }
+}
+/* Таблицы списков на узких экранах — горизонтальный скролл вместо слома. */
+@media (max-width: 640px) {
+    .data-table { display: block; overflow-x: auto; white-space: nowrap; }
+}
 .admin-main__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .admin-main__header h1 { margin: 0; font-size: 24px; }
 

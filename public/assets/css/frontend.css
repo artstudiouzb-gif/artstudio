@@ -259,6 +259,32 @@ a { color: var(--color-accent, #e63946); }
 @keyframes skeleton-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 @media (prefers-reduced-motion: reduce) { .skeleton::before { animation: none; } }
 
+/* --- Печатные стили (задача 63.2): чистый документ с логотипом и canonical --- */
+.print-only { display: none; }
+@media print {
+    /* Скрываем всё «служебное»: шапку, сайдбары, футер, переключатель темы,
+       соцкнопки, CTA, cookie-баннер, кнопки шеринга, слайдер-навигацию. */
+    .site-header, .layout__sidebar, .site-footer, .site-theme-toggle,
+    .site-social, .site-cta, .site-lang-switcher, .site-menu,
+    .cookie-banner, .share-buttons, .news-slider__nav, .news-video__play,
+    .news-single__back { display: none !important; }
+
+    html, body { background: #fff !important; color: #000 !important; }
+    a { color: #000 !important; text-decoration: none; }
+    .site-content, .layout { max-width: none; margin: 0; padding: 0; display: block; }
+    .cms-block, .cms-block[data-reveal] { opacity: 1 !important; transform: none !important; padding: 12px 0 !important; }
+    img, picture { max-width: 100% !important; }
+
+    /* Печатная «шапка»: логотип и адрес страницы. */
+    .print-only { display: block !important; }
+    .print-header { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #000; }
+    .print-header img { max-height: 48px; }
+    .print-header .print-name { font-size: 20px; font-weight: 700; }
+    .print-footer { margin-top: 18px; padding-top: 10px; border-top: 1px solid #000; font-size: 12px; color: #000; }
+    /* Раскрываем ссылки после текста, где это уместно. */
+    .news-single__content a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 11px; }
+}
+
 /* Лайтбокс для блоков галереи */
 .cms-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
 .cms-lightbox.is-open { display: flex; }

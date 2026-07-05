@@ -176,6 +176,13 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
     </div>
 </header>
 <main class="site-content">
+<div class="print-only print-header">
+    <?php if ($logo !== ''): ?>
+        <img src="<?= htmlspecialchars($logo, ENT_QUOTES) ?>" alt="<?= htmlspecialchars($siteName, ENT_QUOTES) ?>">
+    <?php else: ?>
+        <div class="print-name"><?= htmlspecialchars($siteName, ENT_QUOTES) ?></div>
+    <?php endif; ?>
+</div>
 <?php foreach (Flash::pull() as $flash): ?>
     <div class="site-alert site-alert--<?= htmlspecialchars($flash['type'], ENT_QUOTES) ?>">
         <?= htmlspecialchars($flash['message'], ENT_QUOTES) ?>

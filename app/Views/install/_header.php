@@ -6,11 +6,12 @@ $heading = $heading ?? 'Установка';
 $steps = ['1' => 'Окружение', '2' => 'База данных', '3' => 'Сайт', '4' => 'Администратор'];
 ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Установка ArtStudio CMS</title>
+<link rel="stylesheet" href="/assets/vendor/pico/pico.classless.min.css">
 <link rel="stylesheet" href="/assets/css/admin.css">
 <style>
 .install-steps { display: flex; gap: 8px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
