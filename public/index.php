@@ -156,6 +156,10 @@ $router->post('/admin/files/upload', [AdminFileController::class, 'upload']);
 $router->post('/admin/files/{id}/delete', [AdminFileController::class, 'destroy']);
 $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class, 'regenerateToken']);
 
+// --- SEO ---
+$router->get('/sitemap.xml', [\App\Controllers\Site\SitemapController::class, 'xml']);
+$router->get('/robots.txt', [\App\Controllers\Site\SitemapController::class, 'robots']);
+
 // --- Публичный сайт ---
 $router->get('/', [SitePageController::class, 'home']);
 $router->get('/news', [SiteNewsController::class, 'index']);

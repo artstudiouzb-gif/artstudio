@@ -8,4 +8,5 @@
 /storage/installed.lock
 /storage/backups/*
 /storage/cache/*
+!/storage/cache/.gitkeep
 .DS_Store

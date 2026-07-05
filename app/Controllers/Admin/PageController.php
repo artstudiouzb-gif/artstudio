@@ -99,6 +99,7 @@ final class PageController
 
         Page::update($id, $data);
         $this->saveTranslations($id);
+        \App\Core\Cache::forgetPrefix('page:' . $id);
 
         Flash::success('Страница обновлена.');
         header('Location: /admin/pages/' . $id . '/edit');
@@ -111,6 +112,7 @@ final class PageController
         Csrf::verifyRequest();
 
         Page::delete((int) $params['id']);
+        \App\Core\Cache::forgetPrefix('page:' . (int) $params['id']);
         Flash::success('Страница удалена.');
         header('Location: /admin/pages');
         exit;

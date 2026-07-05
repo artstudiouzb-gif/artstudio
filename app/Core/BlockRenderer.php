@@ -46,12 +46,13 @@ final class BlockRenderer
 
     /**
      * @param array<int, array<string, mixed>> $blocks
-     * @return array{html: string, css: string}
+     * @return array{html: string, css: string, assets: array<int, string>}
      */
     public static function renderPage(array $blocks): array
     {
         $htmlParts = [];
         $cssParts = [];
+        $assets = [];
 
         foreach ($blocks as $block) {
             $rendered = self::render($block);
@@ -59,11 +60,14 @@ final class BlockRenderer
             if ($rendered['css'] !== '') {
                 $cssParts[] = "/* block #{$block['id']} ({$block['type']}) */\n" . $rendered['css'];
             }
+            $type = preg_replace('/[^a-z0-9_]/', '', strtolower((string) $block['type'])) ?? '';
+            $assets[$type] = true;
         }
 
         return [
             'html' => implode("\n", $htmlParts),
             'css' => implode("\n\n", $cssParts),
+            'assets' => array_keys($assets),
         ];
     }
 

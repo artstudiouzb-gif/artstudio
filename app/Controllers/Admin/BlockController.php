@@ -54,6 +54,7 @@ final class BlockController
 
         $title = trim((string) ($_POST['title'] ?? ''));
         $blockId = Block::create($pageId, $lang, $type, $title !== '' ? $title : null, self::DEFAULTS[$type], '');
+        \App\Core\Cache::forgetPrefix('page:' . $pageId);
 
         Flash::success('Блок добавлен. Заполните его содержимое.');
         header('Location: /admin/blocks/' . $blockId . '/edit');
@@ -97,6 +98,7 @@ final class BlockController
         $data = $this->collectData($block['type']);
 
         Block::update((int) $block['id'], $title !== '' ? $title : null, $data, $customCss);
+        \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок сохранён.');
         header('Location: ' . $this->pageEditUrl($block));
@@ -116,6 +118,7 @@ final class BlockController
         }
 
         Block::delete((int) $block['id']);
+        \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
         Flash::success('Блок удалён.');
         header('Location: ' . $this->pageEditUrl($block));
         exit;
@@ -140,6 +143,7 @@ final class BlockController
         } elseif ($direction === 'down') {
             Block::moveDown((int) $block['id'], (int) $block['page_id'], $lang);
         }
+        \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         header('Location: ' . $this->pageEditUrl($block));
         exit;

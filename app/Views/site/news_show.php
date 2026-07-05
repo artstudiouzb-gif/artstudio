@@ -6,6 +6,8 @@ use App\Core\Locale;
 
 $metaTitle = $news['meta_title'] ?: $news['title'];
 $metaDescription = $news['meta_description'] ?: ($news['excerpt'] ?? '');
+$ogType = 'article';
+$ogImage = $news['image'] ?? '';
 require __DIR__ . '/_header.php';
 ?>
 <article class="news-single">

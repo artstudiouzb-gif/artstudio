@@ -91,6 +91,11 @@ final class Uploader
             self::sanitizeSvgFile($destination);
         }
 
+        // Оптимизация растровой графики: WebP + адаптивные разрешения (best-effort).
+        if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
+            self::optimizeImage($destination);
+        }
+
         $accessToken = $accessType === 'protected' ? bin2hex(random_bytes(32)) : null;
 
         $id = FileEntry::create([
@@ -111,6 +116,70 @@ final class Uploader
      * обработчики событий, javascript:-URI, внешние ссылки). Работает через
      * DOMDocument (нативное расширение, без сторонних зависимостей).
      */
+    /**
+     * Создаёт WebP-версию и адаптивные разрешения (desktop/mobile) для
+     * растрового изображения через нативный GD. Best-effort: любые ошибки
+     * не мешают основной загрузке. Побочные файлы кладутся рядом:
+     *   name.jpg -> name.webp (полный размер),
+     *              name-1600.webp (desktop, если исходник шире),
+     *              name-800.webp  (mobile).
+     */
+    public static function optimizeImage(string $path): void
+    {
+        if (!extension_loaded('gd')) {
+            return;
+        }
+
+        try {
+            $info = @getimagesize($path);
+            if ($info === false) {
+                return;
+            }
+            [$width, $height] = $info;
+            $type = $info[2];
+
+            $src = match ($type) {
+                IMAGETYPE_JPEG => @imagecreatefromjpeg($path),
+                IMAGETYPE_PNG => @imagecreatefrompng($path),
+                default => null,
+            };
+            if (!$src) {
+                return;
+            }
+
+            if ($type === IMAGETYPE_PNG) {
+                imagepalettetotruecolor($src);
+                imagealphablending($src, true);
+                imagesavealpha($src, true);
+            }
+
+            $base = preg_replace('/\.[^.]+$/', '', $path) ?? $path;
+
+            // WebP полного размера.
+            @imagewebp($src, $base . '.webp', 82);
+
+            // Адаптивные размеры.
+            foreach ([1600, 800] as $targetWidth) {
+                if ($width <= $targetWidth) {
+                    continue;
+                }
+                $targetHeight = (int) round($height * ($targetWidth / $width));
+                $resized = imagecreatetruecolor($targetWidth, $targetHeight);
+                if ($type === IMAGETYPE_PNG) {
+                    imagealphablending($resized, false);
+                    imagesavealpha($resized, true);
+                }
+                imagecopyresampled($resized, $src, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
+                @imagewebp($resized, $base . '-' . $targetWidth . '.webp', 82);
+                imagedestroy($resized);
+            }
+
+            imagedestroy($src);
+        } catch (\Throwable $e) {
+            Logger::error('Image optimize failed: ' . $e->getMessage());
+        }
+    }
+
     public static function sanitizeSvgFile(string $path): void
     {
         $content = file_get_contents($path);

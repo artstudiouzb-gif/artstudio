@@ -1,0 +1,89 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers\Site;
+
+use App\Core\Config;
+use App\Core\Database;
+use App\Models\Language;
+
+final class SitemapController
+{
+    public function xml(): void
+    {
+        $base = rtrim((string) Config::get('app.url', ''), '/');
+        $languages = Language::active();
+        $defaultCode = Language::defaultCode();
+
+        $prefix = static function (string $code) use ($defaultCode): string {
+            return $code === $defaultCode ? '' : '/' . $code;
+        };
+
+        $urls = [];
+
+        // Главная + раздел новостей на каждом языке.
+        foreach ($languages as $lang) {
+            $p = $prefix((string) $lang['code']);
+            $urls[] = ['loc' => $base . ($p === '' ? '/' : $p), 'priority' => '1.0'];
+            $urls[] = ['loc' => $base . $p . '/news', 'priority' => '0.7'];
+        }
+
+        // Опубликованные страницы (не главные, не удалённые).
+        $pages = Database::pdo()->query(
+            "SELECT slug, updated_at FROM pages WHERE status = 'published' AND is_home = 0 AND deleted_at IS NULL"
+        )->fetchAll();
+        foreach ($pages as $page) {
+            foreach ($languages as $lang) {
+                $urls[] = [
+                    'loc' => $base . $prefix((string) $lang['code']) . '/' . $page['slug'],
+                    'lastmod' => substr((string) $page['updated_at'], 0, 10),
+                    'priority' => '0.8',
+                ];
+            }
+        }
+
+        // Опубликованные новости.
+        $news = Database::pdo()->query(
+            "SELECT slug, updated_at FROM news WHERE status = 'published' AND published_at <= NOW() AND deleted_at IS NULL"
+        )->fetchAll();
+        foreach ($news as $item) {
+            foreach ($languages as $lang) {
+                $urls[] = [
+                    'loc' => $base . $prefix((string) $lang['code']) . '/news/' . $item['slug'],
+                    'lastmod' => substr((string) $item['updated_at'], 0, 10),
+                    'priority' => '0.6',
+                ];
+            }
+        }
+
+        header('Content-Type: application/xml; charset=UTF-8');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        foreach ($urls as $url) {
+            echo '  <url>' . "\n";
+            echo '    <loc>' . htmlspecialchars($url['loc'], ENT_XML1) . '</loc>' . "\n";
+            if (!empty($url['lastmod'])) {
+                echo '    <lastmod>' . htmlspecialchars($url['lastmod'], ENT_XML1) . '</lastmod>' . "\n";
+            }
+            echo '    <priority>' . $url['priority'] . '</priority>' . "\n";
+            echo '  </url>' . "\n";
+        }
+        echo '</urlset>' . "\n";
+        exit;
+    }
+
+    public function robots(): void
+    {
+        $base = rtrim((string) Config::get('app.url', ''), '/');
+
+        header('Content-Type: text/plain; charset=UTF-8');
+        echo "User-agent: *\n";
+        echo "Disallow: /admin\n";
+        echo "Disallow: /install\n";
+        echo "Disallow: /download.php\n";
+        echo "Allow: /\n\n";
+        echo 'Sitemap: ' . $base . "/sitemap.xml\n";
+        exit;
+    }
+}

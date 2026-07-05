@@ -10,6 +10,8 @@ use App\Models\Setting;
 /** @var string $metaTitle */
 /** @var string $metaDescription */
 /** @var string $extraHeadCss */
+/** @var string $ogImage */
+/** @var string $ogType */
 
 $siteName = Setting::get('site_name', 'ArtStudio');
 $logo = Setting::get('logo_url', '');
@@ -17,6 +19,16 @@ $primaryColor = Setting::get('color_primary', '#1a1a1a');
 $accentColor = Setting::get('color_accent', '#e63946');
 $font = Setting::get('font_family', "'Inter', sans-serif");
 $extraHeadCss = $extraHeadCss ?? '';
+
+// --- SEO / Open Graph ---
+$appUrl = rtrim((string) \App\Core\Config::get('app.url', ''), '/');
+$canonicalUrl = $appUrl . Locale::url(Locale::path());
+$ogType = $ogType ?? 'website';
+$ogImageRaw = $ogImage ?? ($logo !== '' ? $logo : '');
+// Абсолютный URL для og:image.
+if ($ogImageRaw !== '' && !preg_match('#^https?://#', $ogImageRaw)) {
+    $ogImageRaw = $appUrl . '/' . ltrim($ogImageRaw, '/');
+}
 
 $hcfg = HeaderConfig::get();
 $currentLang = Locale::current();
@@ -99,6 +111,18 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml;
 <title><?= htmlspecialchars($metaTitle, ENT_QUOTES) ?></title>
 <?php if (!empty($metaDescription)): ?>
 <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES) ?>">
+<?php endif; ?>
+<link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
+<meta property="og:site_name" content="<?= htmlspecialchars($siteName, ENT_QUOTES) ?>">
+<meta property="og:type" content="<?= htmlspecialchars($ogType, ENT_QUOTES) ?>">
+<meta property="og:title" content="<?= htmlspecialchars($metaTitle, ENT_QUOTES) ?>">
+<?php if (!empty($metaDescription)): ?>
+<meta property="og:description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES) ?>">
+<?php endif; ?>
+<meta property="og:url" content="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
+<?php if ($ogImageRaw !== ''): ?>
+<meta property="og:image" content="<?= htmlspecialchars($ogImageRaw, ENT_QUOTES) ?>">
+<meta name="twitter:card" content="summary_large_image">
 <?php endif; ?>
 <link rel="stylesheet" href="/assets/css/frontend.css">
 <style>

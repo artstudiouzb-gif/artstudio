@@ -149,3 +149,9 @@ a { color: var(--color-accent, #e63946); }
 
 .news-single time { display: block; font-size: 13px; color: #888; margin-bottom: 16px; }
 .news-single img { border-radius: 12px; margin-bottom: 20px; }
+
+/* Лайтбокс для блоков галереи */
+.cms-lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.85); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
+.cms-lightbox.is-open { display: flex; }
+.cms-lightbox img { max-width: 92vw; max-height: 88vh; border-radius: 8px; }
+.cms-lightbox__close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #fff; font-size: 40px; line-height: 1; cursor: pointer; }

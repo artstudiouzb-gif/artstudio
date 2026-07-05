@@ -44,8 +44,20 @@ final class PageController
 
     private function renderPage(array $page, string $lang): void
     {
-        $blocks = Block::forPageLocalized((int) $page['id'], $lang);
-        $rendered = BlockRenderer::renderPage($blocks);
+        // Скомпилированные блоки (HTML + scoped CSS) кэшируются на диск и
+        // сбрасываются при изменении страницы/блоков в админке.
+        $rendered = \App\Core\Cache::remember(
+            'page:' . (int) $page['id'] . ':' . $lang,
+            static function () use ($page, $lang): array {
+                $blocks = Block::forPageLocalized((int) $page['id'], $lang);
+                return BlockRenderer::renderPage($blocks);
+            }
+        );
+
+        // Ассеты блоков регистрируются и на попадании в кэш, и при промахе.
+        foreach ($rendered['assets'] ?? [] as $assetType) {
+            \App\Core\AssetCollector::requireJs($assetType);
+        }
 
         $layoutType = $page['layout_type'] ?? 'no_sidebar';
         $sidebar = null;
