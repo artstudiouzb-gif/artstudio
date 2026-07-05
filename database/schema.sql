@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS news (
     excerpt         TEXT NULL,
     content         LONGTEXT NULL,
     image           VARCHAR(255) NULL,
+    meta_title      VARCHAR(255) NULL,
+    meta_description VARCHAR(500) NULL,
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
     published_at    DATETIME NULL,
     author_id       INT UNSIGNED NULL,
@@ -56,17 +58,52 @@ CREATE TABLE IF NOT EXISTS news (
     CONSTRAINT fk_news_author FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Переводы новостей (для НЕ-дефолтных языков)
+CREATE TABLE IF NOT EXISTS news_translations (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    news_id         INT UNSIGNED NOT NULL,
+    lang            VARCHAR(8) NOT NULL,
+    title           VARCHAR(255) NULL,
+    excerpt         TEXT NULL,
+    content         LONGTEXT NULL,
+    meta_title      VARCHAR(255) NULL,
+    meta_description VARCHAR(500) NULL,
+    UNIQUE KEY uq_news_translations (news_id, lang),
+    CONSTRAINT fk_news_translations_news FOREIGN KEY (news_id) REFERENCES news(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Языки сайта (управляемый список для мультиязычности)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS languages (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code            VARCHAR(8) NOT NULL COMMENT 'ISO-код: ru, uz, en',
+    name            VARCHAR(60) NOT NULL COMMENT 'отображаемое название: Русский, Oʻzbekcha',
+    is_default      TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'язык по умолчанию (URL без префикса)',
+    is_active       TINYINT(1) NOT NULL DEFAULT 1,
+    sort_order      INT NOT NULL DEFAULT 0,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_languages_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT INTO languages (code, name, is_default, is_active, sort_order) VALUES
+    ('ru', 'Русский', 1, 1, 0),
+    ('uz', 'Oʻzbekcha', 0, 1, 1)
+ON DUPLICATE KEY UPDATE code = code;
+
 -- ---------------------------------------------------------------------------
 -- Страницы (статические, собираются из блоков)
+-- Базовая строка = контент на языке по умолчанию; переводы в page_translations.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS pages (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    title           VARCHAR(255) NOT NULL,
+    title           VARCHAR(255) NOT NULL COMMENT 'заголовок на языке по умолчанию',
     slug            VARCHAR(255) NOT NULL,
     meta_title      VARCHAR(255) NULL,
     meta_description VARCHAR(500) NULL,
     status          ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
     is_home         TINYINT(1) NOT NULL DEFAULT 0,
+    layout_type     ENUM('no_sidebar', 'left_sidebar', 'right_sidebar') NOT NULL DEFAULT 'no_sidebar',
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uq_pages_slug (slug)
@@ -75,12 +112,26 @@ CREATE TABLE IF NOT EXISTS pages (
 -- Гарантия, что домашней может быть только одна страница обеспечивается на уровне приложения
 -- (перед установкой is_home = 1 остальные страницы сбрасываются в транзакции).
 
+-- Переводы страниц (заголовок и мета для НЕ-дефолтных языков)
+CREATE TABLE IF NOT EXISTS page_translations (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    page_id         INT UNSIGNED NOT NULL,
+    lang            VARCHAR(8) NOT NULL,
+    title           VARCHAR(255) NULL,
+    meta_title      VARCHAR(255) NULL,
+    meta_description VARCHAR(500) NULL,
+    UNIQUE KEY uq_page_translations (page_id, lang),
+    CONSTRAINT fk_page_translations_page FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------------------
 -- Блоки конструктора страниц (Page Builder)
+-- Каждый блок принадлежит паре (page_id, lang): у каждого языка свой стек блоков.
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS blocks (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     page_id         INT UNSIGNED NOT NULL,
+    lang            VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'код языка стека блоков',
     type            VARCHAR(60) NOT NULL COMMENT 'text, slider, advantages, cta, gallery, form, html',
     title           VARCHAR(255) NULL COMMENT 'внутреннее название блока для админки',
     data            JSON NOT NULL COMMENT 'структурированные данные блока',
@@ -88,7 +139,7 @@ CREATE TABLE IF NOT EXISTS blocks (
     sort_order      INT NOT NULL DEFAULT 0,
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    KEY idx_blocks_page (page_id, sort_order),
+    KEY idx_blocks_page (page_id, lang, sort_order),
     CONSTRAINT fk_blocks_page FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -193,7 +244,8 @@ INSERT INTO settings (`key`, `value`) VALUES
     ('contact_phone', ''),
     ('contact_email', ''),
     ('contact_address', ''),
-    ('counter_codes', '')
+    ('counter_codes', ''),
+    ('header_config', '{"logo_position":"left","menu_position":"right","language_switcher":{"enabled":true,"format":"code"},"social_buttons":[],"cta":{"enabled":false,"text":"","url":"","style":"filled"}}')
 ON DUPLICATE KEY UPDATE `key` = `key`;
 
 -- ---------------------------------------------------------------------------
@@ -212,6 +264,43 @@ CREATE TABLE IF NOT EXISTS files (
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY idx_files_access_type (access_type),
     CONSTRAINT fk_files_uploaded_by FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Пункты меню шапки (конструктор меню)
+-- lang: код языка пункта; пустой ('') = показывать во всех языках.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS menu_items (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    lang            VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'код языка или пусто для всех',
+    title           VARCHAR(190) NOT NULL,
+    url_type        ENUM('page', 'news_index', 'custom') NOT NULL DEFAULT 'custom',
+    url_value       VARCHAR(500) NULL COMMENT 'slug страницы или произвольный URL',
+    parent_id       INT UNSIGNED NULL,
+    sort_order      INT NOT NULL DEFAULT 0,
+    is_active       TINYINT(1) NOT NULL DEFAULT 1,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_menu_items_lang (lang, sort_order),
+    CONSTRAINT fk_menu_items_parent FOREIGN KEY (parent_id) REFERENCES menu_items(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
+-- Модульные боковые виджеты (Sidebar Engine)
+-- sidebar: в какую колонку; lang: пусто = все языки, иначе конкретный язык.
+-- data: JSON-настройки виджета (зависят от type).
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS widgets (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sidebar         ENUM('left', 'right') NOT NULL,
+    type            VARCHAR(60) NOT NULL COMMENT 'latest_news, contacts, custom_html, projects_list, team_list',
+    title           VARCHAR(190) NULL COMMENT 'заголовок виджета на сайте',
+    lang            VARCHAR(8) NOT NULL DEFAULT '' COMMENT 'код языка или пусто для всех',
+    data            JSON NOT NULL,
+    sort_order      INT NOT NULL DEFAULT 0,
+    is_active       TINYINT(1) NOT NULL DEFAULT 1,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_widgets_sidebar (sidebar, sort_order)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

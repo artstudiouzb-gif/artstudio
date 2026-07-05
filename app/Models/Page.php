@@ -15,7 +15,7 @@ final class Page
         return $stmt->fetchAll();
     }
 
-    public static function findBySlug(string $slug): ?array
+    public static function findBySlug(string $slug, ?string $lang = null): ?array
     {
         $stmt = Database::pdo()->prepare(
             "SELECT * FROM pages WHERE slug = :slug AND status = 'published' LIMIT 1"
@@ -23,17 +23,48 @@ final class Page
         $stmt->execute([':slug' => $slug]);
         $row = $stmt->fetch();
 
-        return $row ?: null;
+        if (!$row) {
+            return null;
+        }
+
+        return $lang !== null ? self::localize($row, $lang) : $row;
     }
 
-    public static function findHome(): ?array
+    public static function findHome(?string $lang = null): ?array
     {
         $stmt = Database::pdo()->query(
             "SELECT * FROM pages WHERE is_home = 1 AND status = 'published' LIMIT 1"
         );
         $row = $stmt->fetch();
 
-        return $row ?: null;
+        if (!$row) {
+            return null;
+        }
+
+        return $lang !== null ? self::localize($row, $lang) : $row;
+    }
+
+    /**
+     * Накладывает перевод (title/meta) на базовую строку страницы.
+     */
+    public static function localize(array $row, string $lang): array
+    {
+        if ($lang === Language::defaultCode()) {
+            return $row;
+        }
+
+        $translation = PageTranslation::find((int) $row['id'], $lang);
+        if ($translation === null) {
+            return $row;
+        }
+
+        if (isset($translation['title']) && trim((string) $translation['title']) !== '') {
+            $row['title'] = $translation['title'];
+        }
+        $row['meta_title'] = $translation['meta_title'] ?? null;
+        $row['meta_description'] = $translation['meta_description'] ?? null;
+
+        return $row;
     }
 
     public static function findById(int $id): ?array
@@ -70,8 +101,8 @@ final class Page
             }
 
             $stmt = $pdo->prepare(
-                'INSERT INTO pages (title, slug, meta_title, meta_description, status, is_home, created_at)
-                 VALUES (:title, :slug, :meta_title, :meta_description, :status, :is_home, NOW())'
+                'INSERT INTO pages (title, slug, meta_title, meta_description, status, is_home, layout_type, created_at)
+                 VALUES (:title, :slug, :meta_title, :meta_description, :status, :is_home, :layout_type, NOW())'
             );
             $stmt->execute([
                 ':title' => $data['title'],
@@ -80,6 +111,7 @@ final class Page
                 ':meta_description' => $data['meta_description'],
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
+                ':layout_type' => $data['layout_type'] ?? 'no_sidebar',
             ]);
             $id = (int) $pdo->lastInsertId();
 
@@ -104,8 +136,8 @@ final class Page
 
             $stmt = $pdo->prepare(
                 'UPDATE pages SET title = :title, slug = :slug, meta_title = :meta_title,
-                 meta_description = :meta_description, status = :status, is_home = :is_home
-                 WHERE id = :id'
+                 meta_description = :meta_description, status = :status, is_home = :is_home,
+                 layout_type = :layout_type WHERE id = :id'
             );
             $stmt->execute([
                 ':title' => $data['title'],
@@ -114,6 +146,7 @@ final class Page
                 ':meta_description' => $data['meta_description'],
                 ':status' => $data['status'],
                 ':is_home' => !empty($data['is_home']) ? 1 : 0,
+                ':layout_type' => $data['layout_type'] ?? 'no_sidebar',
                 ':id' => $id,
             ]);
 

@@ -10,6 +10,7 @@ use App\Core\Flash;
 use App\Core\View;
 use App\Models\Block;
 use App\Models\FormDef;
+use App\Models\Language;
 use App\Models\Page;
 
 final class BlockController
@@ -40,14 +41,19 @@ final class BlockController
         }
 
         $type = (string) ($_POST['type'] ?? '');
+        $lang = (string) ($_POST['block_lang'] ?? Language::defaultCode());
+        if (!Language::isActive($lang)) {
+            $lang = Language::defaultCode();
+        }
+
         if (!in_array($type, self::TYPES, true)) {
             Flash::error('Неизвестный тип блока.');
-            header('Location: /admin/pages/' . $pageId . '/edit');
+            header('Location: /admin/pages/' . $pageId . '/edit?block_lang=' . urlencode($lang));
             exit;
         }
 
         $title = trim((string) ($_POST['title'] ?? ''));
-        $blockId = Block::create($pageId, $type, $title !== '' ? $title : null, self::DEFAULTS[$type], '');
+        $blockId = Block::create($pageId, $lang, $type, $title !== '' ? $title : null, self::DEFAULTS[$type], '');
 
         Flash::success('Блок добавлен. Заполните его содержимое.');
         header('Location: /admin/blocks/' . $blockId . '/edit');
@@ -93,7 +99,7 @@ final class BlockController
         Block::update((int) $block['id'], $title !== '' ? $title : null, $data, $customCss);
 
         Flash::success('Блок сохранён.');
-        header('Location: /admin/pages/' . (int) $block['page_id'] . '/edit');
+        header('Location: ' . $this->pageEditUrl($block));
         exit;
     }
 
@@ -111,7 +117,7 @@ final class BlockController
 
         Block::delete((int) $block['id']);
         Flash::success('Блок удалён.');
-        header('Location: /admin/pages/' . (int) $block['page_id'] . '/edit');
+        header('Location: ' . $this->pageEditUrl($block));
         exit;
     }
 
@@ -127,15 +133,21 @@ final class BlockController
             return;
         }
 
+        $lang = (string) $block['lang'];
         $direction = $_POST['direction'] ?? '';
         if ($direction === 'up') {
-            Block::moveUp((int) $block['id'], (int) $block['page_id']);
+            Block::moveUp((int) $block['id'], (int) $block['page_id'], $lang);
         } elseif ($direction === 'down') {
-            Block::moveDown((int) $block['id'], (int) $block['page_id']);
+            Block::moveDown((int) $block['id'], (int) $block['page_id'], $lang);
         }
 
-        header('Location: /admin/pages/' . (int) $block['page_id'] . '/edit');
+        header('Location: ' . $this->pageEditUrl($block));
         exit;
+    }
+
+    private function pageEditUrl(array $block): string
+    {
+        return '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) $block['lang']);
     }
 
     private function collectData(string $type): array

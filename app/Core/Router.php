@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Models\Language;
+
 final class Router
 {
     /** @var array<int, array{method: string, pattern: string, handler: callable|array}> */
@@ -36,6 +38,8 @@ final class Router
             $path = '/';
         }
 
+        $path = $this->resolveLocale($path);
+
         foreach ($this->routes as $route) {
             if ($route['method'] !== strtoupper($method)) {
                 continue;
@@ -51,6 +55,36 @@ final class Router
 
         http_response_code(404);
         View::render('errors/404');
+    }
+
+    /**
+     * Определяет язык из первого сегмента URL. Если это код активного
+     * не-дефолтного языка (site.com/uz/...), язык устанавливается и префикс
+     * отрезается. Админка (/admin) под языковой префикс не попадает.
+     */
+    private function resolveLocale(string $path): string
+    {
+        if (str_starts_with($path, '/admin')) {
+            Locale::set(Language::defaultCode());
+
+            return $path;
+        }
+
+        if (preg_match('#^/([a-zA-Z]{2,8})(/.*|)$#', $path, $m)) {
+            $code = strtolower($m[1]);
+            if ($code !== Language::defaultCode() && Language::isActive($code)) {
+                Locale::set($code);
+                $rest = $m[2] === '' ? '/' : $m[2];
+                Locale::setPath($rest);
+
+                return $rest;
+            }
+        }
+
+        Locale::set(Language::defaultCode());
+        Locale::setPath($path);
+
+        return $path;
     }
 
     private function compile(string $pattern): string

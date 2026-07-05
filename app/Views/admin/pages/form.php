@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Csrf;
+use App\Models\Language;
 
 $isEdit = !empty($page['id']);
 $pageTitle = $isEdit ? 'Редактирование страницы' : 'Новая страница';
@@ -8,11 +9,15 @@ $activeNav = 'pages';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array|null $page */
+/** @var array $translations */
 /** @var string|null $error */
 /** @var array $blocks */
 $blocks = $blocks ?? [];
+$blockLang = $blockLang ?? Language::defaultCode();
 
 $action = $isEdit ? '/admin/pages/' . (int) $page['id'] . '/edit' : '/admin/pages/create';
+$defaultCode = Language::defaultCode();
+$languages = Language::active();
 
 $blockTypeLabels = [
     'text' => 'Текст',
@@ -29,25 +34,68 @@ $blockTypeLabels = [
     <form method="post" action="<?= $action ?>" class="form-grid">
         <?= Csrf::field() ?>
 
-        <div class="form-field">
-            <label for="title">Заголовок страницы</label>
-            <input type="text" id="title" name="title" value="<?= htmlspecialchars($page['title'] ?? '', ENT_QUOTES) ?>" required>
+        <div data-lang-tabs>
+            <div class="lang-tabs">
+                <?php foreach ($languages as $i => $lang): ?>
+                    <button type="button" class="lang-tab-btn <?= $i === 0 ? 'is-active' : '' ?>" data-lang-target="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>">
+                        <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
+                        <?php if ($lang['code'] === $defaultCode): ?><span class="lang-tab-btn__badge">(основной)</span><?php endif; ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+            <?php foreach ($languages as $i => $lang): ?>
+                <?php $code = (string) $lang['code']; $isDefault = $code === $defaultCode; ?>
+                <div class="lang-tab-panel <?= $i === 0 ? 'is-active' : '' ?>" data-lang-panel="<?= htmlspecialchars($code, ENT_QUOTES) ?>">
+                    <?php if ($isDefault): ?>
+                        <div class="form-field">
+                            <label>Заголовок страницы</label>
+                            <input type="text" name="title" value="<?= htmlspecialchars($page['title'] ?? '', ENT_QUOTES) ?>" required>
+                        </div>
+                        <div class="form-field">
+                            <label>SEO: meta title</label>
+                            <input type="text" name="meta_title" value="<?= htmlspecialchars($page['meta_title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label>SEO: meta description</label>
+                            <textarea name="meta_description"><?= htmlspecialchars($page['meta_description'] ?? '', ENT_QUOTES) ?></textarea>
+                        </div>
+                    <?php else: ?>
+                        <?php $t = $translations[$code] ?? []; ?>
+                        <p class="form-hint">Перевод для языка «<?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>». Пустой заголовок на сайте заменяется версией основного языка.</p>
+                        <div class="form-field">
+                            <label>Заголовок страницы</label>
+                            <input type="text" name="translations[<?= $code ?>][title]" value="<?= htmlspecialchars($t['title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label>SEO: meta title</label>
+                            <input type="text" name="translations[<?= $code ?>][meta_title]" value="<?= htmlspecialchars($t['meta_title'] ?? '', ENT_QUOTES) ?>">
+                        </div>
+                        <div class="form-field">
+                            <label>SEO: meta description</label>
+                            <textarea name="translations[<?= $code ?>][meta_description]"><?= htmlspecialchars($t['meta_description'] ?? '', ENT_QUOTES) ?></textarea>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
         </div>
 
+        <hr style="border:none;border-top:1px solid var(--admin-border);margin:6px 0;">
+
         <div class="form-field">
-            <label for="slug">ЧПУ (slug)</label>
+            <label for="slug">ЧПУ (slug) — общий для всех языков</label>
             <input type="text" id="slug" name="slug" value="<?= htmlspecialchars($page['slug'] ?? '', ENT_QUOTES) ?>" placeholder="оставьте пустым для автогенерации">
-            <span class="form-hint">Итоговый адрес: /&lt;slug&gt;</span>
+            <span class="form-hint">Адрес: /&lt;slug&gt; (основной язык), /<?= htmlspecialchars($languages[1]['code'] ?? 'uz', ENT_QUOTES) ?>/&lt;slug&gt; (другой язык)</span>
         </div>
 
         <div class="form-field">
-            <label for="meta_title">SEO: meta title</label>
-            <input type="text" id="meta_title" name="meta_title" value="<?= htmlspecialchars($page['meta_title'] ?? '', ENT_QUOTES) ?>">
-        </div>
-
-        <div class="form-field">
-            <label for="meta_description">SEO: meta description</label>
-            <textarea id="meta_description" name="meta_description"><?= htmlspecialchars($page['meta_description'] ?? '', ENT_QUOTES) ?></textarea>
+            <label for="layout_type">Макет страницы</label>
+            <select id="layout_type" name="layout_type">
+                <option value="no_sidebar" <?= ($page['layout_type'] ?? 'no_sidebar') === 'no_sidebar' ? 'selected' : '' ?>>Без сайдбара (на всю ширину)</option>
+                <option value="left_sidebar" <?= ($page['layout_type'] ?? '') === 'left_sidebar' ? 'selected' : '' ?>>Левый сайдбар</option>
+                <option value="right_sidebar" <?= ($page['layout_type'] ?? '') === 'right_sidebar' ? 'selected' : '' ?>>Правый сайдбар</option>
+            </select>
+            <span class="form-hint">Виджеты сайдбара настраиваются в разделе «Виджеты».</span>
         </div>
 
         <div class="form-field">
@@ -73,8 +121,18 @@ $blockTypeLabels = [
 <?php if ($isEdit): ?>
     <h2 style="margin-top:40px;">Блоки страницы</h2>
 
+    <div class="lang-tabs" style="margin-bottom:16px;">
+        <?php foreach ($languages as $lang): ?>
+            <a class="lang-tab-btn <?= (string) $lang['code'] === $blockLang ? 'is-active' : '' ?>"
+               href="/admin/pages/<?= (int) $page['id'] ?>/edit?block_lang=<?= urlencode((string) $lang['code']) ?>">
+                Блоки: <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
+            </a>
+        <?php endforeach; ?>
+    </div>
+    <p class="form-hint">У каждого языка свой независимый стек блоков. Если стек языка пуст, на сайте показывается стек основного языка.</p>
+
     <?php if (empty($blocks)): ?>
-        <p class="form-hint">На странице пока нет блоков.</p>
+        <p class="form-hint">На этом языке блоков пока нет.</p>
     <?php endif; ?>
 
     <?php foreach ($blocks as $index => $block): ?>
@@ -106,8 +164,9 @@ $blockTypeLabels = [
     <div class="form-card" style="margin-top:20px;">
         <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/blocks/add" class="form-grid">
             <?= Csrf::field() ?>
+            <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
             <div class="form-field">
-                <label for="type">Добавить блок</label>
+                <label for="type">Добавить блок (язык: <?= htmlspecialchars($blockLang, ENT_QUOTES) ?>)</label>
                 <select id="type" name="type">
                     <?php foreach ($blockTypeLabels as $type => $label): ?>
                         <option value="<?= $type ?>"><?= htmlspecialchars($label, ENT_QUOTES) ?></option>

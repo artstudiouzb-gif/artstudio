@@ -8,14 +8,31 @@ use App\Core\Database;
 
 final class Block
 {
-    public static function forPage(int $pageId): array
+    /**
+     * Блоки страницы для конкретного языкового стека.
+     */
+    public static function forPage(int $pageId, ?string $lang = null): array
     {
+        $lang = $lang ?? Language::defaultCode();
         $stmt = Database::pdo()->prepare(
-            'SELECT * FROM blocks WHERE page_id = :page_id ORDER BY sort_order ASC, id ASC'
+            'SELECT * FROM blocks WHERE page_id = :page_id AND lang = :lang ORDER BY sort_order ASC, id ASC'
         );
-        $stmt->execute([':page_id' => $pageId]);
+        $stmt->execute([':page_id' => $pageId, ':lang' => $lang]);
 
         return $stmt->fetchAll();
+    }
+
+    /**
+     * Блоки для вывода на сайте: язык -> при отсутствии откат на язык по умолчанию.
+     */
+    public static function forPageLocalized(int $pageId, string $lang): array
+    {
+        $blocks = self::forPage($pageId, $lang);
+        if (!empty($blocks) || $lang === Language::defaultCode()) {
+            return $blocks;
+        }
+
+        return self::forPage($pageId, Language::defaultCode());
     }
 
     public static function findById(int $id): ?array
@@ -27,20 +44,21 @@ final class Block
         return $row ?: null;
     }
 
-    public static function create(int $pageId, string $type, ?string $title, array $data, string $customCss): int
+    public static function create(int $pageId, string $lang, string $type, ?string $title, array $data, string $customCss): int
     {
         $stmt = Database::pdo()->prepare(
-            'SELECT COALESCE(MAX(sort_order), 0) + 1 FROM blocks WHERE page_id = :page_id'
+            'SELECT COALESCE(MAX(sort_order), 0) + 1 FROM blocks WHERE page_id = :page_id AND lang = :lang'
         );
-        $stmt->execute([':page_id' => $pageId]);
+        $stmt->execute([':page_id' => $pageId, ':lang' => $lang]);
         $nextOrder = (int) $stmt->fetchColumn();
 
         $stmt = Database::pdo()->prepare(
-            'INSERT INTO blocks (page_id, type, title, data, custom_css, sort_order, created_at)
-             VALUES (:page_id, :type, :title, :data, :custom_css, :sort_order, NOW())'
+            'INSERT INTO blocks (page_id, lang, type, title, data, custom_css, sort_order, created_at)
+             VALUES (:page_id, :lang, :type, :title, :data, :custom_css, :sort_order, NOW())'
         );
         $stmt->execute([
             ':page_id' => $pageId,
+            ':lang' => $lang,
             ':type' => $type,
             ':title' => $title,
             ':data' => json_encode($data, JSON_UNESCAPED_UNICODE),
@@ -70,19 +88,19 @@ final class Block
         $stmt->execute([':id' => $id]);
     }
 
-    public static function moveUp(int $id, int $pageId): void
+    public static function moveUp(int $id, int $pageId, string $lang): void
     {
-        self::swap($id, $pageId, 'up');
+        self::swap($id, $pageId, $lang, 'up');
     }
 
-    public static function moveDown(int $id, int $pageId): void
+    public static function moveDown(int $id, int $pageId, string $lang): void
     {
-        self::swap($id, $pageId, 'down');
+        self::swap($id, $pageId, $lang, 'down');
     }
 
-    private static function swap(int $id, int $pageId, string $direction): void
+    private static function swap(int $id, int $pageId, string $lang, string $direction): void
     {
-        $blocks = self::forPage($pageId);
+        $blocks = self::forPage($pageId, $lang);
         $index = null;
         foreach ($blocks as $i => $block) {
             if ((int) $block['id'] === $id) {

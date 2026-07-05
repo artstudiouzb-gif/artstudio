@@ -9,11 +9,15 @@ use App\Controllers\Admin\BlockController as AdminBlockController;
 use App\Controllers\Admin\DashboardController;
 use App\Controllers\Admin\FileController as AdminFileController;
 use App\Controllers\Admin\FormController as AdminFormController;
+use App\Controllers\Admin\HeaderController as AdminHeaderController;
+use App\Controllers\Admin\LanguageController as AdminLanguageController;
+use App\Controllers\Admin\MenuController as AdminMenuController;
 use App\Controllers\Admin\NewsController as AdminNewsController;
 use App\Controllers\Admin\PageController as AdminPageController;
 use App\Controllers\Admin\ProjectController as AdminProjectController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\TeamController as AdminTeamController;
+use App\Controllers\Admin\WidgetController as AdminWidgetController;
 use App\Controllers\Site\FormController as SiteFormController;
 use App\Controllers\Site\NewsController as SiteNewsController;
 use App\Controllers\Site\PageController as SitePageController;
@@ -80,6 +84,32 @@ $router->post('/admin/forms/{id}/edit', [AdminFormController::class, 'update']);
 $router->post('/admin/forms/{id}/delete', [AdminFormController::class, 'destroy']);
 $router->get('/admin/forms/{id}/submissions', [AdminFormController::class, 'submissions']);
 $router->post('/admin/forms/submissions/{id}/delete', [AdminFormController::class, 'deleteSubmission']);
+
+// --- Admin: языки ---
+$router->get('/admin/languages', [AdminLanguageController::class, 'index']);
+$router->post('/admin/languages/create', [AdminLanguageController::class, 'store']);
+$router->post('/admin/languages/{id}/edit', [AdminLanguageController::class, 'update']);
+$router->post('/admin/languages/{id}/delete', [AdminLanguageController::class, 'destroy']);
+
+// --- Admin: конструктор меню ---
+$router->get('/admin/menu', [AdminMenuController::class, 'index']);
+$router->post('/admin/menu/create', [AdminMenuController::class, 'store']);
+$router->post('/admin/menu/{id}/edit', [AdminMenuController::class, 'update']);
+$router->post('/admin/menu/{id}/delete', [AdminMenuController::class, 'destroy']);
+$router->post('/admin/menu/{id}/move', [AdminMenuController::class, 'move']);
+
+// --- Admin: конструктор шапки (mini app) ---
+$router->get('/admin/header', [AdminHeaderController::class, 'index']);
+$router->post('/admin/header', [AdminHeaderController::class, 'update']);
+
+// --- Admin: боковые виджеты ---
+$router->get('/admin/widgets', [AdminWidgetController::class, 'index']);
+$router->get('/admin/widgets/create', [AdminWidgetController::class, 'create']);
+$router->post('/admin/widgets/create', [AdminWidgetController::class, 'store']);
+$router->get('/admin/widgets/{id}/edit', [AdminWidgetController::class, 'edit']);
+$router->post('/admin/widgets/{id}/edit', [AdminWidgetController::class, 'update']);
+$router->post('/admin/widgets/{id}/delete', [AdminWidgetController::class, 'destroy']);
+$router->post('/admin/widgets/{id}/move', [AdminWidgetController::class, 'move']);
 
 // --- Admin: настройки дизайна ---
 $router->get('/admin/settings', [SettingsController::class, 'index']);

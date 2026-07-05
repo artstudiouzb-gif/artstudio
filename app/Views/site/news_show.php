@@ -1,9 +1,11 @@
 <?php
 
+use App\Core\Locale;
+
 /** @var array $news */
 
-$metaTitle = $news['title'];
-$metaDescription = $news['excerpt'] ?? '';
+$metaTitle = $news['meta_title'] ?: $news['title'];
+$metaDescription = $news['meta_description'] ?: ($news['excerpt'] ?? '');
 require __DIR__ . '/_header.php';
 ?>
 <article class="news-single">
@@ -14,5 +16,5 @@ require __DIR__ . '/_header.php';
     <?php endif; ?>
     <div class="news-single__content"><?= $news['content'] ?></div>
 </article>
-<p><a href="/news">&larr; Все новости</a></p>
+<p><a href="<?= htmlspecialchars(Locale::url('news'), ENT_QUOTES) ?>">&larr; Все новости</a></p>
 <?php require __DIR__ . '/_footer.php'; ?>

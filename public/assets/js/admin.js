@@ -37,4 +37,20 @@
             }
         });
     });
+
+    // Языковые вкладки: переключение панелей внутри одной группы [data-lang-tabs]
+    document.querySelectorAll('[data-lang-tabs]').forEach(function (group) {
+        const buttons = group.querySelectorAll('.lang-tab-btn');
+        const panels = group.querySelectorAll('.lang-tab-panel');
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function (event) {
+                event.preventDefault();
+                const target = btn.getAttribute('data-lang-target');
+                buttons.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
+                panels.forEach(function (p) {
+                    p.classList.toggle('is-active', p.getAttribute('data-lang-panel') === target);
+                });
+            });
+        });
+    });
 })();

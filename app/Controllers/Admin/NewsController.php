@@ -10,7 +10,9 @@ use App\Core\Flash;
 use App\Core\ImageField;
 use App\Core\Slug;
 use App\Core\View;
+use App\Models\Language;
 use App\Models\News;
+use App\Models\NewsTranslation;
 
 final class NewsController
 {
@@ -23,7 +25,7 @@ final class NewsController
     public function create(): void
     {
         Auth::requireLogin();
-        View::render('admin/news/form', ['news' => null, 'error' => null]);
+        View::render('admin/news/form', ['news' => null, 'translations' => [], 'error' => null]);
     }
 
     public function store(): void
@@ -34,11 +36,13 @@ final class NewsController
         [$data, $error] = $this->collectInput(null);
 
         if ($error !== null) {
-            View::render('admin/news/form', ['news' => $data, 'error' => $error]);
+            View::render('admin/news/form', ['news' => $data, 'translations' => [], 'error' => $error]);
             return;
         }
 
-        News::create($data);
+        $id = News::create($data);
+        $this->saveTranslations($id);
+
         Flash::success('Новость создана.');
         header('Location: /admin/news');
         exit;
@@ -53,7 +57,11 @@ final class NewsController
             View::render('errors/404');
             return;
         }
-        View::render('admin/news/form', ['news' => $news, 'error' => null]);
+        View::render('admin/news/form', [
+            'news' => $news,
+            'translations' => NewsTranslation::forNews((int) $news['id']),
+            'error' => null,
+        ]);
     }
 
     public function update(array $params): void
@@ -72,14 +80,45 @@ final class NewsController
         [$data, $error] = $this->collectInput($id, $news);
 
         if ($error !== null) {
-            View::render('admin/news/form', ['news' => array_merge($news, $data), 'error' => $error]);
+            View::render('admin/news/form', [
+                'news' => array_merge($news, $data),
+                'translations' => NewsTranslation::forNews($id),
+                'error' => $error,
+            ]);
             return;
         }
 
         News::update($id, $data);
+        $this->saveTranslations($id);
+
         Flash::success('Новость обновлена.');
         header('Location: /admin/news');
         exit;
+    }
+
+    /**
+     * Сохраняет переводы для всех НЕ-дефолтных активных языков из полей
+     * translations[<lang>][...].
+     */
+    private function saveTranslations(int $newsId): void
+    {
+        $defaultCode = Language::defaultCode();
+        $input = (array) ($_POST['translations'] ?? []);
+
+        foreach (Language::active() as $lang) {
+            $code = (string) $lang['code'];
+            if ($code === $defaultCode) {
+                continue;
+            }
+            $t = (array) ($input[$code] ?? []);
+            NewsTranslation::upsert($newsId, $code, [
+                'title' => trim((string) ($t['title'] ?? '')),
+                'excerpt' => trim((string) ($t['excerpt'] ?? '')),
+                'content' => (string) ($t['content'] ?? ''),
+                'meta_title' => trim((string) ($t['meta_title'] ?? '')),
+                'meta_description' => trim((string) ($t['meta_description'] ?? '')),
+            ]);
+        }
     }
 
     public function destroy(array $params): void
@@ -102,6 +141,8 @@ final class NewsController
         $slugInput = trim((string) ($_POST['slug'] ?? ''));
         $excerpt = trim((string) ($_POST['excerpt'] ?? ''));
         $content = (string) ($_POST['content'] ?? '');
+        $metaTitle = trim((string) ($_POST['meta_title'] ?? ''));
+        $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
         $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
         $publishedAtInput = trim((string) ($_POST['published_at'] ?? ''));
 
@@ -124,6 +165,8 @@ final class NewsController
             'excerpt' => $excerpt !== '' ? $excerpt : null,
             'content' => $content,
             'image' => $image,
+            'meta_title' => $metaTitle !== '' ? $metaTitle : null,
+            'meta_description' => $metaDescription !== '' ? $metaDescription : null,
             'status' => $status,
             'published_at' => $publishedAt,
             'author_id' => Auth::id(),

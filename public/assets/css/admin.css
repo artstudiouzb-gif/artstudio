@@ -205,3 +205,34 @@ body {
 .block-list-item__meta { display: flex; flex-direction: column; gap: 2px; }
 .block-list-item__type { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: .04em; }
 .block-list-item__actions { display: flex; gap: 6px; align-items: center; }
+
+/* Языковые вкладки редактора контента */
+.lang-tabs { display: flex; gap: 4px; border-bottom: 2px solid var(--admin-border); margin-bottom: 20px; flex-wrap: wrap; }
+.lang-tab-btn {
+    padding: 9px 16px;
+    border: none;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+}
+.lang-tab-btn.is-active { color: var(--admin-accent); border-bottom-color: var(--admin-accent); }
+.lang-tab-btn__badge { font-size: 11px; color: #aaa; font-weight: 400; }
+.lang-tab-panel { display: none; }
+.lang-tab-panel.is-active { display: block; }
+
+/* Header mini-app конструктор */
+.header-builder__group { border: 1px solid var(--admin-border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+.header-builder__group h3 { margin: 0 0 12px; font-size: 15px; }
+.header-preview {
+    background: #fff; border: 1px dashed var(--admin-border); border-radius: 10px;
+    padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 16px;
+}
+
+/* Виджеты */
+.sidebar-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media (max-width: 720px) { .sidebar-columns { grid-template-columns: 1fr; } }
+.sidebar-column h2 { font-size: 16px; }

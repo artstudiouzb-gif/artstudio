@@ -11,8 +11,9 @@ require __DIR__ . '/../layout/header.php';
 /** @var array $forms */
 
 $type = $block['type'];
+$backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) ($block['lang'] ?? ''));
 ?>
-<a href="/admin/pages/<?= (int) $block['page_id'] ?>/edit" class="btn btn--small" style="margin-bottom:16px;">&larr; Назад к странице</a>
+<a href="<?= htmlspecialchars($backUrl, ENT_QUOTES) ?>" class="btn btn--small" style="margin-bottom:16px;">&larr; Назад к странице</a>
 
 <div class="form-card">
     <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/edit" class="form-grid">
@@ -211,7 +212,7 @@ $type = $block['type'];
 
         <div class="form-actions">
             <button type="submit" class="btn btn--primary">Сохранить блок</button>
-            <a href="/admin/pages/<?= (int) $block['page_id'] ?>/edit" class="btn">Отмена</a>
+            <a href="<?= htmlspecialchars($backUrl, ENT_QUOTES) ?>" class="btn">Отмена</a>
         </div>
     </form>
 </div>

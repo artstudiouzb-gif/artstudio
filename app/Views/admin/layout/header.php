@@ -14,6 +14,10 @@ $navItems = [
     'team' => ['/admin/team', 'Команда'],
     'forms' => ['/admin/forms', 'Формы'],
     'files' => ['/admin/files', 'Файлы'],
+    'menu' => ['/admin/menu', 'Меню'],
+    'widgets' => ['/admin/widgets', 'Виджеты'],
+    'header' => ['/admin/header', 'Шапка сайта'],
+    'languages' => ['/admin/languages', 'Языки'],
     'settings' => ['/admin/settings', 'Настройки'],
 ];
 ?>

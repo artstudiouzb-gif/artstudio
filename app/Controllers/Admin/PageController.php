@@ -10,7 +10,9 @@ use App\Core\Flash;
 use App\Core\Slug;
 use App\Core\View;
 use App\Models\Block;
+use App\Models\Language;
 use App\Models\Page;
+use App\Models\PageTranslation;
 
 final class PageController
 {
@@ -23,7 +25,7 @@ final class PageController
     public function create(): void
     {
         Auth::requireLogin();
-        View::render('admin/pages/form', ['page' => null, 'error' => null]);
+        View::render('admin/pages/form', ['page' => null, 'translations' => [], 'error' => null]);
     }
 
     public function store(): void
@@ -34,11 +36,13 @@ final class PageController
         [$data, $error] = $this->collectInput(null);
 
         if ($error !== null) {
-            View::render('admin/pages/form', ['page' => $data, 'error' => $error]);
+            View::render('admin/pages/form', ['page' => $data, 'translations' => [], 'error' => $error]);
             return;
         }
 
         $id = Page::create($data);
+        $this->saveTranslations($id);
+
         Flash::success('Страница создана. Теперь добавьте блоки контента.');
         header('Location: /admin/pages/' . $id . '/edit');
         exit;
@@ -55,10 +59,14 @@ final class PageController
             return;
         }
 
+        $blockLang = $this->resolveBlockLang();
+
         View::render('admin/pages/form', [
             'page' => $page,
+            'translations' => PageTranslation::forPage((int) $page['id']),
             'error' => null,
-            'blocks' => Block::forPage((int) $page['id']),
+            'blocks' => Block::forPage((int) $page['id'], $blockLang),
+            'blockLang' => $blockLang,
         ]);
     }
 
@@ -78,15 +86,20 @@ final class PageController
         [$data, $error] = $this->collectInput($id, $page);
 
         if ($error !== null) {
+            $blockLang = $this->resolveBlockLang();
             View::render('admin/pages/form', [
                 'page' => array_merge($page, $data),
+                'translations' => PageTranslation::forPage($id),
                 'error' => $error,
-                'blocks' => Block::forPage($id),
+                'blocks' => Block::forPage($id, $blockLang),
+                'blockLang' => $blockLang,
             ]);
             return;
         }
 
         Page::update($id, $data);
+        $this->saveTranslations($id);
+
         Flash::success('Страница обновлена.');
         header('Location: /admin/pages/' . $id . '/edit');
         exit;
@@ -103,6 +116,32 @@ final class PageController
         exit;
     }
 
+    private function resolveBlockLang(): string
+    {
+        $lang = (string) ($_GET['block_lang'] ?? Language::defaultCode());
+
+        return Language::isActive($lang) ? $lang : Language::defaultCode();
+    }
+
+    private function saveTranslations(int $pageId): void
+    {
+        $defaultCode = Language::defaultCode();
+        $input = (array) ($_POST['translations'] ?? []);
+
+        foreach (Language::active() as $lang) {
+            $code = (string) $lang['code'];
+            if ($code === $defaultCode) {
+                continue;
+            }
+            $t = (array) ($input[$code] ?? []);
+            PageTranslation::upsert($pageId, $code, [
+                'title' => trim((string) ($t['title'] ?? '')),
+                'meta_title' => trim((string) ($t['meta_title'] ?? '')),
+                'meta_description' => trim((string) ($t['meta_description'] ?? '')),
+            ]);
+        }
+    }
+
     /**
      * @return array{0: array, 1: string|null}
      */
@@ -114,6 +153,8 @@ final class PageController
         $metaDescription = trim((string) ($_POST['meta_description'] ?? ''));
         $status = ($_POST['status'] ?? 'draft') === 'published' ? 'published' : 'draft';
         $isHome = !empty($_POST['is_home']);
+        $layoutType = in_array($_POST['layout_type'] ?? '', ['no_sidebar', 'left_sidebar', 'right_sidebar'], true)
+            ? $_POST['layout_type'] : 'no_sidebar';
 
         if ($title === '') {
             return [['title' => $title, 'slug' => $slugInput, 'status' => $status], 'Укажите заголовок страницы.'];
@@ -131,6 +172,7 @@ final class PageController
             'meta_description' => $metaDescription !== '' ? $metaDescription : null,
             'status' => $status,
             'is_home' => $isHome,
+            'layout_type' => $layoutType,
         ];
 
         return [$data, null];

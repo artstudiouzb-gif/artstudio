@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Site;
 
+use App\Core\Locale;
 use App\Core\View;
 use App\Models\News;
 
@@ -11,13 +12,15 @@ final class NewsController
 {
     public function index(): void
     {
-        $items = News::published(20, 0);
+        $lang = Locale::current();
+        $items = News::published(20, 0, $lang);
         View::render('site/news_index', ['items' => $items]);
     }
 
     public function show(array $params): void
     {
-        $news = News::findPublishedBySlug($params['slug'] ?? '');
+        $lang = Locale::current();
+        $news = News::findPublishedBySlug($params['slug'] ?? '', $lang);
 
         if (!$news) {
             http_response_code(404);
