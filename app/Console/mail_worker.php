@@ -19,6 +19,8 @@ require __DIR__ . '/../Core/Cli.php';
 
 require __DIR__ . '/../Core/bootstrap.php';
 
+\App\Core\Heartbeat::touch('mail'); // группа 2.1
+
 use App\Core\Mailer;
 use App\Models\MailQueue;
 

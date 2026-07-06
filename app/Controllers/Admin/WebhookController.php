@@ -20,10 +20,14 @@ final class WebhookController
     public function index(): void
     {
         Auth::requireSuperAdmin();
+        // Фильтр журнала доставок по статусу (группа 2.2): all|failed|pending|sent.
+        $status = (string) ($_GET['status'] ?? '');
+        $status = in_array($status, ['failed', 'pending', 'sent'], true) ? $status : '';
         View::render('admin/webhooks/index', [
             'items' => Webhook::all(),
-            'deliveries' => WebhookDelivery::recent(30),
+            'deliveries' => WebhookDelivery::recent(30, $status !== '' ? $status : null),
             'events' => Webhook::EVENTS,
+            'statusFilter' => $status,
         ]);
     }
 

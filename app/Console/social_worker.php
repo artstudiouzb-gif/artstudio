@@ -19,6 +19,8 @@ require __DIR__ . '/../Core/Cli.php';
 
 require __DIR__ . '/../Core/bootstrap.php';
 
+\App\Core\Heartbeat::touch('social'); // группа 2.1
+
 use App\Core\Logger;
 use App\Core\SocialPublisher;
 use App\Core\SocialSettings;

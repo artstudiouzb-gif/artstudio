@@ -58,4 +58,26 @@ $fieldLabels = [
         </div>
     </form>
 </div>
+
+<?php /** @var array $failedPosts */ $failedPosts = $failedPosts ?? []; ?>
+<div class="form-card" style="margin-top:24px;">
+    <h2 style="margin-top:0;">Проблемные публикации (dead-letter)</h2>
+    <p class="form-hint">Публикации, не отправленные после всех попыток. О переходе в этот статус приходит алерт в Telegram.</p>
+    <table class="data-table">
+        <thead><tr><th>Новость</th><th>Сеть</th><th>Попыток</th><th>Ошибка</th></tr></thead>
+        <tbody>
+            <?php if (empty($failedPosts)): ?>
+                <tr><td colspan="4" class="data-table__empty">Проблемных публикаций нет.</td></tr>
+            <?php endif; ?>
+            <?php foreach ($failedPosts as $fp): ?>
+                <tr>
+                    <td><?= htmlspecialchars((string) ($fp['news_title'] ?? ('#' . (int) $fp['news_id'])), ENT_QUOTES) ?></td>
+                    <td><?= htmlspecialchars((string) $fp['network'], ENT_QUOTES) ?></td>
+                    <td><?= (int) ($fp['attempts'] ?? 0) ?></td>
+                    <td><?= htmlspecialchars((string) ($fp['last_error'] ?? ''), ENT_QUOTES) ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+</div>
 <?php require __DIR__ . '/../layout/footer.php'; ?>

@@ -64,6 +64,20 @@ final class SocialPost
         $stmt->bindValue(':max', self::MAX_ATTEMPTS, PDO::PARAM_INT);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
+
+        // Dead-letter (группа 2.2): переход в failed после исчерпания ретраев —
+        // алертим один раз.
+        $check = Database::pdo()->prepare('SELECT news_id, network, status FROM social_posts WHERE id = :id LIMIT 1');
+        $check->execute([':id' => $id]);
+        $row = $check->fetch();
+        if ($row && (string) $row['status'] === 'failed') {
+            \App\Core\Logger::warning('Автопубликация в соцсеть не удалась после всех попыток (dead-letter)', [
+                'social_post_id' => $id,
+                'news_id' => (int) ($row['news_id'] ?? 0),
+                'network' => (string) ($row['network'] ?? ''),
+                'error' => mb_substr($error, 0, 200),
+            ]);
+        }
     }
 
     /** @return array<int, array<string, mixed>> статусы публикаций новости */
@@ -71,6 +85,25 @@ final class SocialPost
     {
         $stmt = Database::pdo()->prepare('SELECT * FROM social_posts WHERE news_id = :nid ORDER BY network');
         $stmt->execute([':nid' => $newsId]);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * Публикации, «застрявшие» в failed после исчерпания ретраев (группа 2.2).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function recentFailed(int $limit = 30): array
+    {
+        $stmt = Database::pdo()->prepare(
+            "SELECT sp.*, n.title AS news_title FROM social_posts sp
+             LEFT JOIN news n ON n.id = sp.news_id
+             WHERE sp.status = 'failed'
+             ORDER BY sp.created_at DESC, sp.id DESC LIMIT :limit"
+        );
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
 
         return $stmt->fetchAll();
     }

@@ -18,6 +18,8 @@ require __DIR__ . '/../Core/Cli.php';
 
 require __DIR__ . '/../Core/bootstrap.php';
 
+\App\Core\Heartbeat::touch('webhook'); // группа 2.1
+
 use App\Core\WebhookDispatcher;
 use App\Models\Webhook;
 use App\Models\WebhookDelivery;

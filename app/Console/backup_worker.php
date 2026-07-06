@@ -27,7 +27,10 @@ require __DIR__ . '/../Core/bootstrap.php';
 
 use App\Core\Backup;
 use App\Core\Config;
+use App\Core\Heartbeat;
 use App\Core\Logger;
+
+Heartbeat::touch('backup'); // группа 2.1
 
 // Защита от наложения запусков: если предыдущий бэкап ещё идёт — выходим.
 $lockFile = APP_ROOT . '/storage/cache/backup_worker.lock';

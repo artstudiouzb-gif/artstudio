@@ -32,7 +32,10 @@ final class SocialController
             ];
         }
 
-        View::render('admin/settings/social', ['config' => $config]);
+        View::render('admin/settings/social', [
+            'config' => $config,
+            'failedPosts' => \App\Models\SocialPost::recentFailed(30),
+        ]);
     }
 
     public function update(): void

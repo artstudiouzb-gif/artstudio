@@ -64,6 +64,13 @@ require __DIR__ . '/../layout/header.php';
 
 <div class="form-card" style="margin-top:24px;">
     <h2 style="margin-top:0;">Журнал доставок</h2>
+    <?php $sf = $statusFilter ?? ''; ?>
+    <div class="filter-tabs" style="margin-bottom:12px;">
+        <a class="btn btn--small <?= $sf === '' ? 'btn--primary' : '' ?>" href="/admin/webhooks">Все</a>
+        <a class="btn btn--small <?= $sf === 'failed' ? 'btn--primary' : '' ?>" href="/admin/webhooks?status=failed">Проблемные (failed)</a>
+        <a class="btn btn--small <?= $sf === 'pending' ? 'btn--primary' : '' ?>" href="/admin/webhooks?status=pending">В очереди</a>
+        <a class="btn btn--small <?= $sf === 'sent' ? 'btn--primary' : '' ?>" href="/admin/webhooks?status=sent">Доставленные</a>
+    </div>
     <table class="data-table">
         <thead><tr><th>Время</th><th>Событие</th><th>URL</th><th>Статус</th><th>HTTP</th><th>Попыток</th><th>Ошибка</th></tr></thead>
         <tbody>

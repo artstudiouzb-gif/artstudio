@@ -67,16 +67,46 @@ final class WebhookDelivery
         $stmt->bindValue(':max', self::MAX_ATTEMPTS, PDO::PARAM_INT);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
+
+        // Dead-letter (группа 2.2): если исчерпаны ретраи и запись перешла в
+        // failed — алертим один раз (после этого воркер её больше не берёт).
+        $row = self::find($id);
+        if ($row !== null && (string) $row['status'] === 'failed') {
+            \App\Core\Logger::warning('Вебхук не доставлен после всех попыток (dead-letter)', [
+                'delivery_id' => $id,
+                'webhook_id' => (int) ($row['webhook_id'] ?? 0),
+                'event' => (string) ($row['event_type'] ?? ''),
+                'response_code' => $responseCode,
+                'error' => mb_substr($error, 0, 200),
+            ]);
+        }
+    }
+
+    public static function find(int $id): ?array
+    {
+        $stmt = Database::pdo()->prepare('SELECT * FROM webhook_deliveries WHERE id = :id LIMIT 1');
+        $stmt->execute([':id' => $id]);
+        $row = $stmt->fetch();
+
+        return $row ?: null;
     }
 
     /** @return array<int, array<string, mixed>> последние доставки для лога в админке */
-    public static function recent(int $limit = 50): array
+    public static function recent(int $limit = 50, ?string $status = null): array
     {
+        $where = '';
+        if ($status !== null && in_array($status, ['failed', 'pending', 'sent'], true)) {
+            $where = 'WHERE d.status = :status';
+        }
         $stmt = Database::pdo()->prepare(
             'SELECT d.*, w.url AS webhook_url FROM webhook_deliveries d
              LEFT JOIN webhooks w ON w.id = d.webhook_id
+             ' . $where . '
              ORDER BY d.created_at DESC LIMIT :limit'
         );
+        if ($where !== '') {
+            $stmt->bindValue(':status', $status);
+        }
         $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
