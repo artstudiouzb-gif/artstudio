@@ -135,7 +135,12 @@ final class BlockController
         // Дизайн-система (общие для всех типов): пресет отступов и анимация.
         $data['_spacing'] = in_array($_POST['spacing'] ?? 'premium', ['none', 'small', 'premium', 'max'], true)
             ? $_POST['spacing'] : 'premium';
-        $data['_reveal'] = !empty($_POST['reveal']);
+        // Анимация появления (группа 4.2): {enabled, type}. Пустой тип = выключено.
+        $revealType = (string) ($_POST['reveal_type'] ?? '');
+        $allowedReveal = ['fade', 'slide-up', 'slide-left', 'slide-right', 'zoom-in'];
+        $data['_reveal'] = in_array($revealType, $allowedReveal, true)
+            ? ['enabled' => true, 'type' => $revealType]
+            : ['enabled' => false, 'type' => 'fade'];
 
         // История версий (группа 5.1): снимаем текущее состояние ПЕРЕД перезаписью.
         BlockRevision::snapshot(
@@ -336,8 +341,15 @@ final class BlockController
                     if ($itemTitle === '' && $itemText === '') {
                         continue;
                     }
+                    // SVG-иконка кодом (группа 4.3): сохраняем уже очищенную
+                    // версию (вырезаем <script>, on*-обработчики, внешние ссылки).
+                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
+                    if ($iconSvg !== '') {
+                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                    }
                     $items[] = [
                         'icon' => trim((string) ($item['icon'] ?? '')),
+                        'icon_svg' => $iconSvg,
                         'title' => TextProcessor::typographPlain($itemTitle, $locale),
                         'text' => TextProcessor::typographPlain($itemText, $locale),
                     ];

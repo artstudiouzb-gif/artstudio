@@ -73,6 +73,11 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                                 <input type="text" name="items[<?= $i ?>][icon]" value="<?= htmlspecialchars($item['icon'] ?? '', ENT_QUOTES) ?>">
                             </div>
                             <div class="form-field">
+                                <label>SVG-иконка кодом (необязательно; имеет приоритет)</label>
+                                <textarea name="items[<?= $i ?>][icon_svg]" placeholder="<svg ...>...</svg>"><?= htmlspecialchars($item['icon_svg'] ?? '', ENT_QUOTES) ?></textarea>
+                                <span class="form-hint">Опасное содержимое (&lt;script&gt;, on*-обработчики) вырезается при сохранении.</span>
+                            </div>
+                            <div class="form-field">
                                 <label>Заголовок</label>
                                 <input type="text" name="items[<?= $i ?>][title]" value="<?= htmlspecialchars($item['title'] ?? '', ENT_QUOTES) ?>">
                             </div>
@@ -88,6 +93,10 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                     <div class="form-field">
                         <label>Иконка (эмодзи или короткий текст)</label>
                         <input type="text" name="items[__INDEX__][icon]">
+                    </div>
+                    <div class="form-field">
+                        <label>SVG-иконка кодом (необязательно; имеет приоритет)</label>
+                        <textarea name="items[__INDEX__][icon_svg]" placeholder="<svg ...>...</svg>"></textarea>
                     </div>
                     <div class="form-field">
                         <label>Заголовок</label>
@@ -288,9 +297,34 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             </select>
             <span class="form-hint">Адаптивные отступы через CSS clamp() — масштабируются под ширину экрана.</span>
         </div>
-        <div class="form-field form-field--checkbox">
-            <input type="checkbox" id="reveal" name="reveal" value="1" <?= !empty($data['_reveal']) ? 'checked' : '' ?>>
-            <label for="reveal">Плавное появление при прокрутке (анимация)</label>
+        <?php
+        // Тип анимации появления (группа 4.2). Обратная совместимость: старое
+        // булево _reveal=true трактуем как {enabled:true, type:'fade'}.
+        $revealRaw = $data['_reveal'] ?? null;
+        if (is_array($revealRaw)) {
+            $revealEnabled = !empty($revealRaw['enabled']);
+            $revealType = (string) ($revealRaw['type'] ?? 'fade');
+        } else {
+            $revealEnabled = !empty($revealRaw);
+            $revealType = 'fade';
+        }
+        $revealCurrent = $revealEnabled ? $revealType : '';
+        $revealOptions = [
+            '' => 'Без анимации',
+            'fade' => 'Плавное появление',
+            'slide-up' => 'Выезд снизу',
+            'slide-left' => 'Выезд слева',
+            'slide-right' => 'Выезд справа',
+            'zoom-in' => 'Увеличение',
+        ];
+        ?>
+        <div class="form-field">
+            <label for="reveal_type">Анимация появления при прокрутке</label>
+            <select id="reveal_type" name="reveal_type">
+                <?php foreach ($revealOptions as $rv => $rl): ?>
+                    <option value="<?= htmlspecialchars($rv, ENT_QUOTES) ?>" <?= $revealCurrent === $rv ? 'selected' : '' ?>><?= htmlspecialchars($rl, ENT_QUOTES) ?></option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <?php if (\App\Core\Auth::isSuperAdmin()): ?>

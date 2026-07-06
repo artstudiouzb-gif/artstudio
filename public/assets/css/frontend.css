@@ -166,11 +166,16 @@ summary:focus-visible {
 .cms-block--space-premium { padding: var(--space-premium) 0; }
 .cms-block--space-max { padding: var(--space-max) 0; }
 
-/* Микро-анимации появления при скролле (Intersection Observer). */
-.cms-block[data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+/* Микро-анимации появления при скролле (Intersection Observer, группа 4.2). */
+.cms-block[data-reveal] { opacity: 0; transition: opacity .7s ease, transform .7s ease; }
+.cms-block[data-reveal-type="slide-up"] { transform: translateY(28px); }
+.cms-block[data-reveal-type="slide-left"] { transform: translateX(-32px); }
+.cms-block[data-reveal-type="slide-right"] { transform: translateX(32px); }
+.cms-block[data-reveal-type="zoom-in"] { transform: scale(.94); }
+/* fade — только прозрачность (transform не нужен). */
 .cms-block[data-reveal].is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
-    .cms-block[data-reveal] { opacity: 1; transform: none; transition: none; }
+    .cms-block[data-reveal] { opacity: 1 !important; transform: none !important; transition: none; }
 }
 
 .block-text__title { font-size: 28px; margin-bottom: 12px; }
@@ -405,3 +410,7 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 .project-card__title { font-weight: 700; padding: 12px 14px 0; }
 .project-card__desc { padding: 6px 14px 14px; margin: 0; color: var(--text-muted); font-size: 14px; }
 .block-team__empty, .block-projects__empty { text-align: center; color: var(--text-muted); }
+
+/* SVG-иконка в блоке преимуществ (группа 4.3) */
+.block-advantages__icon--svg svg { width: 48px; height: 48px; display: block; margin: 0 auto; }
+.block-advantages__icon--svg svg [fill]:not([fill="none"]) { fill: currentColor; }

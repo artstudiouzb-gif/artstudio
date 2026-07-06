@@ -79,7 +79,22 @@ final class BlockRenderer
         if (!in_array($spacing, ['none', 'small', 'premium', 'max'], true)) {
             $spacing = 'premium';
         }
-        $reveal = !empty($data['_reveal']) ? ' data-reveal' : '';
+        // Анимация появления (группа 4.2). Обратная совместимость: старое
+        // булево _reveal=true → {enabled:true, type:'fade'}.
+        $revealRaw = $data['_reveal'] ?? null;
+        if (is_array($revealRaw)) {
+            $revealOn = !empty($revealRaw['enabled']);
+            $revealType = (string) ($revealRaw['type'] ?? 'fade');
+        } else {
+            $revealOn = !empty($revealRaw);
+            $revealType = 'fade';
+        }
+        if (!in_array($revealType, ['fade', 'slide-up', 'slide-left', 'slide-right', 'zoom-in'], true)) {
+            $revealType = 'fade';
+        }
+        $reveal = $revealOn
+            ? ' data-reveal data-reveal-type="' . htmlspecialchars($revealType, ENT_QUOTES) . '"'
+            : '';
 
         $wrapped = sprintf(
             '<section id="block-%d" class="cms-block cms-block--%s cms-block--space-%s" data-block-type="%s"%s>%s</section>',
