@@ -22,6 +22,15 @@ $navItems = [
     'profile' => ['/admin/profile', 'Профиль'],
 ];
 
+// Динамические разделы пользовательских типов контента (задача 131).
+try {
+    foreach (\App\Models\ContentType::all() as $ct) {
+        $navItems['content:' . $ct['slug']] = ['/admin/content/' . $ct['slug'], $ct['name']];
+    }
+} catch (\Throwable $e) {
+    // Таблица типов ещё не создана (миграция не накатана) — пропускаем.
+}
+
 // Системные разделы — только для супер-администратора.
 if ($isSuper) {
     $navItems += [
@@ -30,6 +39,7 @@ if ($isSuper) {
         'header' => ['/admin/header', 'Шапка сайта'],
         'languages' => ['/admin/languages', 'Языки'],
         'users' => ['/admin/users', 'Пользователи'],
+        'content_types' => ['/admin/content-types', 'Типы контента'],
         'social' => ['/admin/social', 'Соцсети'],
         'webhooks' => ['/admin/webhooks', 'Вебхуки'],
         'settings' => ['/admin/settings', 'Настройки'],

@@ -188,6 +188,21 @@ $router->get('/admin/users', [\App\Controllers\Admin\UserController::class, 'ind
 $router->post('/admin/users/create', [\App\Controllers\Admin\UserController::class, 'store']);
 $router->post('/admin/users/{id}/delete', [\App\Controllers\Admin\UserController::class, 'destroy']);
 
+// --- Admin: конструктор типов контента (супер-админ) ---
+$router->get('/admin/content-types', [\App\Controllers\Admin\ContentTypeController::class, 'index']);
+$router->post('/admin/content-types/create', [\App\Controllers\Admin\ContentTypeController::class, 'store']);
+$router->get('/admin/content-types/{id}/fields', [\App\Controllers\Admin\ContentTypeController::class, 'fields']);
+$router->post('/admin/content-types/{id}/fields', [\App\Controllers\Admin\ContentTypeController::class, 'saveFields']);
+$router->post('/admin/content-types/{id}/delete', [\App\Controllers\Admin\ContentTypeController::class, 'destroy']);
+
+// --- Admin: авто-CRUD записей типов контента ---
+$router->get('/admin/content/{type}', [\App\Controllers\Admin\ContentEntryController::class, 'index']);
+$router->get('/admin/content/{type}/create', [\App\Controllers\Admin\ContentEntryController::class, 'create']);
+$router->post('/admin/content/{type}/create', [\App\Controllers\Admin\ContentEntryController::class, 'store']);
+$router->get('/admin/content/{type}/{id}/edit', [\App\Controllers\Admin\ContentEntryController::class, 'edit']);
+$router->post('/admin/content/{type}/{id}/edit', [\App\Controllers\Admin\ContentEntryController::class, 'update']);
+$router->post('/admin/content/{type}/{id}/delete', [\App\Controllers\Admin\ContentEntryController::class, 'destroy']);
+
 // --- Admin: настройки дизайна ---
 $router->get('/admin/settings', [SettingsController::class, 'index']);
 $router->post('/admin/settings', [SettingsController::class, 'update']);

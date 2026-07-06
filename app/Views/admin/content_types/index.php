@@ -1,0 +1,53 @@
+<?php
+
+use App\Core\Csrf;
+
+$pageTitle = 'Типы контента';
+$activeNav = 'content_types';
+require __DIR__ . '/../layout/header.php';
+
+/** @var array $items */
+?>
+<div class="form-card">
+    <h2 style="margin-top:0;">Новый тип контента</h2>
+    <p class="form-hint">Например «Вакансии», «Отзывы», «Услуги». После создания добавьте поля — и раздел заработает сам.</p>
+    <form method="post" action="/admin/content-types/create" class="form-grid">
+        <?= Csrf::field() ?>
+        <div class="form-field">
+            <label for="name">Название</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-field">
+            <label for="slug">Адрес (латиница, необязательно)</label>
+            <input type="text" id="slug" name="slug" placeholder="напр. vacancies">
+        </div>
+        <div class="form-field form-field--checkbox">
+            <input type="checkbox" id="has_translations" name="has_translations" value="1">
+            <label for="has_translations">Мультиязычный (переводы записей)</label>
+        </div>
+        <div class="form-actions"><button type="submit" class="btn btn--primary">Создать тип</button></div>
+    </form>
+</div>
+
+<table class="data-table" style="margin-top:20px;">
+    <thead><tr><th>Название</th><th>Адрес</th><th>Переводы</th><th></th></tr></thead>
+    <tbody>
+        <?php if (empty($items)): ?><tr><td colspan="4" class="data-table__empty">Типов пока нет.</td></tr><?php endif; ?>
+        <?php foreach ($items as $t): ?>
+            <tr>
+                <td><?= htmlspecialchars((string) $t['name'], ENT_QUOTES) ?></td>
+                <td><code><?= htmlspecialchars((string) $t['slug'], ENT_QUOTES) ?></code></td>
+                <td><?= (int) $t['has_translations'] === 1 ? 'да' : 'нет' ?></td>
+                <td class="data-table__actions">
+                    <a class="btn btn--small" href="/admin/content/<?= htmlspecialchars((string) $t['slug'], ENT_QUOTES) ?>">Записи</a>
+                    <a class="btn btn--small" href="/admin/content-types/<?= (int) $t['id'] ?>/fields">Поля</a>
+                    <form method="post" action="/admin/content-types/<?= (int) $t['id'] ?>/delete" data-confirm="Удалить тип «<?= htmlspecialchars((string) $t['name'], ENT_QUOTES) ?>» и ВСЕ его записи?">
+                        <?= Csrf::field() ?>
+                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+<?php require __DIR__ . '/../layout/footer.php'; ?>
