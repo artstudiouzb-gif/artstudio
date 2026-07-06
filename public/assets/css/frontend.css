@@ -47,6 +47,21 @@ body {
 img { max-width: 100%; display: block; }
 a { color: var(--color-accent, #e63946); }
 
+/* Доступность (задача 122): видимый фокус на всех интерактивных элементах. */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible,
+summary:focus-visible {
+    outline: 3px solid var(--color-accent, #e63946);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+/* Ссылка «пропустить к содержимому» для клавиатуры/скринридеров. */
+.skip-link {
+    position: absolute; left: -999px; top: 0; z-index: 10000;
+    background: var(--bg-surface); color: var(--text-main); padding: 10px 16px; border-radius: 0 0 8px 0;
+}
+.skip-link:focus { left: 0; }
+
 .site-header__inner { max-width: 1140px; margin: 0 auto; padding: 20px; display: flex; align-items: center; gap: 20px; }
 .site-header__zone { display: flex; align-items: center; gap: 18px; }
 .site-header__zone--left { justify-content: flex-start; }

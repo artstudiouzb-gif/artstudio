@@ -684,6 +684,16 @@ php tests/run.php
   (`app_env`/`app_url`/`encryption_key`) — критические ключи строго из файла,
   не из БД (задача 115; Telegram/SMTP там же).
 
+- **16.6 — доступность и раздача через CDN** (задачи 122/127): версионирование
+  ассетов `App\Core\Asset::url()` (к пути добавляется `?v=<hash>` из mtime+size)
+  — cache-busting без ручной инвалидации; далёкий `Cache-Control:
+  max-age=31536000, immutable` в `public/.htaccess` для статики; рецепт CDN
+  (`docs/CDN.md`, Cloudflare, опциональный отдельный хост). Доступность (a11y):
+  видимый фокус `:focus-visible` на всех интерактивных элементах (frontend +
+  admin), ссылка-«пропуск к содержимому» (`.skip-link`) и landmark
+  `<main id="main-content">`, ARIA для модалок/баннера/медиа-сетки
+  (`role="dialog"`/`aria-modal`, `role="region"`, `aria-busy`).
+
 ## Возможные дальнейшие шаги
 
 Оставшийся технический бэклог: Блоки 9–10 (реактивный CSRF double-submit и

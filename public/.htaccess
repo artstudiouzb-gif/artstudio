@@ -15,6 +15,13 @@
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Долгий кэш для версионированных ассетов (задача 127). URL меняется через
+    # ?v=<hash> при обновлении файла (App\Core\Asset::url), поэтому CDN отдаёт
+    # новую версию без ручной очистки, а старые кэшируются «навсегда».
+    <FilesMatch "\.(css|js|woff2?|ttf|eot|svg|jpe?g|png|gif|webp|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
 </IfModule>
 
 Options -Indexes

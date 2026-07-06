@@ -53,7 +53,7 @@ if ($isSuper) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — Панель управления</title>
 <link rel="stylesheet" href="/assets/vendor/pico/pico.classless.min.css">
-<link rel="stylesheet" href="/assets/css/admin.css">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/admin.css'), ENT_QUOTES) ?>">
 </head>
 <body>
 <div class="admin-shell">

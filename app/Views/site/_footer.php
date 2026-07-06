@@ -26,8 +26,8 @@ if ($privacyPageId > 0) {
 <footer class="site-footer">
     <p>&copy; <?= date('Y') ?> <?= htmlspecialchars($siteName, ENT_QUOTES) ?></p>
 </footer>
-<script src="/assets/js/frontend.js"></script>
-<script src="/assets/js/forms.js" defer></script>
+<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>"></script>
+<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/forms.js'), ENT_QUOTES) ?>" defer></script>
 <?= \App\Core\AssetCollector::renderScripts() /* JS блоков — по одному разу */ ?>
 <?php if ($analyticsInit !== ''): ?>
 <?php // Код счётчиков инертен (type text/plain); consent.js активирует его. ?>

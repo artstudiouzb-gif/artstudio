@@ -173,7 +173,7 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-title" content="<?= htmlspecialchars($pwaShortName, ENT_QUOTES) ?>">
 <?php endif; ?>
-<link rel="stylesheet" href="/assets/css/frontend.css">
+<link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">
 <style>
 :root {
     --color-primary: <?= htmlspecialchars($primaryColor, ENT_QUOTES) ?>;
@@ -188,6 +188,7 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
 <?php endif; ?>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Перейти к содержимому</a>
 <header class="site-header site-header--logo-<?= htmlspecialchars($hcfg['logo_position'], ENT_QUOTES) ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
@@ -195,7 +196,7 @@ $zones['right'] .= $langHtml . $socialHtml . $ctaHtml . $themeToggle;
         <div class="site-header__zone site-header__zone--right"><?= $zones['right'] ?></div>
     </div>
 </header>
-<main class="site-content">
+<main class="site-content" id="main-content">
 <div class="print-only print-header">
     <?php if ($logo !== ''): ?>
         <img src="<?= htmlspecialchars($logo, ENT_QUOTES) ?>" alt="<?= htmlspecialchars($siteName, ENT_QUOTES) ?>">

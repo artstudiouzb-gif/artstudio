@@ -28,6 +28,8 @@
     function showBanner() {
         var bar = document.createElement('div');
         bar.className = 'cookie-banner';
+        bar.setAttribute('role', 'region');
+        bar.setAttribute('aria-label', 'Согласие на использование cookie');
         var text = document.createElement('span');
         text.className = 'cookie-banner__text';
         text.textContent = 'Мы используем cookie для аналитики. Продолжая, вы соглашаетесь с их использованием.';

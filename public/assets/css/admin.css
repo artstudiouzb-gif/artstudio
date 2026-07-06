@@ -9,6 +9,14 @@
 
 * { box-sizing: border-box; }
 
+/* Доступность (задача 122): видимый фокус на интерактивных элементах. */
+a:focus-visible, button:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--admin-accent, #4361ee);
+    outline-offset: 2px;
+    border-radius: 3px;
+}
+
 body {
     margin: 0;
     font-family: 'Segoe UI', Roboto, Arial, sans-serif;

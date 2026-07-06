@@ -195,6 +195,7 @@
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     loaded = true;
+                    grid.setAttribute('aria-busy', 'false');
                     var items = data.items || [];
                     if (!items.length) { grid.innerHTML = '<div class="media-modal__empty">В библиотеке нет изображений.</div>'; return; }
                     grid.innerHTML = '';
