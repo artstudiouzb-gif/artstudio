@@ -151,6 +151,11 @@ final class Auth
             Logger::error('SessionRegistry::register failed: ' . $e->getMessage());
         }
 
+        Logger::security('Успешный вход в панель управления', [
+            'user' => (string) $user['username'],
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
+
         // Вероятностная очистка старых записей брутфорса и ротация логов.
         RateLimiter::garbageCollect();
     }
@@ -191,6 +196,10 @@ final class Auth
 
         // Защита от перехвата сессии: фингерпринт должен совпадать.
         if (!isset($_SESSION['fingerprint']) || !hash_equals($_SESSION['fingerprint'], self::fingerprint())) {
+            Logger::security('Несовпадение фингерпринта сессии — принудительный выход', [
+                'user' => (string) ($_SESSION['username'] ?? ''),
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            ]);
             self::logout();
             return false;
         }

@@ -60,18 +60,24 @@ final class Csrf
      */
     public static function isSpam(int $minSeconds = 2): bool
     {
+        $spam = false;
         if (trim((string) ($_POST['hp_website'] ?? '')) !== '') {
-            return true;
+            $spam = true;
+        } else {
+            $ts = (int) ($_POST['hp_ts'] ?? 0);
+            if ($ts <= 0 || (time() - $ts) < $minSeconds) {
+                $spam = true;
+            }
         }
 
-        $ts = (int) ($_POST['hp_ts'] ?? 0);
-        if ($ts <= 0) {
-            return true;
-        }
-        if ((time() - $ts) < $minSeconds) {
-            return true;
+        if ($spam) {
+            // SECURITY-событие с длинным троттлингом — поток спама не заливает чат.
+            Logger::security('Honeypot: подозрительная отправка формы отклонена', [
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+                'throttle' => 3600,
+            ]);
         }
 
-        return false;
+        return $spam;
     }
 }

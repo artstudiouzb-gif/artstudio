@@ -57,6 +57,8 @@ final class Backup
 
         $zip->close();
 
+        Logger::info('Резервная копия создана', ['file' => basename($zipPath)]);
+
         return $zipPath;
     }
 

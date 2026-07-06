@@ -88,10 +88,10 @@ final class RateLimiter
             self::recordAttempt($identifier, false);
 
             if ($count >= $maxAttempts) {
-                Logger::error(sprintf(
-                    'Rate limit exceeded: ns=%s key=%s ip=%s count=%d/%d',
-                    $namespace, $key, $ip, $count + 1, $maxAttempts
-                ));
+                Logger::warning(
+                    sprintf('Превышен лимит запросов: %s (%d/%d)', $namespace, $count + 1, $maxAttempts),
+                    ['ip' => $ip, 'key' => $key]
+                );
                 return false;
             }
         } catch (\Throwable $e) {

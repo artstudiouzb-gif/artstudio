@@ -66,5 +66,9 @@ foreach ($batch as $row) {
     }
 }
 
+if ($sent > 0) {
+    Logger::info(sprintf('Автопубликация по расписанию: опубликовано %d, ошибок %d.', $sent, $failed));
+}
+
 fwrite(STDOUT, sprintf('Готово: опубликовано %d, ошибок %d.%s', $sent, $failed, PHP_EOL));
 exit(0);

@@ -46,7 +46,9 @@ if (is_file($configFile)) {
         try {
             Database::init($config['db']);
         } catch (\Throwable $e) {
-            \App\Core\Logger::error('DB unavailable: ' . $e->getMessage());
+            \App\Core\Logger::critical('Падение БД (503): ' . $e->getMessage(), [
+                'url' => $_SERVER['REQUEST_URI'] ?? 'cli',
+            ]);
             if (PHP_SAPI !== 'cli') {
                 http_response_code(503);
                 header('Retry-After: 60');

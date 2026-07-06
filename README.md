@@ -620,6 +620,28 @@ php tests/run.php
 [мин/5] * * * * php /path/to/app/Console/social_worker.php >> storage/logs/social_worker.log 2>&1
 ```
 
+### Задача 59 — Telegram-алертинг с уровнями критичности
+
+- **Уровни**: 🔴 CRITICAL, 🟠 ERROR, 🟡 WARNING, 🔵 SECURITY, ⚪ INFO.
+- **`Logger::event(level, message, context)`** — единая точка: пишет в файл
+  (канал по уровню) и дублирует в Telegram по правилам. Обёртки
+  `critical/warning/security/info`; `error()` совместим со старой сигнатурой.
+- **`TelegramNotifier`** — нативный POST на `sendMessage` (`parse_mode=MarkdownV2`,
+  экранирование), метка уровня + контекст (файл/строка/URL/IP/пользователь) +
+  время по таймзоне сайта. `SECURITY` уходит в отдельный чат при
+  `chat_id_security`. Транспорт инжектируется → тесты без сети.
+- **Троттлинг** по сигнатуре `уровень + форма сообщения` (числа обезличиваются):
+  CRITICAL — без троттлинга, ERROR 5 мин, SECURITY 10 мин, WARNING 15 мин,
+  INFO 1 час; honeypot — час. Флаги в `storage/cache/telegram/`.
+- **`min_level`** в `config.php` отключает менее важные уровни без правки кода
+  (SECURITY отправляется всегда). Конфиг Telegram — строго из `config.php`
+  (не из БД), чтобы падение БД не мешало алертам (задача 115).
+- **Точки интеграции**: `ErrorHandler` (CRITICAL fatal / ERROR исключения),
+  bootstrap 503 (CRITICAL), `RateLimiter` (WARNING), `Uploader` disk guard
+  (WARNING), `Auth` вход/смена фингерпринта (SECURITY), `Csrf::isSpam` honeypot
+  (SECURITY), смена/сброс пароля и отзыв сессий (SECURITY), `Backup`/воркер
+  соцсетей (INFO), новый `/health` (WARNING/CRITICAL).
+
 ## Возможные дальнейшие шаги
 
 Оставшийся технический бэклог: Блоки 9–10 (реактивный CSRF double-submit и

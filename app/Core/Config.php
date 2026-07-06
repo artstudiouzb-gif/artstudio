@@ -13,6 +13,12 @@ final class Config
         self::$data = $data;
     }
 
+    /** Поверхностное слияние в существующую конфигурацию (верхнеуровневые ключи). */
+    public static function merge(array $data): void
+    {
+        self::$data = array_merge(self::$data, $data);
+    }
+
     public static function get(string $key, mixed $default = null): mixed
     {
         $segments = explode('.', $key);

@@ -201,6 +201,9 @@ $router->post('/admin/files/chunk', [\App\Controllers\Admin\ChunkedUploadControl
 $router->post('/admin/files/{id}/delete', [AdminFileController::class, 'destroy']);
 $router->post('/admin/files/{id}/regenerate-token', [AdminFileController::class, 'regenerateToken']);
 
+// --- Health-check (мониторинг) ---
+$router->get('/health', [\App\Controllers\Site\HealthController::class, 'index']);
+
 // --- SEO ---
 $router->get('/sitemap.xml', [\App\Controllers\Site\SitemapController::class, 'xml']);
 $router->get('/robots.txt', [\App\Controllers\Site\SitemapController::class, 'robots']);

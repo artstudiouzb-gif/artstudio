@@ -186,7 +186,10 @@ final class Uploader
 
         $threshold = max(self::MIN_FREE_BYTES, (int) ($total * self::MIN_FREE_RATIO));
         if ($free < $threshold) {
-            Logger::error(sprintf('Disk space guard: %d bytes free, threshold %d — upload blocked.', $free, $threshold));
+            Logger::warning(
+                sprintf('Disk Space Guard: свободно %d Б при пороге %d Б — загрузка заблокирована.', $free, $threshold),
+                ['free' => $free, 'threshold' => $threshold]
+            );
             throw new RuntimeException('Недостаточно свободного места на сервере. Загрузка временно недоступна — освободите место.');
         }
     }

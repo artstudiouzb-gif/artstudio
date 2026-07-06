@@ -121,6 +121,11 @@ final class PasswordResetController
         // Принудительно завершаем все активные сессии пользователя.
         SessionRegistry::revokeAll((int) $record['user_id']);
 
+        Logger::security('Пароль сброшен по ссылке восстановления', [
+            'user' => (string) ($user['username'] ?? ''),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
+
         Flash::success('Пароль изменён. Войдите с новым паролем.');
         header('Location: /admin/login');
         exit;

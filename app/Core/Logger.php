@@ -38,9 +38,85 @@ final class Logger
         @file_put_contents($file, $line, FILE_APPEND | LOCK_EX);
     }
 
-    public static function error(string $message, string $channel = 'error'): void
+    /** Файл-канал по уровню важности. */
+    private const LEVEL_CHANNEL = [
+        'CRITICAL' => 'error',
+        'ERROR' => 'error',
+        'WARNING' => 'warning',
+        'SECURITY' => 'security',
+        'INFO' => 'app',
+    ];
+
+    /**
+     * Единая точка логирования с уровнем важности (задача 59): пишет в файл и
+     * дублирует в Telegram по правилам TelegramNotifier (уровень/min_level/
+     * троттлинг). Все модули могут вызывать её напрямую.
+     *
+     * @param array<string, mixed> $context
+     */
+    public static function event(string $level, string $message, array $context = []): void
+    {
+        $level = strtoupper($level);
+        $channel = self::LEVEL_CHANNEL[$level] ?? 'app';
+
+        // Компактная запись контекста в файл.
+        $suffix = '';
+        if ($context !== []) {
+            $pairs = [];
+            foreach ($context as $k => $v) {
+                if ($k === 'throttle') {
+                    continue;
+                }
+                $pairs[] = $k . '=' . (is_scalar($v) ? (string) $v : json_encode($v, JSON_UNESCAPED_UNICODE));
+            }
+            if ($pairs !== []) {
+                $suffix = ' {' . implode(', ', $pairs) . '}';
+            }
+        }
+
+        self::log($channel, $message . $suffix, $level);
+
+        try {
+            TelegramNotifier::send($level, $message, $context);
+        } catch (\Throwable $e) {
+            error_log('Logger telegram dispatch failed: ' . $e->getMessage());
+        }
+    }
+
+    public static function critical(string $message, array $context = []): void
+    {
+        self::event('CRITICAL', $message, $context);
+    }
+
+    public static function warning(string $message, array $context = []): void
+    {
+        self::event('WARNING', $message, $context);
+    }
+
+    public static function security(string $message, array $context = []): void
+    {
+        self::event('SECURITY', $message, $context);
+    }
+
+    public static function info(string $message, array $context = []): void
+    {
+        self::event('INFO', $message, $context);
+    }
+
+    /**
+     * Ошибка: пишет в файл и (если настроено) шлёт ERROR-алерт в Telegram.
+     * Сохранена сигнатура (message, channel) ради обратной совместимости.
+     *
+     * @param array<string, mixed> $context
+     */
+    public static function error(string $message, string $channel = 'error', array $context = []): void
     {
         self::log($channel, $message, 'ERROR');
+        try {
+            TelegramNotifier::send('ERROR', $message, $context);
+        } catch (\Throwable $e) {
+            error_log('Logger telegram dispatch failed: ' . $e->getMessage());
+        }
     }
 
     private static function rotateIfNeeded(string $file): void

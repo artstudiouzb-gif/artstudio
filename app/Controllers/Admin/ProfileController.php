@@ -64,6 +64,10 @@ final class ProfileController
         }
 
         if ($error !== null) {
+            \App\Core\Logger::security('Отклонён слабый/некорректный пароль при смене', [
+                'user' => (string) ($user['username'] ?? ''),
+                'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            ]);
             Flash::error($error);
             header('Location: /admin/profile');
             exit;
@@ -73,6 +77,10 @@ final class ProfileController
         // Завершаем все прочие сессии; текущую оставляем активной.
         SessionRegistry::revokeAllExcept($userId, session_id());
 
+        \App\Core\Logger::security('Пароль администратора изменён', [
+            'user' => (string) ($user['username'] ?? ''),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
         Flash::success('Пароль изменён. Другие сессии завершены.');
         header('Location: /admin/profile');
         exit;
@@ -95,6 +103,10 @@ final class ProfileController
         Csrf::verifyRequest();
 
         SessionRegistry::revokeAllExcept((int) Auth::id(), session_id());
+        \App\Core\Logger::security('Отзыв всех прочих сессий администратора', [
+            'user' => (string) ($_SESSION['username'] ?? ''),
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
         Flash::success('Все другие сессии завершены.');
         header('Location: /admin/profile');
         exit;

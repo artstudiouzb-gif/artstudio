@@ -49,4 +49,16 @@ return [
         'from_name' => getenv('SMTP_FROM_NAME') ?: 'ArtStudio CMS',
         'timeout' => 15,
     ],
+    // Telegram-алертинг (задача 59). Читается строго из файла/окружения, не из
+    // БД — чтобы падение БД не мешало отправке критических оповещений.
+    'telegram' => [
+        'bot_token' => getenv('TELEGRAM_BOT_TOKEN') ?: '',
+        'chat_id' => getenv('TELEGRAM_CHAT_ID') ?: '',
+        // Опциональный отдельный чат для событий безопасности (SECURITY).
+        'chat_id_security' => getenv('TELEGRAM_CHAT_ID_SECURITY') ?: '',
+        // Минимальный уровень для отправки в Telegram: INFO|WARNING|ERROR|CRITICAL.
+        // Ниже этого уровня события пишутся только в файл. SECURITY отправляется
+        // всегда (если Telegram настроен).
+        'min_level' => getenv('TELEGRAM_MIN_LEVEL') ?: 'WARNING',
+    ],
 ];

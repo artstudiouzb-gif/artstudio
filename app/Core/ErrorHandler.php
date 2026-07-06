@@ -38,16 +38,16 @@ final class ErrorHandler
 
     public static function handleException(Throwable $e): void
     {
-        Logger::error(sprintf(
-            '%s: %s in %s:%d%sStack trace:%s%s',
-            get_class($e),
-            $e->getMessage(),
-            $e->getFile(),
-            $e->getLine(),
-            PHP_EOL,
-            PHP_EOL,
-            $e->getTraceAsString()
-        ));
+        $concise = get_class($e) . ': ' . $e->getMessage();
+        // Полный стек — в файл; в Telegram уходит компактное сообщение + контекст.
+        Logger::log('error', $concise . ' in ' . $e->getFile() . ':' . $e->getLine()
+            . PHP_EOL . 'Stack trace:' . PHP_EOL . $e->getTraceAsString(), 'ERROR');
+        \App\Core\TelegramNotifier::send('ERROR', $concise, [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'url' => $_SERVER['REQUEST_URI'] ?? 'cli',
+            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+        ]);
 
         self::renderErrorPage($e);
     }
@@ -62,12 +62,11 @@ final class ErrorHandler
             return;
         }
 
-        Logger::error(sprintf(
-            'Fatal: %s in %s:%d',
-            $error['message'],
-            $error['file'],
-            $error['line']
-        ));
+        Logger::critical('Fatal: ' . $error['message'], [
+            'file' => $error['file'],
+            'line' => $error['line'],
+            'url' => $_SERVER['REQUEST_URI'] ?? 'cli',
+        ]);
 
         self::renderErrorPage(new \ErrorException(
             $error['message'],
