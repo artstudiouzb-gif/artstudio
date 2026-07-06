@@ -8,9 +8,8 @@ declare(strict_types=1);
  * Создаёт storage/backups/backup_YYYY-MM-DD_HHMMSS.zip (дамп БД + загрузки).
  */
 
-if (PHP_SAPI !== 'cli') {
-    exit('Только из командной строки.');
-}
+require __DIR__ . '/../app/Core/Cli.php';
+\App\Core\Cli::assertCli();
 
 require __DIR__ . '/../app/Core/bootstrap.php';
 

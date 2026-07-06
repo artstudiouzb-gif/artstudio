@@ -14,9 +14,8 @@ declare(strict_types=1);
  * счётчик попыток; после трёх неудач публикация помечается как failed.
  */
 
-if (PHP_SAPI !== 'cli') {
-    exit('Только из командной строки.');
-}
+require __DIR__ . '/../Core/Cli.php';
+\App\Core\Cli::assertCli();
 
 require __DIR__ . '/../Core/bootstrap.php';
 

@@ -5,9 +5,8 @@ declare(strict_types=1);
 // Консольная утилита создания первого администратора.
 // Запуск: php database/create_admin.php
 
-if (PHP_SAPI !== 'cli') {
-    exit('Этот скрипт запускается только из командной строки.');
-}
+require __DIR__ . '/../app/Core/Cli.php';
+\App\Core\Cli::assertCli();
 
 require __DIR__ . '/../app/Core/bootstrap.php';
 

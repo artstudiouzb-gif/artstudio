@@ -11,10 +11,35 @@
     RewriteRule (.*) public/$1 [L]
 </IfModule>
 
-# Полностью запрещаем прямой доступ к служебным папкам, если docroot
-# указывает на корень проекта.
+# Запрет листинга директорий (storage/logs, database и т.п.).
+Options -Indexes
+
+# Полностью запрещаем прямой доступ к любым .php в обход public/index.php:
+# config/config.php, database/create_admin.php и прочие служебные скрипты не
+# должны исполняться через веб (задача 1.1). Единственный вход в приложение —
+# public/index.php, которому public/.htaccess возвращает разрешение явно.
+# Поддерживаем и новый (mod_authz_core, Apache 2.4+), и старый синтаксис.
 <IfModule mod_authz_core.c>
-    <FilesMatch "\.(sql|env|log)$">
+    <FilesMatch "\.php$">
         Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</IfModule>
+
+# Дампы БД, конфиги, логи, lock-файлы не должны отдаваться как статика.
+<IfModule mod_authz_core.c>
+    <FilesMatch "\.(sql|env|log|lock|ini)$">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+<IfModule !mod_authz_core.c>
+    <FilesMatch "\.(sql|env|log|lock|ini)$">
+        Order allow,deny
+        Deny from all
     </FilesMatch>
 </IfModule>

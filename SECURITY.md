@@ -88,6 +88,24 @@
   с проверкой пути через `realpath` (защита от path traversal), анти-перебором
   токенов и `X-Content-Type-Options: nosniff`.
 
+## Запрет прямого доступа к служебным .php (задача 1.1)
+
+- Все CLI-утилиты (`database/create_admin.php`, `backup.php`, `migrate.php` и
+  воркеры `app/Console/*`) первой строкой вызывают `App\Core\Cli::assertCli()`:
+  при запуске не из CLI выполнение прерывается с HTTP 403 «CLI only». Это
+  исключает создание администратора или снятие бэкапа через браузер в обход
+  авторизации.
+- Корневой `.htaccess` (fallback-сценарий, когда docroot нельзя перевести на
+  `/public`) применяет **deny-all для всех `.php`** (Apache 2.2 и 2.4-синтаксис)
+  плюс запрет отдачи `.sql/.env/.log/.lock/.ini` как статики и `Options -Indexes`.
+  `public/.htaccess` явно возвращает `Require all granted` только точкам входа
+  `index.php` и `download.php`, отменяя унаследованный запрет.
+- **Обязательная ручная проверка на реальном сервере** (built-in PHP-сервер не
+  читает `.htaccess`): `/config/config.php`, `/database/create_admin.php`,
+  `/database/schema.sql`, `/storage/logs/` должны возвращать 403/404. Если
+  хостинг игнорирует `.htaccess` (`AllowOverride None`) — включить `AllowOverride`
+  или переносить сайт; код это починить не может.
+
 ## Тесты
 
 Нативный тест-раннер `php tests/run.php` (без Composer) покрывает: рендер блока с

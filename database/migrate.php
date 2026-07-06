@@ -14,9 +14,8 @@ declare(strict_types=1);
  * это позволяет) и фиксируется в таблице.
  */
 
-if (PHP_SAPI !== 'cli') {
-    exit('Только из командной строки.');
-}
+require __DIR__ . '/../app/Core/Cli.php';
+\App\Core\Cli::assertCli();
 
 require __DIR__ . '/../app/Core/Config.php';
 require __DIR__ . '/../app/Core/Database.php';
