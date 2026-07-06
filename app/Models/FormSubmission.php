@@ -60,4 +60,23 @@ final class FormSubmission
         $stmt = Database::pdo()->prepare('DELETE FROM form_submissions WHERE id = :id');
         $stmt->execute([':id' => $id]);
     }
+
+    /**
+     * Удаляет заявки старше $days дней (GDPR-очистка ПДн, группа 6).
+     * $days <= 0 — очистка отключена (хранить бессрочно). Возвращает число
+     * удалённых записей.
+     */
+    public static function deleteOlderThan(int $days): int
+    {
+        if ($days <= 0) {
+            return 0;
+        }
+        $stmt = Database::pdo()->prepare(
+            'DELETE FROM form_submissions WHERE created_at < (NOW() - INTERVAL :days DAY)'
+        );
+        $stmt->bindValue(':days', $days, \PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount();
+    }
 }

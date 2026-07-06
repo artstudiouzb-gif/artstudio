@@ -27,6 +27,9 @@ test('CLI-only скрипты вызывают assertCli первой строк
         'app/Console/mail_worker.php',
         'app/Console/social_worker.php',
         'app/Console/webhook_worker.php',
+        'app/Console/backup_worker.php',
+        'app/Console/gdpr_cleanup.php',
+        'database/restore.php',
     ];
     foreach ($scripts as $rel) {
         $src = (string) file_get_contents(APP_ROOT . '/' . $rel);
