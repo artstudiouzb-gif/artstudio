@@ -164,6 +164,22 @@ CREATE TABLE IF NOT EXISTS blocks (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
+-- История версий блоков (группа 5.1). Снимок состояния блока перед каждой
+-- перезаписью; хранятся последние 20 ревизий на блок.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS block_revisions (
+    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    block_id        INT UNSIGNED NOT NULL,
+    title           VARCHAR(255) NULL,
+    data            JSON NOT NULL,
+    custom_css      TEXT NULL,
+    created_by      INT UNSIGNED NULL COMMENT 'автор изменения (users.id), NULL если неизвестен',
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_block_revisions_block (block_id, id),
+    CONSTRAINT fk_block_revisions_block FOREIGN KEY (block_id) REFERENCES blocks(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
 -- Проекты (портфолио)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS projects (
@@ -512,7 +528,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_05_social_posts.sql'),
     ('2026_07_06_block_snippets.sql'),
     ('2026_07_06_webhooks.sql'),
-    ('2026_07_06_content_types.sql')
+    ('2026_07_06_content_types.sql'),
+    ('2026_07_06_block_revisions.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

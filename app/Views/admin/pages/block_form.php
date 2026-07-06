@@ -14,6 +14,7 @@ $type = $block['type'];
 $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) ($block['lang'] ?? ''));
 ?>
 <a href="<?= htmlspecialchars($backUrl, ENT_QUOTES) ?>" class="btn btn--small" style="margin-bottom:16px;">&larr; Назад к странице</a>
+<a href="/admin/blocks/<?= (int) $block['id'] ?>/revisions" class="btn btn--small" style="margin-bottom:16px;">История изменений</a>
 
 <div class="form-card">
     <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/edit" class="form-grid">

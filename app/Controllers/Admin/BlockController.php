@@ -10,6 +10,7 @@ use App\Core\Flash;
 use App\Core\View;
 use App\Core\TextProcessor;
 use App\Models\Block;
+use App\Models\BlockRevision;
 use App\Models\FormDef;
 use App\Models\Language;
 use App\Models\Page;
@@ -105,10 +106,83 @@ final class BlockController
             ? $_POST['spacing'] : 'premium';
         $data['_reveal'] = !empty($_POST['reveal']);
 
+        // История версий (группа 5.1): снимаем текущее состояние ПЕРЕД перезаписью.
+        BlockRevision::snapshot(
+            (int) $block['id'],
+            $block['title'] !== null ? (string) $block['title'] : null,
+            json_decode((string) $block['data'], true) ?: [],
+            $block['custom_css'] !== null ? (string) $block['custom_css'] : null,
+            Auth::id()
+        );
+
         Block::update((int) $block['id'], $title !== '' ? $title : null, $data, $customCss);
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок сохранён.');
+        header('Location: ' . $this->pageEditUrl($block));
+        exit;
+    }
+
+    /** История версий блока (группа 5.1). */
+    public function revisions(array $params): void
+    {
+        Auth::requireLogin();
+        $block = Block::findById((int) $params['id']);
+        if (!$block) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        View::render('admin/blocks/revisions', [
+            'block' => $block,
+            'revisions' => BlockRevision::forBlock((int) $block['id']),
+            'backUrl' => $this->pageEditUrl($block),
+        ]);
+    }
+
+    /** Восстановление блока из ревизии (создаёт новую ревизию, группа 5.1). */
+    public function restoreRevision(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verifyRequest();
+
+        $block = Block::findById((int) $params['id']);
+        if (!$block) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+        $rev = BlockRevision::findById((int) ($_POST['revision_id'] ?? 0));
+        if (!$rev || (int) $rev['block_id'] !== (int) $block['id']) {
+            Flash::error('Ревизия не найдена.');
+            header('Location: /admin/blocks/' . (int) $block['id'] . '/revisions');
+            exit;
+        }
+
+        // custom_css трогает только супер-админ; редактору оставляем текущий.
+        $customCss = Auth::isSuperAdmin()
+            ? ($rev['custom_css'] !== null ? (string) $rev['custom_css'] : '')
+            : (string) ($block['custom_css'] ?? '');
+
+        // Снимок текущего состояния, затем применяем ревизию.
+        BlockRevision::snapshot(
+            (int) $block['id'],
+            $block['title'] !== null ? (string) $block['title'] : null,
+            json_decode((string) $block['data'], true) ?: [],
+            $block['custom_css'] !== null ? (string) $block['custom_css'] : null,
+            Auth::id()
+        );
+
+        Block::update(
+            (int) $block['id'],
+            $rev['title'] !== null ? (string) $rev['title'] : null,
+            json_decode((string) $rev['data'], true) ?: [],
+            $customCss
+        );
+        \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
+
+        Flash::success('Блок восстановлен из выбранной версии.');
         header('Location: ' . $this->pageEditUrl($block));
         exit;
     }
