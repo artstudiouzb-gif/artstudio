@@ -160,7 +160,7 @@ final class BlockRenderer
         // Дочерние блоки доступны только при наличии реального id (в рендере из БД).
         $children = [];
         if (!empty($block['id']) && class_exists(\App\Models\Block::class)) {
-            $children = \App\Models\Block::childrenOf((int) $block['id']);
+            $children = \App\Models\Block::childrenOf((int) $block['id'], true);
         }
 
         // Группируем по колонкам 0..count-1.

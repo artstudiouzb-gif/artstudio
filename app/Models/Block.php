@@ -13,12 +13,15 @@ final class Block
      * верхнего уровня (parent_block_id IS NULL); дочерние блоки колонок
      * (группа 4.1) выбираются отдельно через childrenOf().
      */
-    public static function forPage(int $pageId, ?string $lang = null, bool $topLevelOnly = true): array
+    public static function forPage(int $pageId, ?string $lang = null, bool $topLevelOnly = true, bool $activeOnly = false): array
     {
         $lang = $lang ?? Language::defaultCode();
         $sql = 'SELECT * FROM blocks WHERE page_id = :page_id AND lang = :lang';
         if ($topLevelOnly) {
             $sql .= ' AND parent_block_id IS NULL';
+        }
+        if ($activeOnly) {
+            $sql .= ' AND is_active = 1';
         }
         $sql .= ' ORDER BY sort_order ASC, id ASC';
         $stmt = Database::pdo()->prepare($sql);
@@ -33,27 +36,37 @@ final class Block
      *
      * @return array<int,array<string,mixed>>
      */
-    public static function childrenOf(int $parentBlockId): array
+    public static function childrenOf(int $parentBlockId, bool $activeOnly = false): array
     {
-        $stmt = Database::pdo()->prepare(
-            'SELECT * FROM blocks WHERE parent_block_id = :pid ORDER BY column_index ASC, sort_order ASC, id ASC'
-        );
+        $sql = 'SELECT * FROM blocks WHERE parent_block_id = :pid';
+        if ($activeOnly) {
+            $sql .= ' AND is_active = 1';
+        }
+        $sql .= ' ORDER BY column_index ASC, sort_order ASC, id ASC';
+        $stmt = Database::pdo()->prepare($sql);
         $stmt->execute([':pid' => $parentBlockId]);
 
         return $stmt->fetchAll();
     }
 
     /**
-     * Блоки для вывода на сайте: язык -> при отсутствии откат на язык по умолчанию.
+     * Блоки для вывода на сайте: только активные; язык -> при отсутствии откат
+     * на язык по умолчанию.
      */
     public static function forPageLocalized(int $pageId, string $lang): array
     {
-        $blocks = self::forPage($pageId, $lang);
+        $blocks = self::forPage($pageId, $lang, true, true);
         if (!empty($blocks) || $lang === Language::defaultCode()) {
             return $blocks;
         }
 
-        return self::forPage($pageId, Language::defaultCode());
+        return self::forPage($pageId, Language::defaultCode(), true, true);
+    }
+
+    public static function setActive(int $id, bool $active): void
+    {
+        $stmt = Database::pdo()->prepare('UPDATE blocks SET is_active = :a WHERE id = :id');
+        $stmt->execute([':a' => $active ? 1 : 0, ':id' => $id]);
     }
 
     public static function findById(int $id): ?array

@@ -121,6 +121,7 @@ $router->get('/admin/blocks/{id}/edit', [AdminBlockController::class, 'edit']);
 $router->post('/admin/blocks/{id}/edit', [AdminBlockController::class, 'update']);
 $router->post('/admin/blocks/{id}/delete', [AdminBlockController::class, 'destroy']);
 $router->post('/admin/blocks/{id}/move', [AdminBlockController::class, 'move']);
+$router->post('/admin/blocks/{id}/toggle', [AdminBlockController::class, 'toggle']);
 $router->post('/admin/blocks/reorder', [AdminBlockController::class, 'reorder']);
 $router->get('/admin/blocks/{id}/revisions', [AdminBlockController::class, 'revisions']);
 $router->post('/admin/blocks/{id}/revisions/restore', [AdminBlockController::class, 'restoreRevision']);

@@ -298,6 +298,28 @@ final class BlockController
         exit;
     }
 
+    /** Включение/отключение вывода блока на сайте (без удаления). */
+    public function toggle(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verifyRequest();
+
+        $block = Block::findById((int) $params['id']);
+        if (!$block) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $newState = (int) ($block['is_active'] ?? 1) !== 1;
+        Block::setActive((int) $block['id'], $newState);
+        \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
+
+        Flash::success($newState ? 'Блок включён и снова выводится на сайте.' : 'Блок отключён — он скрыт на сайте, но сохранён.');
+        header('Location: ' . $this->pageEditUrl($block));
+        exit;
+    }
+
     private function pageEditUrl(array $block): string
     {
         return '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) $block['lang']);

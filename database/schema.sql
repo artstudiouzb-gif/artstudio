@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS blocks (
     data            JSON NOT NULL COMMENT 'структурированные данные блока',
     custom_css      TEXT NULL COMMENT 'CSS блока, изолируется при рендере через #block-{id}',
     sort_order      INT NOT NULL DEFAULT 0,
+    is_active       TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'блок выводится на сайте (0 — скрыт, но не удалён)',
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     KEY idx_blocks_page (page_id, lang, sort_order),
@@ -607,7 +608,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_06_block_columns.sql'),
     ('2026_07_06_page_landing.sql'),
     ('2026_07_06_file_repository.sql'),
-    ('2026_07_06_content_frontend.sql')
+    ('2026_07_06_content_frontend.sql'),
+    ('2026_07_07_block_active.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -166,11 +166,13 @@ foreach ($blocks as $b) {
          data-block-lang="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>"
          data-csrf="<?= htmlspecialchars(Csrf::token(), ENT_QUOTES) ?>">
     <?php foreach ($blocks as $index => $block): ?>
-        <div class="block-list-item" draggable="true" data-block-id="<?= (int) $block['id'] ?>">
+        <?php $blockActive = (int) ($block['is_active'] ?? 1) === 1; ?>
+        <div class="block-list-item<?= $blockActive ? '' : ' block-list-item--off' ?>" draggable="true" data-block-id="<?= (int) $block['id'] ?>">
             <span class="block-list-item__handle" title="Перетащить" aria-hidden="true">⠿</span>
             <div class="block-list-item__meta">
                 <strong><?= htmlspecialchars($block['title'] ?: ('Блок #' . $block['id']), ENT_QUOTES) ?></strong>
                 <span class="block-list-item__type"><?= htmlspecialchars($blockTypeLabels[$block['type']] ?? $block['type'], ENT_QUOTES) ?></span>
+                <?php if (!$blockActive): ?><span class="block-list-item__badge">Скрыт</span><?php endif; ?>
             </div>
             <div class="block-list-item__actions">
                 <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/move">
@@ -182,6 +184,10 @@ foreach ($blocks as $b) {
                     <?= Csrf::field() ?>
                     <input type="hidden" name="direction" value="down">
                     <button type="submit" class="btn btn--small" <?= $index === count($blocks) - 1 ? 'disabled' : '' ?>>&darr;</button>
+                </form>
+                <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/toggle" title="<?= $blockActive ? 'Отключить (скрыть на сайте)' : 'Включить (показать на сайте)' ?>">
+                    <?= Csrf::field() ?>
+                    <button type="submit" class="btn btn--small"><?= $blockActive ? '👁 Скрыть' : '🚫 Показать' ?></button>
                 </form>
                 <a class="btn btn--small" href="/admin/blocks/<?= (int) $block['id'] ?>/edit">Редактировать</a>
                 <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/delete" data-confirm="Удалить блок?">
