@@ -25,7 +25,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($block['title'] ?? '', ENT_QUOTES) ?>">
         </div>
 
-        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'faq'], true)): ?>
+        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq'], true)): ?>
             <div class="form-field">
                 <label for="title_field">Заголовок, показываемый на сайте</label>
                 <input type="text" id="title_field" name="title_field" value="<?= htmlspecialchars($data['title'] ?? '', ENT_QUOTES) ?>">
@@ -289,6 +289,45 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                         Блок выводит опубликованные записи раздела «<?= $type === 'team_list' ? 'Команда' : 'Проекты' ?>» по порядку сортировки.
                     <?php endif; ?>
                 </span>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'banner'): ?>
+            <div class="form-field">
+                <label for="text">Текст баннера</label>
+                <textarea id="text" name="text" rows="2"><?= htmlspecialchars($data['text'] ?? '', ENT_QUOTES) ?></textarea>
+            </div>
+            <?= \App\Core\AdminUi::imageField('image', $data['image'] ?? '', ['label' => 'Фоновое изображение', 'hint' => 'Тёмная подложка накладывается автоматически для читаемости текста.']) ?>
+            <div class="form-field">
+                <label for="button_text">Текст кнопки</label>
+                <input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field">
+                <label for="button_url">Ссылка кнопки</label>
+                <input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/catalog/documenty">
+            </div>
+        <?php endif; ?>
+
+        <?php if ($type === 'partners'): ?>
+            <div>
+                <label>Логотипы партнёров</label>
+                <div data-repeater="items">
+                    <?php foreach (($data['items'] ?? []) as $i => $item): ?>
+                        <div class="repeater-row">
+                            <div class="form-field"><label>Ссылка на логотип</label><input type="text" name="items[<?= $i ?>][logo]" value="<?= htmlspecialchars($item['logo'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/logo.png"></div>
+                            <div class="form-field"><label>Название</label><input type="text" name="items[<?= $i ?>][name]" value="<?= htmlspecialchars($item['name'] ?? '', ENT_QUOTES) ?>"></div>
+                            <div class="form-field"><label>Ссылка (необязательно)</label><input type="text" name="items[<?= $i ?>][url]" value="<?= htmlspecialchars($item['url'] ?? '', ENT_QUOTES) ?>" placeholder="https://..."></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="items">
+                    <div class="form-field"><label>Ссылка на логотип</label><input type="text" name="items[__INDEX__][logo]" placeholder="/uploads/public/logo.png"></div>
+                    <div class="form-field"><label>Название</label><input type="text" name="items[__INDEX__][name]"></div>
+                    <div class="form-field"><label>Ссылка (необязательно)</label><input type="text" name="items[__INDEX__][url]" placeholder="https://..."></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить логотип</button></div>
             </div>
         <?php endif; ?>
 

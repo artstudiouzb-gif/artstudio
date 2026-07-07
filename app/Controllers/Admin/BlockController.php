@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'faq'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq'];
 
     public function store(array $params): void
     {
@@ -466,6 +466,39 @@ final class BlockController
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
                     'limit' => max(0, (int) ($_POST['limit'] ?? 0)),
+                ];
+            case 'partners':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $logo = trim((string) ($item['logo'] ?? ''));
+                    if ($logo === '') {
+                        continue;
+                    }
+                    $url = trim((string) ($item['url'] ?? ''));
+                    if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
+                        $url = '';
+                    }
+                    $items[] = [
+                        'logo' => $logo,
+                        'name' => trim((string) ($item['name'] ?? '')),
+                        'url' => $url,
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'items' => $items,
+                ];
+            case 'banner':
+                $bannerUrl = trim((string) ($_POST['button_url'] ?? ''));
+                if ($bannerUrl !== '' && !\App\Core\UrlGuard::isSafeLink($bannerUrl)) {
+                    $bannerUrl = '';
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
+                    'image' => trim((string) ($_POST['image'] ?? '')),
+                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
+                    'button_url' => $bannerUrl,
                 ];
             case 'faq':
                 $items = [];

@@ -28,6 +28,8 @@ final class BlockRenderer
         'team_list' => ['title' => '', 'limit' => 0],
         'projects_list' => ['title' => '', 'limit' => 3],
         'news_latest' => ['title' => 'Последние новости', 'limit' => 3],
+        'partners' => ['title' => 'Партнёры', 'items' => []],
+        'banner' => ['title' => '', 'text' => '', 'image' => '', 'button_text' => '', 'button_url' => ''],
         'faq' => ['title' => '', 'items' => []],
     ];
 

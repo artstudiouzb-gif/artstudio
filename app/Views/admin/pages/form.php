@@ -33,6 +33,8 @@ $blockTypeLabels = [
     'team_list' => 'Список команды',
     'projects_list' => 'Список проектов',
     'news_latest' => 'Последние новости',
+    'partners' => 'Партнёры (логотипы)',
+    'banner' => 'Баннер с фоном',
     'faq' => 'FAQ / аккордеон',
 ];
 
