@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\ContentFields;
+use App\Models\ContentEntry;
 use App\Models\ContentType;
 
 // --- Юнит: рендер значения поля для фронтенда (без БД, кроме relation) ---
