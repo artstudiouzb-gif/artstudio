@@ -90,6 +90,7 @@ $router->post('/admin/profile/sessions/{id}/revoke', [\App\Controllers\Admin\Pro
 
 // --- Admin: дашборд ---
 $router->get('/admin', [DashboardController::class, 'index']);
+$router->post('/admin/demo-content', [DashboardController::class, 'seedDemo']);
 
 // --- Admin: массовые операции + быстрый поиск (этап 12.4) ---
 $router->post('/admin/bulk/{type}', [\App\Controllers\Admin\BulkController::class, 'handle']);

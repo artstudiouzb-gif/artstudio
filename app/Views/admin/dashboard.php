@@ -40,4 +40,15 @@ require __DIR__ . '/layout/header.php';
     </a>
 </div>
 
+<?php if (\App\Core\Auth::isSuperAdmin()): ?>
+<div class="form-card" style="margin-top:24px;">
+    <h2 style="margin-top:0;">Демо-контент</h2>
+    <p class="form-hint">Наполнить разделы примерами (новости, документы, вакансии, тендеры, руководство, типовые страницы и меню). Существующие записи не дублируются — можно нажимать повторно безопасно.</p>
+    <form method="post" action="/admin/demo-content" data-confirm="Загрузить демо-контент в разделы сайта?">
+        <?= \App\Core\Csrf::field() ?>
+        <button type="submit" class="btn btn--primary">Загрузить демо-контент</button>
+    </form>
+</div>
+<?php endif; ?>
+
 <?php require __DIR__ . '/layout/footer.php'; ?>
