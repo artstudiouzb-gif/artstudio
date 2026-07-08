@@ -557,3 +557,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .design-card__preview--font_style-system::after { font-family: system-ui, Arial, sans-serif; }
 .design-card__preview--font_style-serif::after { font-family: Georgia, 'Times New Roman', serif; }
 .design-card__preview--font_style-custom::after { content: 'Аа?'; font-family: inherit; color: #66707c; }
+
+/* Мои конфигурации: форма сохранения */
+.design-save-preset { display: flex; gap: 10px; max-width: 560px; }
+.design-save-preset input { flex: 1; }
+@media (max-width: 560px) { .design-save-preset { flex-direction: column; } .design-save-preset .btn { width: 100%; } }
+.design-preset--user { background: #fff; }

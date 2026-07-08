@@ -230,14 +230,106 @@ final class DesignSettings
         }
     }
 
-    /** Применяет готовую конфигурацию. */
+    /** Применяет готовую конфигурацию (встроенную или пользовательскую «user:slug»). */
     public static function applyPreset(string $preset): bool
     {
+        if (str_starts_with($preset, 'user:')) {
+            return self::applyUserPreset(substr($preset, 5));
+        }
         if (!isset(self::PRESETS[$preset])) {
             return false;
         }
         self::save(self::PRESETS[$preset]['values']);
         Setting::set('design_preset', $preset);
+
+        return true;
+    }
+
+    // --- Пользовательские конфигурации (сохранённые администратором) ---
+
+    private const USER_PRESETS_KEY = 'design_user_presets';
+    private const USER_PRESETS_MAX = 10;
+
+    /** @return array<string,array{label:string,values:array<string,string>,colors?:array<int,string>}> */
+    public static function userPresets(): array
+    {
+        $json = Setting::get(self::USER_PRESETS_KEY, '');
+        $data = $json !== '' ? json_decode($json, true) : null;
+
+        return is_array($data) ? $data : [];
+    }
+
+    /**
+     * Сохраняет ТЕКУЩИЕ настройки дизайна как именованную конфигурацию.
+     * Вместе с опциями снапшотится ручная тройка цвет/акцент/шрифт — чтобы
+     * пресет с палитрой «Свои цвета» восстанавливался в точности.
+     * Возвращает slug или null (пустое имя / превышен лимит).
+     */
+    public static function saveUserPreset(string $name): ?string
+    {
+        $name = mb_substr(trim($name), 0, 40);
+        if ($name === '') {
+            return null;
+        }
+
+        $presets = self::userPresets();
+        $slug = preg_replace('/[^a-z0-9]+/', '-', mb_strtolower($name)) ?: 'preset';
+        $slug = trim($slug, '-') ?: 'preset';
+        if (!isset($presets[$slug]) && count($presets) >= self::USER_PRESETS_MAX) {
+            return null;
+        }
+
+        $presets[$slug] = [
+            'label' => $name,
+            'values' => self::current(),
+            'colors' => [
+                Setting::get('color_primary', ''),
+                Setting::get('color_accent', ''),
+                Setting::get('font_family', ''),
+            ],
+        ];
+        Setting::set(self::USER_PRESETS_KEY, json_encode($presets, JSON_UNESCAPED_UNICODE));
+        Setting::set('design_preset', 'user:' . $slug);
+
+        return $slug;
+    }
+
+    public static function deleteUserPreset(string $slug): bool
+    {
+        $presets = self::userPresets();
+        if (!isset($presets[$slug])) {
+            return false;
+        }
+        unset($presets[$slug]);
+        Setting::set(self::USER_PRESETS_KEY, json_encode($presets, JSON_UNESCAPED_UNICODE));
+        if (Setting::get('design_preset', '') === 'user:' . $slug) {
+            Setting::set('design_preset', '');
+        }
+
+        return true;
+    }
+
+    public static function applyUserPreset(string $slug): bool
+    {
+        $presets = self::userPresets();
+        if (!isset($presets[$slug])) {
+            return false;
+        }
+        $preset = $presets[$slug];
+        self::save((array) ($preset['values'] ?? []));
+
+        // Палитра «Свои цвета»: восстанавливаем снапшот ручных значений.
+        $values = (array) ($preset['values'] ?? []);
+        $colors = (array) ($preset['colors'] ?? []);
+        if (($values['palette'] ?? '') === 'custom' && count($colors) === 3) {
+            if ($colors[0] !== '') { Setting::set('color_primary', (string) $colors[0]); }
+            if ($colors[1] !== '') { Setting::set('color_accent', (string) $colors[1]); }
+        }
+        if (($values['font_style'] ?? '') === 'custom' && ($colors[2] ?? '') !== '') {
+            Setting::set('font_family', (string) $colors[2]);
+        }
+
+        Setting::set('design_preset', 'user:' . $slug);
 
         return true;
     }

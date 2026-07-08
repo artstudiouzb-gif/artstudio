@@ -24,9 +24,41 @@ final class DesignController
         View::render('admin/design/index', [
             'options' => DesignSettings::OPTIONS,
             'presets' => DesignSettings::PRESETS,
+            'userPresets' => DesignSettings::userPresets(),
             'values' => DesignSettings::current(),
             'activePreset' => Setting::get('design_preset', ''),
         ]);
+    }
+
+    /** Сохранить текущие настройки как собственную конфигурацию. */
+    public function savePreset(): void
+    {
+        Auth::requireSuperAdmin();
+        Csrf::verifyRequest();
+
+        $slug = DesignSettings::saveUserPreset((string) ($_POST['name'] ?? ''));
+        if ($slug === null) {
+            Flash::error('Не удалось сохранить: укажите название (до 40 символов); максимум 10 конфигураций.');
+        } else {
+            Flash::success('Конфигурация сохранена. Теперь её можно применить в один клик.');
+        }
+        header('Location: /admin/design');
+        exit;
+    }
+
+    /** Удалить собственную конфигурацию. */
+    public function deletePreset(): void
+    {
+        Auth::requireSuperAdmin();
+        Csrf::verifyRequest();
+
+        if (DesignSettings::deleteUserPreset((string) ($_POST['slug'] ?? ''))) {
+            Flash::success('Конфигурация удалена.');
+        } else {
+            Flash::error('Конфигурация не найдена.');
+        }
+        header('Location: /admin/design');
+        exit;
     }
 
     public function update(): void
@@ -51,7 +83,9 @@ final class DesignController
         $preset = (string) ($_POST['preset'] ?? '');
         if (DesignSettings::applyPreset($preset)) {
             Cache::forgetPrefix('page:');
-            Flash::success('Конфигурация «' . (DesignSettings::PRESETS[$preset]['label'] ?? $preset) . '» применена.');
+            $label = DesignSettings::PRESETS[$preset]['label']
+                ?? (DesignSettings::userPresets()[substr($preset, 5)]['label'] ?? $preset);
+            Flash::success('Конфигурация «' . $label . '» применена.');
         } else {
             Flash::error('Неизвестная конфигурация.');
         }

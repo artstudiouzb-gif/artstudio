@@ -8,6 +8,7 @@ require __DIR__ . '/../layout/header.php';
 
 /** @var array $options */
 /** @var array $presets */
+/** @var array $userPresets */
 /** @var array $values */
 /** @var string $activePreset */
 
@@ -35,6 +36,42 @@ foreach ($options as $key => $opt) {
             </form>
         <?php endforeach; ?>
     </div>
+</section>
+
+<section class="design-section">
+    <h2 class="design-section__title">Мои конфигурации</h2>
+    <?php if (!empty($userPresets)): ?>
+        <div class="design-presets" style="margin-bottom:16px;">
+            <?php foreach ($userPresets as $uslug => $upreset): ?>
+                <div class="design-preset design-preset--user<?= $activePreset === 'user:' . $uslug ? ' is-active' : '' ?>">
+                    <div class="design-preset__head">
+                        <strong><?= htmlspecialchars((string) $upreset['label'], ENT_QUOTES) ?></strong>
+                        <?php if ($activePreset === 'user:' . $uslug): ?><span class="design-preset__badge">Активна</span><?php endif; ?>
+                    </div>
+                    <p class="design-preset__desc">Сохранённая вами конфигурация.</p>
+                    <div style="display:flex;gap:8px;">
+                        <form method="post" action="/admin/design/preset" style="margin:0;">
+                            <?= Csrf::field() ?>
+                            <input type="hidden" name="preset" value="user:<?= htmlspecialchars($uslug, ENT_QUOTES) ?>">
+                            <button type="submit" class="btn btn--small btn--primary">Применить</button>
+                        </form>
+                        <form method="post" action="/admin/design/preset/delete" style="margin:0;" data-confirm="Удалить конфигурацию «<?= htmlspecialchars((string) $upreset['label'], ENT_QUOTES) ?>»?">
+                            <?= Csrf::field() ?>
+                            <input type="hidden" name="slug" value="<?= htmlspecialchars($uslug, ENT_QUOTES) ?>">
+                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        </form>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <p class="form-hint">Сохранённых конфигураций пока нет. Настройте параметры ниже, сохраните — и сможете переключаться в один клик.</p>
+    <?php endif; ?>
+    <form method="post" action="/admin/design/preset/save" class="design-save-preset">
+        <?= Csrf::field() ?>
+        <input type="text" name="name" maxlength="40" placeholder="Название конфигурации (напр. «Зимняя тема»)" required>
+        <button type="submit" class="btn">Сохранить текущие настройки</button>
+    </form>
 </section>
 
 <form method="post" action="/admin/design" class="design-fine">

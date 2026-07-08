@@ -216,6 +216,8 @@ $router->post('/admin/content/{type}/{id}/delete', [\App\Controllers\Admin\Conte
 $router->get('/admin/design', [\App\Controllers\Admin\DesignController::class, 'index']);
 $router->post('/admin/design', [\App\Controllers\Admin\DesignController::class, 'update']);
 $router->post('/admin/design/preset', [\App\Controllers\Admin\DesignController::class, 'applyPreset']);
+$router->post('/admin/design/preset/save', [\App\Controllers\Admin\DesignController::class, 'savePreset']);
+$router->post('/admin/design/preset/delete', [\App\Controllers\Admin\DesignController::class, 'deletePreset']);
 
 // --- Admin: настройки дизайна ---
 $router->get('/admin/settings', [SettingsController::class, 'index']);
