@@ -99,6 +99,9 @@ final class FormController
             $this->notify($form, $data);
         }
 
+        // Мгновенное уведомление в Telegram (если настроен бот и получатели).
+        \App\Core\FormNotifier::notifySubmission((string) $form['name'], $data);
+
         // Событие для исходящих вебхуков (задача 136).
         \App\Core\WebhookDispatcher::dispatch('form.submitted', [
             'form' => (string) $form['slug'],

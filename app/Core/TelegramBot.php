@@ -38,6 +38,12 @@ final class TelegramBot
         $text = "\u{1F510} Код входа в панель управления: {$code}\n"
             . "Действует 5 минут. Никому не сообщайте этот код.";
 
+        return self::sendMessage($chatId, $text);
+    }
+
+    /** Произвольное текстовое сообщение (уведомления о заявках и т.п.). */
+    public static function sendMessage(int $chatId, string $text): bool
+    {
         return self::request('sendMessage', [
             'chat_id' => $chatId,
             'text' => $text,

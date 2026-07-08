@@ -58,6 +58,7 @@ function ua_short(?string $ua): string
         <p class="form-hint">Бот не настроен. Супер-администратор может создать бота у @BotFather (бесплатно) и указать токен в «Настройках».</p>
     <?php elseif ($botLinked ?? false): ?>
         <p><span class="badge badge--success">Привязан</span> Коды входа приходят вам в Telegram от бота.</p>
+        <p class="form-hint">Ваш chat_id: <code><?= (int) ($profileUser['telegram_chat_id'] ?? 0) ?></code> — укажите его в «Настройках», чтобы получать уведомления о заявках с форм.</p>
         <form method="post" action="/admin/profile/telegram/unlink" class="form-grid" style="max-width:480px;">
             <?= Csrf::field() ?>
             <div class="form-field">

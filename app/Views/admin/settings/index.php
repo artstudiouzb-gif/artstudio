@@ -86,6 +86,11 @@ require __DIR__ . '/../layout/header.php';
                 <input type="text" id="telegram_gateway_token" name="telegram_gateway_token" value="<?= htmlspecialchars($settings['telegram_gateway_token'] ?? '', ENT_QUOTES) ?>" autocomplete="off" spellcheck="false">
                 <span class="form-hint">Получите токен в кабинете <code>gateway.telegram.org</code>. Когда токен указан и у администратора заполнен телефон, вход подтверждается 6-значным кодом, который приходит в Telegram от официального канала <strong>Verification&nbsp;Codes</strong> (t.me/VerificationCodes). Если поле пустое — вход только по паролю.</span>
             </div>
+            <div class="form-field">
+                <label for="telegram_notify_chat_ids">Уведомления о заявках форм: chat_id получателей</label>
+                <input type="text" id="telegram_notify_chat_ids" name="telegram_notify_chat_ids" value="<?= htmlspecialchars($settings['telegram_notify_chat_ids'] ?? '', ENT_QUOTES) ?>" placeholder="123456789, -1001234567890" autocomplete="off" spellcheck="false">
+                <span class="form-hint">Каждая заявка с форм сайта мгновенно приходит сообщением от бота на эти chat_id (через запятую; отрицательный id — групповой чат, куда добавлен бот). Свой chat_id виден в «Профиле» после привязки Telegram. Пусто — уведомления выключены.</span>
+            </div>
         </fieldset>
 
         <fieldset class="settings-group">
