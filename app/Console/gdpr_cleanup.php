@@ -11,6 +11,7 @@ declare(strict_types=1);
  *
  * Удаляет form_submissions старше настройки «Срок хранения ПДн» (дней).
  * pii_retention_days = 0 → очистка отключена (хранить бессрочно).
+ * Дополнительно чистит журнал действий администраторов старше 180 дней.
  */
 
 require __DIR__ . '/../Core/Cli.php';
@@ -30,9 +31,15 @@ if ($lock === null) {
 }
 
 try {
+    // Журнал действий администраторов: храним 180 дней (не зависит от ПДн).
+    $auditRemoved = \App\Models\AuditLog::purgeOlderThan(180);
+    if ($auditRemoved > 0) {
+        Logger::info('Очистка журнала действий: удалены старые записи', ['removed' => $auditRemoved]);
+    }
+
     $days = (int) Setting::get('pii_retention_days', '0');
     if ($days <= 0) {
-        fwrite(STDOUT, 'Срок хранения ПДн не задан (0) — очистка отключена.' . PHP_EOL);
+        fwrite(STDOUT, 'Срок хранения ПДн не задан (0) — очистка заявок отключена.' . PHP_EOL);
         exit(0);
     }
 

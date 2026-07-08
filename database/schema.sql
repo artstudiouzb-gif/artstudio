@@ -464,6 +464,22 @@ CREATE TABLE IF NOT EXISTS block_snippets (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ---------------------------------------------------------------------------
+-- Журнал действий администраторов (аудит): кто, что (метод + путь), когда,
+-- с какого IP. Пишется центрально для всех изменяющих запросов /admin.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_log (
+    id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT UNSIGNED NULL,
+    username   VARCHAR(100) NOT NULL DEFAULT '',
+    method     VARCHAR(8) NOT NULL DEFAULT 'POST',
+    path       VARCHAR(255) NOT NULL,
+    ip         VARCHAR(45) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_audit_user (user_id, created_at),
+    KEY idx_audit_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------------------------
 -- Конструктор произвольных типов контента (этап 16.4)
 -- ---------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS content_types (
@@ -651,7 +667,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_07_block_active.sql'),
     ('2026_07_07_home_page.sql'),
     ('2026_07_08_telegram_gateway_2fa.sql'),
-    ('2026_07_08_telegram_bot_login.sql')
+    ('2026_07_08_telegram_bot_login.sql'),
+    ('2026_07_08_audit_log.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

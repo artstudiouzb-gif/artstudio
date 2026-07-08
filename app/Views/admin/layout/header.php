@@ -78,7 +78,10 @@ if ($navIsSuper) {
         'webhooks' => ['/admin/webhooks', 'Вебхуки'],
         'settings' => ['/admin/settings', 'Настройки'],
     ];
-    $navUsersGroup = ['users' => ['/admin/users', 'Пользователи']];
+    $navUsersGroup = [
+        'users' => ['/admin/users', 'Пользователи'],
+        'audit' => ['/admin/audit', 'Журнал действий'],
+    ];
     $navTools['repository'] = ['/admin/repository', 'Хранилище'];
 }
 

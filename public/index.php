@@ -193,6 +193,7 @@ $router->post('/admin/trash/{type}/{id}/restore', [\App\Controllers\Admin\TrashC
 $router->post('/admin/trash/{type}/{id}/force-delete', [\App\Controllers\Admin\TrashController::class, 'forceDelete']);
 
 // --- Admin: пользователи (только супер-администратор) ---
+$router->get('/admin/audit', [\App\Controllers\Admin\AuditController::class, 'index']);
 $router->get('/admin/users', [\App\Controllers\Admin\UserController::class, 'index']);
 $router->post('/admin/users/create', [\App\Controllers\Admin\UserController::class, 'store']);
 $router->post('/admin/users/{id}/delete', [\App\Controllers\Admin\UserController::class, 'destroy']);
@@ -287,5 +288,9 @@ $router->get('/catalog/{type}', [\App\Controllers\Site\ContentController::class,
 $router->get('/catalog/{type}/{slug}', [\App\Controllers\Site\ContentController::class, 'show']);
 $router->post('/forms/{slug}/submit', [SiteFormController::class, 'submit']);
 $router->get('/{slug}', [SitePageController::class, 'show']);
+
+// Журнал действий администраторов: центральная запись изменяющих запросов
+// панели (кто/что/когда/откуда; тело запроса не сохраняется).
+\App\Models\AuditLog::record();
 
 $router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
