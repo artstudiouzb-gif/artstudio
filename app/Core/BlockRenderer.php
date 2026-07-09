@@ -39,6 +39,7 @@ final class BlockRenderer
         'cards_grid' => ['title' => '', 'all_text' => '', 'all_url' => '', 'columns' => 5, 'items' => []],
         'image_cards' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
         'media_gallery' => ['title' => '', 'all_text' => '', 'all_url' => '', 'items' => []],
+        'news_feature' => ['title' => 'Новости и аналитика', 'all_text' => 'Все новости', 'all_url' => '', 'limit' => 6],
     ];
 
     public static function defaultsFor(string $type): array
@@ -255,6 +256,31 @@ final class BlockRenderer
             }
             $data['news'] = $items;
             $data['all_url'] = Locale::url('news', $lang);
+        }
+
+        // Блок «Новости и аналитика»: крупная главная новость + список (для
+        // главной страницы). limit 0 -> 6.
+        if ($type === 'news_feature') {
+            $limit = (int) ($data['limit'] ?? 6);
+            if ($limit <= 0) {
+                $limit = 6;
+            }
+            $lang = Locale::current();
+            $items = [];
+            foreach (\App\Models\News::published($limit, 0, $lang) as $row) {
+                $items[] = [
+                    'title' => (string) $row['title'],
+                    'slug' => (string) $row['slug'],
+                    'published_at' => (string) ($row['published_at'] ?? ''),
+                    'excerpt' => (string) ($row['excerpt'] ?? ''),
+                    'cover' => \App\Models\News::getCoverImage($row),
+                    'url' => Locale::url('news/' . $row['slug'], $lang),
+                ];
+            }
+            $data['news'] = $items;
+            if (($data['all_url'] ?? '') === '') {
+                $data['all_url'] = Locale::url('news', $lang);
+            }
         }
 
         return $data;

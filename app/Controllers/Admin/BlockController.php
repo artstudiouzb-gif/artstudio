@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature'];
 
     public function store(array $params): void
     {
@@ -590,6 +590,7 @@ final class BlockController
                         'title' => TextProcessor::typographPlain($label, $locale),
                         'text' => TextProcessor::typographPlain(trim((string) ($item['text'] ?? '')), $locale),
                         'meta' => TextProcessor::typographPlain(trim((string) ($item['meta'] ?? '')), $locale),
+                        'kind' => ($item['kind'] ?? '') === 'photo' ? 'photo' : 'video',
                         'url' => $url,
                     ];
                 }
@@ -600,6 +601,13 @@ final class BlockController
                     'all_url' => (trim((string) ($_POST['all_url'] ?? '')) !== '' && \App\Core\UrlGuard::isSafeLink(trim((string) ($_POST['all_url'] ?? '')))) ? trim((string) ($_POST['all_url'] ?? '')) : '',
                     'columns' => max(2, min(5, $cols)),
                     'items' => $items,
+                ];
+            case 'news_feature':
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'all_text' => trim((string) ($_POST['all_text'] ?? '')),
+                    'all_url' => (trim((string) ($_POST['all_url'] ?? '')) !== '' && \App\Core\UrlGuard::isSafeLink(trim((string) ($_POST['all_url'] ?? '')))) ? trim((string) ($_POST['all_url'] ?? '')) : '',
+                    'limit' => max(2, min(12, (int) ($_POST['limit'] ?? 6))),
                 ];
             case 'categories_grid':
                 $items = [];

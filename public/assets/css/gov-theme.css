@@ -222,3 +222,38 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .mediacard__duration { position: absolute; right: 10px; bottom: 10px; background: rgba(11,26,48,.8); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
 .mediacard__title { display: block; font-weight: 700; font-family: 'PT Serif', serif; color: var(--gov-navy); line-height: 1.3; }
 .mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }
+
+/* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
+.newsfeat-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; }
+@media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
+.newsfeat-lead { display: flex; flex-direction: column; text-decoration: none; color: var(--gov-ink); background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); overflow: hidden; }
+.newsfeat-lead__media { display: block; aspect-ratio: 16/9; background: #24425f center/cover no-repeat; }
+.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
+.newsfeat-lead__body { display: flex; flex-direction: column; gap: 10px; padding: 22px; }
+.newsfeat-lead__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.35rem; color: var(--gov-navy); line-height: 1.25; }
+.newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.55; }
+.newsfeat-side { display: flex; flex-direction: column; gap: 18px; }
+.newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
+.newsfeat__more { color: var(--gov-teal); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; }
+.newsfeat-mini { display: grid; grid-template-columns: 116px 1fr; gap: 14px; text-decoration: none; color: var(--gov-ink); align-items: center; }
+.newsfeat-mini__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; }
+.newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
+.newsfeat-mini__body { display: flex; flex-direction: column; gap: 5px; }
+.newsfeat-mini__title { font-weight: 700; color: var(--gov-navy); line-height: 1.3; font-size: .98rem; }
+.newsfeat-text { display: flex; flex-direction: column; gap: 5px; text-decoration: none; color: var(--gov-ink); padding-top: 16px; border-top: 1px solid var(--gov-border); }
+.newsfeat-text__title { font-weight: 700; color: var(--gov-navy); line-height: 1.3; font-size: .98rem; }
+.newsfeat-lead:hover .newsfeat-lead__title, .newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
+
+/* --- Медиа-галерея: переключатели --- */
+.media-tabs { display: inline-flex; gap: 22px; margin-right: auto; margin-left: 24px; }
+.media-tabs__tab { border: 0; background: transparent; padding: 4px 0; cursor: pointer; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; color: var(--gov-muted); border-bottom: 2px solid transparent; font-family: 'PT Sans', sans-serif; }
+.media-tabs__tab.is-active { color: var(--gov-teal); border-bottom-color: var(--gov-teal); }
+.mediacard__play--photo svg { width: 22px; height: 22px; }
+
+/* --- Форма подписки в подвале --- */
+.footer-subscribe { display: flex; margin-top: 12px; max-width: 320px; }
+.footer-subscribe input[type=email] { flex: 1; min-width: 0; border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.06); color: #fff; border-radius: 8px 0 0 8px; padding: 11px 14px; }
+.footer-subscribe input[type=email]::placeholder { color: rgba(255,255,255,.55); }
+.footer-subscribe button { border: 0; background: var(--gov-teal); color: #fff; padding: 0 18px; border-radius: 0 8px 8px 0; cursor: pointer; font-size: 18px; }
+.footer-subscribe button:hover { background: color-mix(in srgb, var(--gov-teal) 85%, #000); }
+.site-footer--columns .site-footer__col--subscribe .site-footer__line { color: rgba(255,255,255,.72); }

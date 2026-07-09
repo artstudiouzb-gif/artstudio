@@ -46,3 +46,8 @@ test('FooterConfig: недопустимый стиль → columns', function (
     assert_same('columns', FooterConfig::normalize(['style' => 'zzz'])['style']);
     assert_same('minimal', FooterConfig::normalize(['style' => 'minimal'])['style']);
 });
+
+test('FooterConfig: виджет subscribe валиден', function () {
+    $cfg = FooterConfig::normalize(['columns' => [['heading' => 'Подписка', 'widget' => 'subscribe']]]);
+    assert_same('subscribe', $cfg['columns'][0]['widget']);
+});

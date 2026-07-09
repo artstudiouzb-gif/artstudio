@@ -20,6 +20,7 @@ final class FooterConfig
         'menu' => 'Меню сайта',
         'contacts' => 'Контакты (адрес, телефон, email)',
         'social' => 'Соцсети',
+        'subscribe' => 'Подписка на новости (форма)',
         'text' => 'Текст / HTML (сниппет)',
     ];
 

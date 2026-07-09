@@ -72,6 +72,17 @@ $renderFooterWidget = function (array $col) use ($logo, $siteName, $address, $ph
                 $h .= '<a class="site-footer__social-link" href="' . htmlspecialchars((string) $btn['url'], ENT_QUOTES) . '" target="_blank" rel="noopener" aria-label="' . htmlspecialchars((string) $btn['network'], ENT_QUOTES) . '">' . htmlspecialchars(mb_strtoupper(mb_substr((string) $btn['network'], 0, 1)), ENT_QUOTES) . '</a>';
             }
             return $h . '</div>';
+        case 'subscribe':
+            // Форма подписки в подвале (постит в /subscribe, как и блок).
+            $ts = (string) time();
+            return '<p class="site-footer__line">Будьте в курсе наших новостей и аналитических материалов.</p>'
+                . '<form class="footer-subscribe" method="post" action="/subscribe">'
+                . \App\Core\Csrf::field()
+                . '<div style="position:absolute;left:-9999px;" aria-hidden="true"><input type="text" name="hp_website" tabindex="-1" autocomplete="off"></div>'
+                . '<input type="hidden" name="hp_ts" value="' . htmlspecialchars($ts, ENT_QUOTES) . '">'
+                . '<input type="email" name="email" placeholder="Ваш e-mail" aria-label="E-mail" required>'
+                . '<button type="submit" aria-label="Подписаться">&rarr;</button>'
+                . '</form>';
         case 'text':
             // Уже очищено санитайзером при сохранении.
             return '<div class="site-footer__text">' . $col['text'] . '</div>';

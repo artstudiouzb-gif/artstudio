@@ -141,3 +141,16 @@
     }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
     reveals.forEach(function (el) { io.observe(el); });
 })();
+
+    // Медиа-галерея: переключатели «Видео / Фото».
+    document.querySelectorAll('[data-media-gallery]').forEach(function (gallery) {
+        var tabs = gallery.querySelectorAll('[data-media-tab]');
+        if (!tabs.length) { return; }
+        var cards = gallery.querySelectorAll('[data-media-kind]');
+        var apply = function (kind) {
+            cards.forEach(function (c) { c.style.display = c.getAttribute('data-media-kind') === kind ? '' : 'none'; });
+            tabs.forEach(function (t) { t.classList.toggle('is-active', t.getAttribute('data-media-tab') === kind); });
+        };
+        tabs.forEach(function (t) { t.addEventListener('click', function () { apply(t.getAttribute('data-media-tab')); }); });
+        apply('video');
+    });
