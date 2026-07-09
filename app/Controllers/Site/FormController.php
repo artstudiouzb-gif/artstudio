@@ -43,6 +43,11 @@ final class FormController
             $this->success($successMessage);
         }
 
+        // Согласие на обработку персональных данных (если включено глобально).
+        if (\App\Models\Setting::get('form_consent_enabled', '0') === '1' && empty($_POST['_consent'])) {
+            $this->fail('Подтвердите согласие на обработку персональных данных.', ['_consent' => 'Требуется согласие.']);
+        }
+
         $data = [];
         $errors = [];
 

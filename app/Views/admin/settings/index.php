@@ -126,6 +126,15 @@ require __DIR__ . '/../layout/header.php';
                 <label for="pii_retention_days">Срок хранения ПДн (дней, 0 — бессрочно)</label>
                 <input type="number" id="pii_retention_days" name="pii_retention_days" min="0" value="<?= htmlspecialchars($settings['pii_retention_days'] ?? '0', ENT_QUOTES) ?>">
             </div>
+            <div class="form-field form-field--checkbox">
+                <input type="checkbox" id="form_consent_enabled" name="form_consent_enabled" value="1" <?= ($settings['form_consent_enabled'] ?? '0') === '1' ? 'checked' : '' ?>>
+                <label for="form_consent_enabled">Требовать согласие на обработку персональных данных во всех публичных формах</label>
+            </div>
+            <div class="form-field">
+                <label for="form_consent_text">Текст согласия</label>
+                <input type="text" id="form_consent_text" name="form_consent_text" maxlength="500" value="<?= htmlspecialchars($settings['form_consent_text'] ?? 'Я согласен на обработку персональных данных', ENT_QUOTES) ?>">
+                <span class="form-hint">Ссылка на «Политику конфиденциальности» добавляется автоматически, если страница выбрана выше.</span>
+            </div>
         </fieldset>
 
         <fieldset class="settings-group">

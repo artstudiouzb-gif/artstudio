@@ -53,6 +53,10 @@ final class SettingsController
         Setting::set('privacy_policy_page_id', $privacyPageId > 0 ? (string) $privacyPageId : '');
         Setting::set('pii_retention_days', (string) SettingsValidator::nonNegativeInt((string) ($_POST['pii_retention_days'] ?? ''), 0));
 
+        // Согласие на обработку персональных данных в публичных формах.
+        Setting::set('form_consent_enabled', !empty($_POST['form_consent_enabled']) ? '1' : '0');
+        Setting::set('form_consent_text', mb_substr(trim((string) ($_POST['form_consent_text'] ?? '')), 0, 500));
+
         // --- Favicon / PWA / Theme Color ---
         $favicon = ImageField::resolve('favicon_file', 'favicon_url', Setting::get('favicon_url'), Auth::id());
         Setting::set('favicon_url', $favicon ?? '');

@@ -215,6 +215,9 @@ summary:focus-visible {
 .block-gallery__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 .block-gallery__item img { border-radius: 8px; }
 
+.block-form__consent { display: flex; align-items: flex-start; gap: 8px; margin: 4px 0 16px; font-size: .92rem; color: var(--text-muted); }
+.block-form__consent input { margin-top: 3px; flex-shrink: 0; }
+.block-form__consent a { color: var(--color-accent, #5b52e5); }
 .block-form__field { margin-bottom: 14px; display: flex; flex-direction: column; gap: 6px; }
 .block-form__field input, .block-form__field textarea {
     padding: 10px;
