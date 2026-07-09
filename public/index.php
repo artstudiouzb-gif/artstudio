@@ -178,6 +178,10 @@ $router->post('/admin/menu/{id}/move', [AdminMenuController::class, 'move']);
 $router->get('/admin/header', [AdminHeaderController::class, 'index']);
 $router->post('/admin/header', [AdminHeaderController::class, 'update']);
 
+// --- Admin: конструктор подвала ---
+$router->get('/admin/footer', [\App\Controllers\Admin\FooterController::class, 'index']);
+$router->post('/admin/footer', [\App\Controllers\Admin\FooterController::class, 'update']);
+
 // --- Admin: боковые виджеты ---
 $router->get('/admin/widgets', [AdminWidgetController::class, 'index']);
 $router->get('/admin/widgets/create', [AdminWidgetController::class, 'create']);
