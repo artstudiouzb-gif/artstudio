@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery'];
 
     public function store(array $params): void
     {
@@ -449,11 +449,16 @@ final class BlockController
                     if ($value === '' && $label === '') {
                         continue;
                     }
+                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
+                    if ($iconSvg !== '') {
+                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                    }
                     $items[] = [
                         // Число хранится как целое (для анимации инкремента).
                         'value' => (int) preg_replace('/\D+/', '', $value),
                         'suffix' => trim((string) ($item['suffix'] ?? '')),
                         'label' => TextProcessor::typographPlain($label, $locale),
+                        'icon_svg' => $iconSvg,
                     ];
                 }
                 return [
@@ -548,16 +553,53 @@ final class BlockController
                     'items' => $items,
                 ];
             case 'hero':
-                $heroUrl = trim((string) ($_POST['button_url'] ?? ''));
-                if ($heroUrl !== '' && !\App\Core\UrlGuard::isSafeLink($heroUrl)) {
-                    $heroUrl = '';
-                }
+                $safe = static fn (string $u): string => ($u !== '' && \App\Core\UrlGuard::isSafeLink($u)) ? $u : '';
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'eyebrow' => TextProcessor::typographPlain(trim((string) ($_POST['eyebrow'] ?? '')), $locale),
                     'subtitle' => TextProcessor::typographPlain(trim((string) ($_POST['subtitle'] ?? '')), $locale),
                     'image' => trim((string) ($_POST['image'] ?? '')),
+                    'video_url' => trim((string) ($_POST['video_url'] ?? '')),
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
-                    'button_url' => $heroUrl,
+                    'button_url' => $safe(trim((string) ($_POST['button_url'] ?? ''))),
+                    'button2_text' => trim((string) ($_POST['button2_text'] ?? '')),
+                    'button2_url' => $safe(trim((string) ($_POST['button2_url'] ?? ''))),
+                    'video_button_text' => trim((string) ($_POST['video_button_text'] ?? '')),
+                    'video_button_url' => $safe(trim((string) ($_POST['video_button_url'] ?? ''))),
+                ];
+            case 'cards_grid':
+            case 'image_cards':
+            case 'media_gallery':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $label = trim((string) ($item['title'] ?? $item['label'] ?? ''));
+                    if ($label === '') {
+                        continue;
+                    }
+                    $url = trim((string) ($item['url'] ?? ''));
+                    if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
+                        $url = '';
+                    }
+                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
+                    if ($iconSvg !== '') {
+                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                    }
+                    $items[] = [
+                        'icon_svg' => $iconSvg,
+                        'image' => trim((string) ($item['image'] ?? '')),
+                        'title' => TextProcessor::typographPlain($label, $locale),
+                        'text' => TextProcessor::typographPlain(trim((string) ($item['text'] ?? '')), $locale),
+                        'meta' => TextProcessor::typographPlain(trim((string) ($item['meta'] ?? '')), $locale),
+                        'url' => $url,
+                    ];
+                }
+                $cols = (int) ($_POST['columns'] ?? 5);
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'all_text' => trim((string) ($_POST['all_text'] ?? '')),
+                    'all_url' => (trim((string) ($_POST['all_url'] ?? '')) !== '' && \App\Core\UrlGuard::isSafeLink(trim((string) ($_POST['all_url'] ?? '')))) ? trim((string) ($_POST['all_url'] ?? '')) : '',
+                    'columns' => max(2, min(5, $cols)),
+                    'items' => $items,
                 ];
             case 'categories_grid':
                 $items = [];

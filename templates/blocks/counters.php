@@ -10,11 +10,16 @@ $items = $data['items'] ?? [];
             $value = (int) ($item['value'] ?? 0);
         ?>
             <div class="counter">
-                <div class="counter__value" data-counter-target="<?= $value ?>"><?= $value ?></div>
-                <?php if (!empty($item['suffix'])): ?>
-                    <span class="counter__suffix"><?= htmlspecialchars($item['suffix'], ENT_QUOTES) ?></span>
+                <?php if (!empty($item['icon_svg'])): ?>
+                    <span class="counter__icon" aria-hidden="true"><?= $item['icon_svg'] ?></span>
                 <?php endif; ?>
-                <div class="counter__label"><?= htmlspecialchars($item['label'] ?? '', ENT_QUOTES) ?></div>
+                <div class="counter__body">
+                    <div class="counter__num">
+                        <span class="counter__value" data-counter-target="<?= $value ?>"><?= $value ?></span>
+                        <?php if (!empty($item['suffix'])): ?><span class="counter__suffix"><?= htmlspecialchars($item['suffix'], ENT_QUOTES) ?></span><?php endif; ?>
+                    </div>
+                    <div class="counter__label"><?= htmlspecialchars($item['label'] ?? '', ENT_QUOTES) ?></div>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>

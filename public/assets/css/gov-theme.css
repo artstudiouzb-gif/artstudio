@@ -135,3 +135,90 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .page-blocks > section.cms-block--cta:first-of-type .block-cta {
     background: var(--gov-navy); box-shadow: none;
 }
+
+/* ==========================================================================
+   ГЛАВНАЯ ПО ЭСКИЗУ: видео-герой, полоса статистики, направления, проекты, медиа
+   ========================================================================== */
+/* Полноширинный герой с видео/фото и тёмным затемнением, текст слева поверх. */
+.cms-block--hero { padding-block: 0 !important; }
+.block-hero--media {
+    position: relative; width: 100vw; margin-left: calc(50% - 50vw); overflow: hidden;
+    border: 0; border-radius: 0; min-height: clamp(460px, 46vw, 640px);
+    display: flex; align-items: center; background: var(--gov-navy);
+}
+.block-hero__video, .block-hero--media .block-hero__media {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    background-size: cover; background-position: center;
+}
+.block-hero__scrim {
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(11,26,48,.92) 0%, rgba(11,26,48,.7) 38%, rgba(11,26,48,.25) 70%, rgba(11,26,48,.15) 100%);
+}
+.block-hero--media .block-hero__inner { position: relative; width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 20px; }
+.block-hero--media .block-hero__text { max-width: 620px; }
+.block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal); font-family: 'PT Sans', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
+.block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
+.block-hero--media .block-hero__title { color: #fff; font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.12; margin: 0 0 20px; }
+.block-hero--media .block-hero__subtitle { color: rgba(255,255,255,.85); font-size: clamp(1.02rem, 1.5vw, 1.18rem); max-width: 520px; }
+.block-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 30px; }
+.block-hero__button { display: inline-block; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; border-radius: 4px; text-decoration: none; }
+.block-hero--media .block-hero__button { background: #16406e; }
+.block-hero__button--ghost { background: transparent; border: 1px solid rgba(255,255,255,.5); }
+.block-hero__button--ghost:hover { background: rgba(255,255,255,.1); }
+.block-hero__play { display: inline-flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.block-hero__play-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(2px); }
+.block-hero__play-icon svg { width: 20px; height: 20px; }
+.block-hero__play:hover .block-hero__play-icon { background: var(--gov-teal); }
+@media (max-width: 720px) { .block-hero__scrim { background: linear-gradient(180deg, rgba(11,26,48,.7), rgba(11,26,48,.9)); } }
+
+/* Полоса статистики — белая карта, «наезжает» на герой; иконка в кружке. */
+.cms-block--hero + .cms-block--counters { padding-top: 0 !important; }
+.cms-block--hero + .cms-block--counters .block-counters { margin-top: -56px; position: relative; z-index: 3; }
+.counter { flex-direction: row; align-items: center; gap: 16px; }
+.counter__icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--gov-navy) 7%, transparent); color: var(--gov-navy); }
+.counter__icon svg { width: 26px; height: 26px; }
+.counter__num { display: flex; align-items: baseline; gap: 4px; }
+.counter__body { display: flex; flex-direction: column; gap: 2px; }
+@media (max-width: 720px) { .cms-block--hero + .cms-block--counters .block-counters { margin-top: 0; } }
+
+/* Заголовок секции: серифный + ссылка «Все …». */
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+.section-head__title { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0; }
+.section-head__all { color: var(--gov-teal); font-family: 'PT Sans', sans-serif; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
+/* Приоритетные направления — карточки иконка+заголовок+текст+стрелка. */
+.cards-grid { display: grid; grid-template-columns: repeat(var(--cards-cols, 5), 1fr); gap: 20px; }
+@media (max-width: 1000px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .cards-grid { grid-template-columns: 1fr; } }
+.feature-card { display: flex; flex-direction: column; gap: 12px; padding: 26px 22px; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); text-decoration: none; color: var(--gov-ink); transition: box-shadow .15s ease, transform .15s ease; }
+.feature-card:hover { box-shadow: 0 12px 32px rgba(19,42,92,.1); transform: translateY(-3px); }
+.feature-card__icon { color: var(--gov-teal); }
+.feature-card__icon svg { width: 34px; height: 34px; }
+.feature-card__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.12rem; color: var(--gov-navy); line-height: 1.25; }
+.feature-card__text { color: var(--gov-muted); font-size: .92rem; line-height: 1.5; flex: 1; }
+.feature-card__arrow { color: var(--gov-teal); font-size: 1.2rem; }
+
+/* Проекты — карточки с фото и тёмным градиентом. */
+.imgcards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 1000px) { .imgcards-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .imgcards-grid { grid-template-columns: 1fr; } }
+.imgcard { position: relative; display: block; min-height: 240px; border-radius: var(--radius); overflow: hidden; text-decoration: none; color: #fff; }
+.imgcard__media { position: absolute; inset: 0; background: #24425f center/cover no-repeat; transition: transform .4s ease; }
+.imgcard:hover .imgcard__media { transform: scale(1.05); }
+.imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); }
+.imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.imgcard__title { font-family: 'PT Serif', serif; font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
+.imgcard__more { text-transform: uppercase; font-size: 12px; letter-spacing: .06em; font-weight: 700; color: rgba(255,255,255,.9); }
+
+/* Медиа-галерея — карточки с play и длительностью. */
+.mediagallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+@media (max-width: 1000px) { .mediagallery-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .mediagallery-grid { grid-template-columns: 1fr; } }
+.mediacard { text-decoration: none; color: var(--gov-ink); }
+.mediacard__media { position: relative; display: grid; place-items: center; aspect-ratio: 16/10; border-radius: var(--radius); overflow: hidden; background: #24425f center/cover no-repeat; margin-bottom: 12px; }
+.mediacard__play { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.9); color: var(--gov-navy); }
+.mediacard__play svg { width: 22px; height: 22px; margin-left: 2px; }
+.mediacard:hover .mediacard__play { background: var(--gov-teal); color: #fff; }
+.mediacard__duration { position: absolute; right: 10px; bottom: 10px; background: rgba(11,26,48,.8); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+.mediacard__title { display: block; font-weight: 700; font-family: 'PT Serif', serif; color: var(--gov-navy); line-height: 1.3; }
+.mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }

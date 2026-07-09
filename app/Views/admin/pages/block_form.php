@@ -25,7 +25,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <input type="text" id="title" name="title" value="<?= htmlspecialchars($block['title'] ?? '', ENT_QUOTES) ?>">
         </div>
 
-        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials'], true)): ?>
+        <?php if (in_array($type, ['text', 'cta', 'advantages', 'gallery', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery'], true)): ?>
             <div class="form-field">
                 <label for="title_field">Заголовок, показываемый на сайте</label>
                 <input type="text" id="title_field" name="title_field" value="<?= htmlspecialchars($data['title'] ?? '', ENT_QUOTES) ?>">
@@ -261,6 +261,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 <div data-repeater="items">
                     <?php foreach (($data['items'] ?? []) as $i => $item): ?>
                         <div class="repeater-row">
+                            <div class="form-field"><label>SVG-иконка (необязательно)</label><textarea name="items[<?= $i ?>][icon_svg]"><?= htmlspecialchars($item['icon_svg'] ?? '', ENT_QUOTES) ?></textarea></div>
                             <div class="form-field"><label>Число</label><input type="number" name="items[<?= $i ?>][value]" value="<?= (int) ($item['value'] ?? 0) ?>"></div>
                             <div class="form-field"><label>Суффикс (напр. + или %)</label><input type="text" name="items[<?= $i ?>][suffix]" value="<?= htmlspecialchars($item['suffix'] ?? '', ENT_QUOTES) ?>"></div>
                             <div class="form-field"><label>Подпись</label><input type="text" name="items[<?= $i ?>][label]" value="<?= htmlspecialchars($item['label'] ?? '', ENT_QUOTES) ?>"></div>
@@ -269,6 +270,7 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                     <?php endforeach; ?>
                 </div>
                 <template data-repeater-template="items">
+                    <div class="form-field"><label>SVG-иконка (необязательно)</label><textarea name="items[__INDEX__][icon_svg]"></textarea></div>
                     <div class="form-field"><label>Число</label><input type="number" name="items[__INDEX__][value]" value="0"></div>
                     <div class="form-field"><label>Суффикс (напр. + или %)</label><input type="text" name="items[__INDEX__][suffix]"></div>
                     <div class="form-field"><label>Подпись</label><input type="text" name="items[__INDEX__][label]"></div>
@@ -393,17 +395,76 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
 
         <?php if ($type === 'hero'): ?>
             <div class="form-field">
+                <label for="eyebrow">Надзаголовок (мелкий текст над заголовком)</label>
+                <input type="text" id="eyebrow" name="eyebrow" value="<?= htmlspecialchars($data['eyebrow'] ?? '', ENT_QUOTES) ?>" placeholder="СТРАТЕГИЯ. РЕФОРМЫ. РАЗВИТИЕ.">
+            </div>
+            <div class="form-field">
                 <label for="subtitle">Подзаголовок</label>
                 <textarea id="subtitle" name="subtitle" rows="2"><?= htmlspecialchars($data['subtitle'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
-            <?= \App\Core\AdminUi::imageField('image', $data['image'] ?? '', ['label' => 'Фото справа', 'hint' => 'Фото плавно перетекает в фон слева, где расположен текст.']) ?>
+            <?= \App\Core\AdminUi::imageField('image', $data['image'] ?? '', ['label' => 'Фото/постер фона', 'hint' => 'Фоновое изображение героя (и постер для видео).']) ?>
             <div class="form-field">
-                <label for="button_text">Текст кнопки (необязательно)</label>
-                <input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>">
+                <label for="video_url">Видео-фон (URL mp4, необязательно)</label>
+                <input type="text" id="video_url" name="video_url" value="<?= htmlspecialchars($data['video_url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/hero.mp4">
+                <span class="form-hint">Загрузите mp4 в «Файлы» и вставьте ссылку. Видео зациклено, без звука.</span>
             </div>
-            <div class="form-field">
-                <label for="button_url">Ссылка кнопки</label>
-                <input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/news">
+            <div class="form-field"><label for="button_text">Кнопка 1 — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="button_url">Кнопка 1 — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/o-nas"></div>
+            <div class="form-field"><label for="button2_text">Кнопка 2 — текст (контурная)</label><input type="text" id="button2_text" name="button2_text" value="<?= htmlspecialchars($data['button2_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="button2_url">Кнопка 2 — ссылка</label><input type="text" id="button2_url" name="button2_url" value="<?= htmlspecialchars($data['button2_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="video_button_text">Кнопка «Смотреть видео» — текст</label><input type="text" id="video_button_text" name="video_button_text" value="<?= htmlspecialchars($data['video_button_text'] ?? '', ENT_QUOTES) ?>"></div>
+            <div class="form-field"><label for="video_button_url">Кнопка «Смотреть видео» — ссылка</label><input type="text" id="video_button_url" name="video_button_url" value="<?= htmlspecialchars($data['video_button_url'] ?? '', ENT_QUOTES) ?>"></div>
+        <?php endif; ?>
+
+        <?php if (in_array($type, ['cards_grid', 'image_cards', 'media_gallery'], true)): ?>
+            <div class="form-field"><label for="all_text">Ссылка «Все …» — текст</label><input type="text" id="all_text" name="all_text" value="<?= htmlspecialchars($data['all_text'] ?? '', ENT_QUOTES) ?>" placeholder="Все направления"></div>
+            <div class="form-field"><label for="all_url">Ссылка «Все …» — URL</label><input type="text" id="all_url" name="all_url" value="<?= htmlspecialchars($data['all_url'] ?? '', ENT_QUOTES) ?>"></div>
+            <?php if ($type === 'cards_grid'): ?>
+                <div class="form-field"><label for="columns">Колонок</label>
+                    <select id="columns" name="columns">
+                        <?php foreach ([2,3,4,5] as $n): ?><option value="<?= $n ?>" <?= (int)($data['columns'] ?? 5)===$n?'selected':'' ?>><?= $n ?></option><?php endforeach; ?>
+                    </select>
+                </div>
+            <?php endif; ?>
+            <div>
+                <label>Элементы</label>
+                <div data-repeater="items">
+                    <?php foreach (($data['items'] ?? []) as $i => $item): ?>
+                        <div class="repeater-row">
+                            <?php if ($type === 'cards_grid'): ?>
+                                <div class="form-field"><label>SVG-иконка</label><textarea name="items[<?= $i ?>][icon_svg]"><?= htmlspecialchars($item['icon_svg'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <?php else: ?>
+                                <div class="form-field"><label>Изображение (URL)</label><input type="text" name="items[<?= $i ?>][image]" value="<?= htmlspecialchars($item['image'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/..."></div>
+                            <?php endif; ?>
+                            <div class="form-field"><label>Заголовок</label><input type="text" name="items[<?= $i ?>][title]" value="<?= htmlspecialchars($item['title'] ?? '', ENT_QUOTES) ?>"></div>
+                            <?php if ($type === 'cards_grid'): ?>
+                                <div class="form-field"><label>Текст</label><textarea name="items[<?= $i ?>][text]"><?= htmlspecialchars($item['text'] ?? '', ENT_QUOTES) ?></textarea></div>
+                            <?php elseif ($type === 'media_gallery'): ?>
+                                <div class="form-field"><label>Длительность (напр. 02:35)</label><input type="text" name="items[<?= $i ?>][meta]" value="<?= htmlspecialchars($item['meta'] ?? '', ENT_QUOTES) ?>"></div>
+                                <div class="form-field"><label>Дата</label><input type="text" name="items[<?= $i ?>][text]" value="<?= htmlspecialchars($item['text'] ?? '', ENT_QUOTES) ?>"></div>
+                            <?php endif; ?>
+                            <div class="form-field"><label>Ссылка</label><input type="text" name="items[<?= $i ?>][url]" value="<?= htmlspecialchars($item['url'] ?? '', ENT_QUOTES) ?>"></div>
+                            <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+                <template data-repeater-template="items">
+                    <?php if ($type === 'cards_grid'): ?>
+                        <div class="form-field"><label>SVG-иконка</label><textarea name="items[__INDEX__][icon_svg]"></textarea></div>
+                    <?php else: ?>
+                        <div class="form-field"><label>Изображение (URL)</label><input type="text" name="items[__INDEX__][image]"></div>
+                    <?php endif; ?>
+                    <div class="form-field"><label>Заголовок</label><input type="text" name="items[__INDEX__][title]"></div>
+                    <?php if ($type === 'cards_grid'): ?>
+                        <div class="form-field"><label>Текст</label><textarea name="items[__INDEX__][text]"></textarea></div>
+                    <?php elseif ($type === 'media_gallery'): ?>
+                        <div class="form-field"><label>Длительность</label><input type="text" name="items[__INDEX__][meta]"></div>
+                        <div class="form-field"><label>Дата</label><input type="text" name="items[__INDEX__][text]"></div>
+                    <?php endif; ?>
+                    <div class="form-field"><label>Ссылка</label><input type="text" name="items[__INDEX__][url]"></div>
+                    <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                </template>
+                <div class="repeater-actions"><button type="button" class="btn btn--small" data-repeater-add="items">+ Добавить</button></div>
             </div>
         <?php endif; ?>
 
