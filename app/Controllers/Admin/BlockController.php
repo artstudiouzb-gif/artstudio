@@ -17,7 +17,7 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe'];
+    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards'];
 
     public function store(array $params): void
     {
@@ -517,6 +517,30 @@ final class BlockController
                     $items[] = [
                         'question' => TextProcessor::typographPlain($q, $locale),
                         'answer' => TextProcessor::process($a, $locale),
+                    ];
+                }
+                return [
+                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
+                    'items' => $items,
+                ];
+            case 'contact_cards':
+                $items = [];
+                foreach ((array) ($_POST['items'] ?? []) as $item) {
+                    $itemTitle = trim((string) ($item['title'] ?? ''));
+                    $lines = trim((string) ($item['lines'] ?? ''));
+                    if ($itemTitle === '' && $lines === '') {
+                        continue;
+                    }
+                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
+                    if ($iconSvg !== '') {
+                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
+                    }
+                    $items[] = [
+                        'icon_svg' => $iconSvg,
+                        'title' => TextProcessor::typographPlain($itemTitle, $locale),
+                        'lines' => $lines,
+                        'link_url' => trim((string) ($item['link_url'] ?? '')),
+                        'link_text' => trim((string) ($item['link_text'] ?? '')),
                     ];
                 }
                 return [

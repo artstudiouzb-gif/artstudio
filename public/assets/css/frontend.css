@@ -1228,3 +1228,39 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
     .site-header--layout-centered .site-header__zone--left,
     .site-header--layout-centered .site-header__zone--right { flex: 0 0 auto; }
 }
+
+/* ==========================================================================
+   БЛОК «Контактные карточки» (модульный блок конструктора) + полоса статистики
+   ========================================================================== */
+.block-contact-cards__title { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0 0 22px; }
+.block-contact-cards__empty { color: var(--text-muted); }
+.contact-cards {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: var(--card-gap, 22px);
+}
+.contact-card {
+    background: var(--surface, #fff); border: 1px solid var(--border-color); border-radius: var(--radius, 14px);
+    padding: 24px; transition: box-shadow .15s ease, transform .15s ease;
+}
+.contact-card:hover { box-shadow: var(--shadow-primary); transform: translateY(-3px); }
+.contact-card__icon {
+    display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 12px; margin-bottom: 14px;
+    background: color-mix(in srgb, var(--color-primary, #223d79) 10%, transparent);
+    color: var(--color-primary, #223d79);
+}
+.contact-card__icon svg { width: 22px; height: 22px; }
+.contact-card__title { font-family: var(--font-heading, inherit); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; color: var(--color-primary, #223d79); }
+.contact-card__line { margin: 2px 0; color: var(--text-muted); }
+.contact-card__link { display: inline-block; margin-top: 12px; font-weight: 600; color: var(--color-accent, #2f6fed); text-decoration: none; }
+.contact-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+:root[data-theme="dark"] .contact-card__title { color: var(--text-main); }
+
+/* Полоса статистики (блок «Счётчики» в гос-стиле): карточки с иконкой-подложкой. */
+.block-counters__grid { text-align: left; }
+.counter {
+    display: flex; flex-direction: column; gap: 4px;
+    padding: 22px 24px; background: var(--surface, #fff);
+    border: 1px solid var(--border-color); border-radius: var(--radius, 14px);
+}
+.counter__value, .counter__suffix { color: var(--color-primary, #223d79); font-family: var(--font-heading, inherit); }
+.counter__label { color: var(--text-muted); margin-top: 4px; font-size: .95rem; }
+:root[data-theme="dark"] .counter__value, :root[data-theme="dark"] .counter__suffix { color: var(--text-main); }

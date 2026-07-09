@@ -32,6 +32,7 @@ final class BlockRenderer
         'banner' => ['title' => '', 'text' => '', 'image' => '', 'button_text' => '', 'button_url' => ''],
         'subscribe' => ['title' => 'Подписка на новости', 'text' => 'Получайте дайджест новостей на почту раз в неделю.', 'button_text' => 'Подписаться'],
         'faq' => ['title' => '', 'items' => []],
+        'contact_cards' => ['title' => '', 'items' => []],
     ];
 
     public static function defaultsFor(string $type): array
