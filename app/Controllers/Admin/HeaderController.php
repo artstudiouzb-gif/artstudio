@@ -59,6 +59,21 @@ final class HeaderController
                 'url' => $_POST['cta_url'] ?? '',
                 'style' => $_POST['cta_style'] ?? 'filled',
             ],
+            // Pro Max: секции top/bottom, контакты и сниппет.
+            'topbar' => [
+                'enabled' => !empty($_POST['topbar_enabled']),
+                'style' => $_POST['topbar_style'] ?? 'navy',
+                'show_mobile' => !empty($_POST['topbar_mobile']),
+                'zones' => $parseZones('topbar_zones'),
+            ],
+            'bottombar' => [
+                'zones' => $parseZones('bottombar_zones'),
+            ],
+            'contacts' => [
+                'phone' => $_POST['contact_phone'] ?? '',
+                'email' => $_POST['contact_email'] ?? '',
+            ],
+            'snippet' => (string) ($_POST['snippet'] ?? ''),
         ]);
 
         Flash::success('Настройки шапки сохранены.');

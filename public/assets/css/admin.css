@@ -641,3 +641,52 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .hdr-tabs__tab.is-active { background: #fff; color: var(--admin-accent, #5b52e5); box-shadow: 0 1px 3px rgba(16,24,40,.1); }
 .hdr-tabs__panel { display: none; }
 .hdr-tabs__panel.is-active { display: block; }
+
+/* ==========================================================================
+   Конструктор шапки Pro Max: секции Top/Middle/Bottom, палитра, чипы-элементы.
+   ========================================================================== */
+.hb-palette { background: linear-gradient(180deg, #f7f9fc, #eef2f8); border: 1px solid var(--admin-border, #e1e3e8); border-radius: 12px; padding: 14px 16px; margin-bottom: 18px; }
+.hb-palette__label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #6b7789; margin-bottom: 10px; }
+.hb-palette__items { display: flex; flex-wrap: wrap; gap: 8px; min-height: 46px; }
+.hb-palette .hb-el__remove { display: none; }
+.hb-palette .hb-el { cursor: grab; }
+
+.hb-section { border: 1px solid var(--admin-border, #e1e3e8); border-radius: 12px; margin-bottom: 14px; overflow: hidden; background: #fff; }
+.hb-section__head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; background: #f7f9fc; border-bottom: 1px solid var(--admin-border, #e1e3e8); }
+.hb-section__badge { padding: 3px 10px; border-radius: 999px; background: #173a63; color: #fff; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+.hb-section__badge--middle { background: #17999b; }
+.hb-section__badge--bottom { background: #4a5a74; }
+.hb-section__title { font-weight: 700; color: #1f2b3d; }
+.hb-section__controls { margin-left: auto; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.hb-note { color: #6b7789; font-size: 12.5px; }
+.hb-select { padding: 6px 10px; border: 1px solid var(--admin-border, #e1e3e8); border-radius: 8px; font-size: 13px; }
+
+.hb-switch { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: #1f2b3d; cursor: pointer; user-select: none; }
+.hb-switch input { position: absolute; opacity: 0; pointer-events: none; }
+.hb-switch__track { width: 34px; height: 20px; border-radius: 999px; background: #cfd6e0; position: relative; transition: background .15s ease; flex: 0 0 auto; }
+.hb-switch__track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: left .15s ease; }
+.hb-switch input:checked + .hb-switch__track { background: #17999b; }
+.hb-switch input:checked + .hb-switch__track::after { left: 16px; }
+.hb-switch input:focus-visible + .hb-switch__track { outline: 3px solid #17999b; outline-offset: 2px; }
+
+.hb-zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 14px 16px; }
+@media (max-width: 900px) { .hb-zones { grid-template-columns: 1fr; } }
+.hb-zone__label { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #8a94a6; margin-bottom: 7px; }
+.hb-zone__drop { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-height: 56px; padding: 9px; border: 2px dashed #d6dce6; border-radius: 10px; background: #fbfcfe; transition: border-color .15s ease, background .15s ease; }
+.hb-zone__drop.is-over { border-color: #17999b; background: #f0fafa; }
+
+.hb-el { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; background: #fff; border: 1px solid #dde3ec; border-radius: 9px; box-shadow: 0 1px 2px rgba(19,42,92,.07); font-size: 13px; font-weight: 600; color: #1f2b3d; cursor: grab; transition: box-shadow .15s ease, border-color .15s ease, transform .12s ease; }
+.hb-el:hover { border-color: #17999b; box-shadow: 0 4px 12px rgba(19,42,92,.12); }
+.hb-el:active { cursor: grabbing; }
+.hb-el.is-dragging { opacity: .45; transform: scale(.97); }
+.hb-el__grip { color: #b6bfcd; display: inline-flex; }
+.hb-el__icon { display: inline-flex; color: #17999b; }
+.hb-el__icon svg { width: 16px; height: 16px; }
+.hb-el__remove { border: 0; background: transparent; color: #98a3b5; font-size: 15px; line-height: 1; cursor: pointer; padding: 2px 3px; border-radius: 5px; }
+.hb-el__remove:hover { color: #d33; background: #fdeaea; }
+
+.hb-tabs { display: inline-flex; background: #eef2f8; border-radius: 9px; padding: 3px; gap: 2px; }
+.hb-tabs .hdr-tabs__tab { border: 0; background: transparent; padding: 6px 14px; border-radius: 7px; font-size: 13px; font-weight: 700; color: #6b7789; cursor: pointer; }
+.hb-tabs .hdr-tabs__tab.is-active { background: #fff; color: #173a63; box-shadow: 0 1px 3px rgba(19,42,92,.12); }
+
+.hb-inline-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }

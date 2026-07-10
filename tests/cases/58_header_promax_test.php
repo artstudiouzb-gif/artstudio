@@ -1,0 +1,35 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Core\HeaderConfig;
+
+test('HeaderConfig Pro Max: секции top/bottom нормализуются, мусор отброшен', function () {
+    $cfg = HeaderConfig::normalize([
+        'topbar' => [
+            'enabled' => '1', 'style' => 'evil', 'show_mobile' => 1,
+            'zones' => ['left' => ['phone', 'email', 'hack'], 'right' => ['language', 'divider', 'divider']],
+        ],
+        'bottombar' => ['zones' => ['right' => ['search', 'search']]],
+        'contacts' => ['phone' => ' +998 71 203 10 00 ', 'email' => 'info@strategy.uz'],
+        'snippet' => '<b>Работаем</b><script>alert(1)</script>',
+    ]);
+    assert_true($cfg['topbar']['enabled'], 'topbar включён');
+    assert_same('navy', $cfg['topbar']['style'], 'недопустимый стиль -> navy');
+    assert_true($cfg['topbar']['show_mobile']);
+    assert_same(['phone', 'email'], $cfg['topbar']['zones']['left'], 'неизвестный элемент отброшен');
+    assert_same(['language', 'divider', 'divider'], $cfg['topbar']['zones']['right'], 'divider повторяем');
+    assert_same(['search'], $cfg['bottombar']['zones']['right'], 'дубль неповторяемого убран');
+    assert_same('+998 71 203 10 00', $cfg['contacts']['phone']);
+    assert_contains('<b>Работаем</b>', $cfg['snippet']);
+    assert_true(!str_contains($cfg['snippet'], '<script'), 'script вырезан санитайзером');
+});
+
+test('HeaderConfig Pro Max: элемент может повторяться в разных секциях', function () {
+    $cfg = HeaderConfig::normalize([
+        'topbar' => ['enabled' => 1, 'zones' => ['right' => ['language']]],
+        'elements' => ['right' => ['language', 'search']],
+    ]);
+    assert_same(['language'], $cfg['topbar']['zones']['right']);
+    assert_same(['language', 'search'], $cfg['elements']['right'], 'уникальность — в пределах секции');
+});

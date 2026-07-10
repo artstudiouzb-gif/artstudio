@@ -29,10 +29,17 @@ final class HeaderConfig
         'button' => 'Кнопка (CTA)',
         'theme' => 'Тёмная тема',
         'a11y' => 'Версия для слабовидящих',
+        'phone' => 'Телефон',
+        'email' => 'E-mail',
+        'snippet' => 'Сниппет (текст/HTML)',
         'divider' => 'Разделитель',
     ];
 
-    /** Элементы, которые можно повторять в зонах (визуальные). Прочие — уникальны. */
+    /** Стили верхней/утилитарной полосы шапки. */
+    public const BAR_STYLES = ['navy', 'light', 'teal'];
+
+    /** Элементы, которые можно повторять в зонах (визуальные). Прочие — уникальны
+     *  в пределах одной секции (но могут повторяться в разных секциях). */
     private const REPEATABLE = ['divider'];
 
     public const DEFAULTS = [
@@ -62,6 +69,24 @@ final class HeaderConfig
             'url' => '',
             'style' => 'filled',              // filled | outline
         ],
+        // Pro Max: верхняя утилитарная полоса над шапкой (top section).
+        'topbar' => [
+            'enabled' => false,
+            'style' => 'navy',                // из BAR_STYLES
+            'show_mobile' => false,
+            'zones' => ['left' => [], 'center' => [], 'right' => []],
+        ],
+        // Pro Max: нижняя полоса (bottom section) — элементы рядом с меню.
+        'bottombar' => [
+            'zones' => ['left' => [], 'center' => [], 'right' => []],
+        ],
+        // Значения для элементов «Телефон» и «E-mail».
+        'contacts' => [
+            'phone' => '',
+            'email' => '',
+        ],
+        // Произвольный сниппет (HTML проходит санитайзер при сохранении).
+        'snippet' => '',
     ];
 
     public static function get(): array
@@ -161,6 +186,33 @@ final class HeaderConfig
             'url' => trim((string) ($cta['url'] ?? '')),
             'style' => in_array($cta['style'] ?? '', ['filled', 'outline'], true) ? $cta['style'] : 'filled',
         ];
+
+        // Pro Max: секции top/bottom.
+        $topbar = (array) ($config['topbar'] ?? []);
+        $result['topbar'] = [
+            'enabled' => !empty($topbar['enabled']),
+            'style' => in_array($topbar['style'] ?? '', self::BAR_STYLES, true) ? $topbar['style'] : 'navy',
+            'show_mobile' => !empty($topbar['show_mobile']),
+            'zones' => isset($topbar['zones']) && is_array($topbar['zones'])
+                ? self::normalizeZones($topbar['zones'])
+                : self::DEFAULTS['topbar']['zones'],
+        ];
+        $bottombar = (array) ($config['bottombar'] ?? []);
+        $result['bottombar'] = [
+            'zones' => isset($bottombar['zones']) && is_array($bottombar['zones'])
+                ? self::normalizeZones($bottombar['zones'])
+                : self::DEFAULTS['bottombar']['zones'],
+        ];
+
+        $contacts = (array) ($config['contacts'] ?? []);
+        $result['contacts'] = [
+            'phone' => trim((string) ($contacts['phone'] ?? '')),
+            'email' => trim((string) ($contacts['email'] ?? '')),
+        ];
+
+        // Сниппет: строгий allowlist-санитайзер (без <script>/on*-обработчиков).
+        $snippet = (string) ($config['snippet'] ?? '');
+        $result['snippet'] = $snippet !== '' ? HtmlSanitizer::sanitize($snippet) : '';
 
         return $result;
     }

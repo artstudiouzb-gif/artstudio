@@ -463,117 +463,118 @@
 (function () {
     'use strict';
     var REPEATABLE = ['divider'];
+    var builders = document.querySelectorAll('[data-hdr-builder]');
+    if (!builders.length) { return; }
+    // Pro Max: палитра — общий источник (чипы клонируются), секции — приёмники.
+    // Перетаскивание работает МЕЖДУ билдерами (глобальное состояние).
+    var palette = document.querySelector('[data-hdr-zone="palette"]');
+    var dragged = null;       // перетаскиваемый чип (клон или размещённый)
+    var fromPalette = false;  // тянем из палитры (клонировать)
 
-    document.querySelectorAll('[data-hdr-builder]').forEach(function (builder) {
-        var labels = {};
-        try { labels = JSON.parse(builder.getAttribute('data-labels') || '{}'); } catch (e) { labels = {}; }
-        var dragged = null;
-
-        function zoneEl(name) { return builder.querySelector('[data-hdr-zone="' + name + '"]'); }
-
-        function serialize() {
+    function serializeAll() {
+        builders.forEach(function (builder) {
             builder.querySelectorAll('[data-hdr-input]').forEach(function (input) {
-                var dz = zoneEl(input.getAttribute('data-hdr-input'));
+                var dz = builder.querySelector('[data-hdr-zone="' + input.getAttribute('data-hdr-input') + '"]');
+                if (!dz) { return; }
                 var types = Array.prototype.map.call(dz.querySelectorAll('.hdr-chip'), function (c) {
                     return c.getAttribute('data-el');
                 });
                 input.value = types.join(',');
             });
-        }
-
-        function makeChip(type) {
-            var chip = document.createElement('span');
-            chip.className = 'hdr-chip';
-            chip.setAttribute('draggable', 'true');
-            chip.setAttribute('data-el', type);
-            chip.innerHTML = '<span class="hdr-chip__grip" aria-hidden="true">⠿</span>' +
-                '<span class="hdr-chip__label"></span>' +
-                '<button type="button" class="hdr-chip__remove" aria-label="Убрать">×</button>';
-            chip.querySelector('.hdr-chip__label').textContent = labels[type] || type;
-            bindChip(chip);
-            return chip;
-        }
-
-        function returnToPalette(type) {
-            if (REPEATABLE.indexOf(type) !== -1) { return; }
-            var palette = zoneEl('palette');
-            if (palette.querySelector('.hdr-chip[data-el="' + type + '"]')) { return; }
-            palette.appendChild(makeChip(type));
-        }
-
-        function bindChip(chip) {
-            chip.addEventListener('dragstart', function (e) {
-                dragged = chip;
-                setTimeout(function () { chip.classList.add('is-dragging'); }, 0);
-                e.dataTransfer.effectAllowed = 'move';
-                try { e.dataTransfer.setData('text/plain', chip.getAttribute('data-el')); } catch (err) {}
-            });
-            chip.addEventListener('dragend', function () {
-                chip.classList.remove('is-dragging');
-                dragged = null;
-                serialize();
-            });
-            var rm = chip.querySelector('.hdr-chip__remove');
-            if (rm) {
-                rm.addEventListener('click', function () {
-                    var type = chip.getAttribute('data-el');
-                    var inPalette = !!chip.closest('[data-hdr-zone="palette"]');
-                    chip.remove();
-                    if (!inPalette) { returnToPalette(type); }
-                    serialize();
-                });
-            }
-        }
-
-        function afterElement(zone, y) {
-            var chips = Array.prototype.slice.call(zone.querySelectorAll('.hdr-chip:not(.is-dragging)'));
-            var closest = { offset: -Infinity, el: null };
-            chips.forEach(function (c) {
-                var box = c.getBoundingClientRect();
-                var offset = y - box.top - box.height / 2;
-                if (offset < 0 && offset > closest.offset) { closest = { offset: offset, el: c }; }
-            });
-            return closest.el;
-        }
-
-        builder.querySelectorAll('[data-hdr-zone]').forEach(function (zone) {
-            var isPalette = zone.getAttribute('data-hdr-zone') === 'palette';
-            zone.addEventListener('dragover', function (e) {
-                if (!dragged) { return; }
-                e.preventDefault();
-                zone.classList.add('is-over');
-                var type = dragged.getAttribute('data-el');
-                var fromPalette = !!dragged.closest('[data-hdr-zone="palette"]');
-
-                if (isPalette) {
-                    // В палитру возвращаем только неповторяемые (для снятия); разделитель — нет.
-                    if (REPEATABLE.indexOf(type) !== -1) { return; }
-                    if (fromPalette) { return; }
-                    zone.appendChild(dragged);
-                    return;
-                }
-
-                var moving = dragged;
-                // Разделитель из палитры клонируем — палитра остаётся источником.
-                if (fromPalette && REPEATABLE.indexOf(type) !== -1) {
-                    moving = makeChip(type);
-                    dragged = moving; // продолжаем тащить клон
-                }
-                var after = afterElement(zone, e.clientY);
-                if (after == null) { zone.appendChild(moving); }
-                else { zone.insertBefore(moving, after); }
-            });
-            zone.addEventListener('dragleave', function () { zone.classList.remove('is-over'); });
-            zone.addEventListener('drop', function (e) {
-                e.preventDefault();
-                zone.classList.remove('is-over');
-                serialize();
-            });
         });
+    }
 
-        builder.querySelectorAll('.hdr-chip').forEach(bindChip);
-        serialize();
+    // Уникальность в пределах одной секции (билдера): повторяем только divider.
+    function sectionHasType(builder, type) {
+        return !!builder.querySelector('[data-hdr-zone]:not([data-hdr-zone="palette"]) .hdr-chip[data-el="' + type + '"]:not(.is-dragging)');
+    }
+
+    function makeChip(type) {
+        var src = palette ? palette.querySelector('.hdr-chip[data-el="' + type + '"]') : null;
+        if (!src) { return null; }
+        var chip = src.cloneNode(true);
+        chip.classList.add('hdr-chip--placed');
+        bindChip(chip);
+        return chip;
+    }
+
+    function bindChip(chip) {
+        chip.addEventListener('dragstart', function (e) {
+            fromPalette = !!chip.closest('[data-hdr-zone="palette"]');
+            dragged = fromPalette ? makeChip(chip.getAttribute('data-el')) : chip;
+            if (!fromPalette) {
+                setTimeout(function () { chip.classList.add('is-dragging'); }, 0);
+            }
+            e.dataTransfer.effectAllowed = fromPalette ? 'copy' : 'move';
+            try { e.dataTransfer.setData('text/plain', chip.getAttribute('data-el')); } catch (err) {}
+        });
+        chip.addEventListener('dragend', function () {
+            chip.classList.remove('is-dragging');
+            // Отменённое перетаскивание из палитры: убираем невставленный клон.
+            if (fromPalette && dragged && !dragged.parentNode) { /* не вставлен */ }
+            dragged = null;
+            fromPalette = false;
+            serializeAll();
+        });
+        var rm = chip.querySelector('.hdr-chip__remove, .hb-el__remove');
+        if (rm) {
+            rm.addEventListener('click', function () {
+                if (chip.closest('[data-hdr-zone="palette"]')) { return; }
+                chip.remove();
+                serializeAll();
+            });
+        }
+    }
+
+    function afterElement(zone, x, y) {
+        var chips = Array.prototype.slice.call(zone.querySelectorAll('.hdr-chip:not(.is-dragging)'));
+        var closest = { offset: -Infinity, el: null };
+        chips.forEach(function (c) {
+            var box = c.getBoundingClientRect();
+            // Горизонтальные зоны: сравниваем по X в пределах строки, иначе по Y.
+            var offset = (Math.abs(y - (box.top + box.height / 2)) < box.height)
+                ? x - box.left - box.width / 2
+                : y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) { closest = { offset: offset, el: c }; }
+        });
+        return closest.el;
+    }
+
+    document.querySelectorAll('[data-hdr-zone]').forEach(function (zone) {
+        var isPalette = zone.getAttribute('data-hdr-zone') === 'palette';
+        zone.addEventListener('dragover', function (e) {
+            if (!dragged) { return; }
+            e.preventDefault();
+            zone.classList.add('is-over');
+            var type = dragged.getAttribute('data-el');
+
+            if (isPalette) {
+                // Бросок размещённого чипа в палитру = удаление из секции.
+                if (!fromPalette && dragged.parentNode) { dragged.remove(); }
+                return;
+            }
+
+            var builder = zone.closest('[data-hdr-builder]');
+            // Не даём дублировать неповторяемый элемент в той же секции
+            // (перенос внутри секции — можно; из палитры/другой секции — нет).
+            var draggedBuilder = dragged.parentNode ? dragged.closest('[data-hdr-builder]') : null;
+            if (REPEATABLE.indexOf(type) === -1 && draggedBuilder !== builder && sectionHasType(builder, type)) {
+                return;
+            }
+            var after = afterElement(zone, e.clientX, e.clientY);
+            if (after == null) { zone.appendChild(dragged); }
+            else { zone.insertBefore(dragged, after); }
+        });
+        zone.addEventListener('dragleave', function () { zone.classList.remove('is-over'); });
+        zone.addEventListener('drop', function (e) {
+            e.preventDefault();
+            zone.classList.remove('is-over');
+            serializeAll();
+        });
     });
+
+    document.querySelectorAll('.hdr-chip').forEach(bindChip);
+    serializeAll();
 })();
 
 /* Вкладки конструктора (Десктоп / Мобильный). */

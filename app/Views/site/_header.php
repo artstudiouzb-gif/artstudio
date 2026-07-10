@@ -207,6 +207,19 @@ $navAlign = $layout === 'centered' ? 'center'
 // --- Раскладка по зонам верхнего ряда ---
 // Конструктор: элементы-«кирпичики» расставляются по зонам согласно
 // header_config.elements. Логотип и бургер размещаются отдельно.
+$phoneVal = trim((string) ($hcfg['contacts']['phone'] ?? ''));
+$emailVal = trim((string) ($hcfg['contacts']['email'] ?? ''));
+$phoneHtml = $phoneVal !== ''
+    ? '<a class="hdr-contact" href="tel:' . htmlspecialchars(preg_replace('/[^+\d]/', '', $phoneVal) ?? '', ENT_QUOTES) . '">'
+        . '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>'
+        . htmlspecialchars($phoneVal, ENT_QUOTES) . '</a>'
+    : '';
+$emailHtml = $emailVal !== ''
+    ? '<a class="hdr-contact" href="mailto:' . htmlspecialchars($emailVal, ENT_QUOTES) . '">'
+        . '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>'
+        . htmlspecialchars($emailVal, ENT_QUOTES) . '</a>'
+    : '';
+$snippetHtml = (string) ($hcfg['snippet'] ?? ''); // очищен санитайзером при сохранении
 $fragments = [
     'search' => $searchHtml,
     'language' => $langHtml,
@@ -214,8 +227,40 @@ $fragments = [
     'button' => $ctaHtml,
     'theme' => $themeToggle,
     'a11y' => $a11yToggle,
+    'phone' => $phoneHtml,
+    'email' => $emailHtml,
+    'snippet' => $snippetHtml !== '' ? '<span class="hdr-snippet">' . $snippetHtml . '</span>' : '',
     'divider' => '<span class="site-header__divider" aria-hidden="true"></span>',
 ];
+
+// --- Pro Max: верхняя утилитарная полоса (top section) ---
+$topbarHtml = '';
+if (!empty($hcfg['topbar']['enabled'])) {
+    $tbZones = '';
+    foreach (['left', 'center', 'right'] as $z) {
+        $inner = '';
+        foreach ((array) ($hcfg['topbar']['zones'][$z] ?? []) as $el) {
+            $inner .= $fragments[$el] ?? '';
+        }
+        $tbZones .= '<div class="site-topbar__zone site-topbar__zone--' . $z . '">' . $inner . '</div>';
+    }
+    $tbStyle = in_array($hcfg['topbar']['style'] ?? 'navy', HeaderConfig::BAR_STYLES, true) ? $hcfg['topbar']['style'] : 'navy';
+    $tbMobile = !empty($hcfg['topbar']['show_mobile']) ? ' site-topbar--mobile-on' : '';
+    $topbarHtml = '<div class="site-topbar site-topbar--' . $tbStyle . $tbMobile . '"><div class="site-topbar__inner">' . $tbZones . '</div></div>';
+}
+
+// --- Pro Max: элементы нижней полосы (bottom section, рядом с меню) ---
+$bottomExtras = ['left' => '', 'center' => '', 'right' => ''];
+$hasBottomExtras = false;
+foreach (['left', 'center', 'right'] as $z) {
+    foreach ((array) ($hcfg['bottombar']['zones'][$z] ?? []) as $el) {
+        $frag = $fragments[$el] ?? '';
+        if ($frag !== '') {
+            $bottomExtras[$z] .= $frag;
+            $hasBottomExtras = true;
+        }
+    }
+}
 // Собираем зоны отдельно для десктопа и мобильного (разные наборы элементов);
 // на фронте нужный вариант показывается по media-запросу.
 $composeZone = static function (string $zone, string $variant) use ($hcfg, $fragments): string {
@@ -388,15 +433,21 @@ if ($inlineMenu !== '') {
     </div>
     <a href="#" class="a11y-panel__off">Обычная версия</a>
 </div>
+<?= $topbarHtml ?>
 <header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?>">
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
         <div class="site-header__zone site-header__zone--center"><?= $zones['center'] ?></div>
         <div class="site-header__zone site-header__zone--right"><?= $zones['right'] ?></div>
     </div>
-    <?php if ($navBarHtml !== ''): ?>
-    <div class="site-nav site-nav--align-<?= htmlspecialchars($navAlign, ENT_QUOTES) ?>">
-        <div class="site-nav__inner"><?= $navBarHtml ?></div>
+    <?php if ($navBarHtml !== '' || $hasBottomExtras): ?>
+    <div class="site-nav site-nav--align-<?= htmlspecialchars($navAlign, ENT_QUOTES) ?><?= $hasBottomExtras ? ' site-nav--with-extras' : '' ?>">
+        <div class="site-nav__inner">
+            <?php if ($bottomExtras['left'] !== ''): ?><span class="site-nav__extra site-nav__extra--left"><?= $bottomExtras['left'] ?></span><?php endif; ?>
+            <?= $navBarHtml ?>
+            <?php if ($bottomExtras['center'] !== ''): ?><span class="site-nav__extra site-nav__extra--center"><?= $bottomExtras['center'] ?></span><?php endif; ?>
+            <?php if ($bottomExtras['right'] !== ''): ?><span class="site-nav__extra site-nav__extra--right"><?= $bottomExtras['right'] ?></span><?php endif; ?>
+        </div>
     </div>
     <?php endif; ?>
 </header>

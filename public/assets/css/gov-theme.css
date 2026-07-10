@@ -687,3 +687,29 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .block-map__card-title { font-weight: 700; color: var(--gov-navy); font-size: .95rem; line-height: 1.35; }
 .block-map__card-address { color: var(--gov-muted); font-size: .86rem; line-height: 1.5; }
 .block-map__card-link { color: var(--gov-teal-text); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; text-decoration: none; }
+
+/* --- Шапка Pro Max: верхняя утилитарная полоса + элементы нижней полосы --- */
+.site-topbar { font-size: 13px; }
+.site-topbar__inner { max-width: var(--container-max); margin: 0 auto; padding: 7px 20px; display: flex; align-items: center; gap: 18px; }
+.site-topbar__zone { display: flex; align-items: center; gap: 14px; }
+.site-topbar__zone--left { margin-right: auto; }
+.site-topbar__zone--center { margin: 0 auto; }
+.site-topbar__zone--right { margin-left: auto; }
+.site-topbar--navy { background: var(--gov-navy); color: rgba(255,255,255,.88); }
+.site-topbar--teal { background: var(--gov-teal); color: #fff; }
+.site-topbar--light { background: var(--gov-surface); color: var(--gov-ink); border-bottom: 1px solid var(--gov-border); }
+.site-topbar a { color: inherit; text-decoration: none; }
+.site-topbar .hdr-contact:hover { color: #fff; }
+.site-topbar--light .hdr-contact:hover { color: var(--gov-teal-text); }
+.site-topbar .site-lang-switcher__item { color: inherit; }
+.site-topbar .site-header__divider { background: currentColor; opacity: .3; }
+@media (max-width: 760px) { .site-topbar { display: none; } .site-topbar--mobile-on { display: block; } .site-topbar--mobile-on .site-topbar__zone--center { display: none; } }
+
+.hdr-contact { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; white-space: nowrap; }
+.hdr-snippet { display: inline-flex; align-items: center; gap: 6px; }
+
+.site-nav--with-extras .site-nav__inner { display: flex; align-items: center; gap: 18px; }
+.site-nav__extra { display: inline-flex; align-items: center; gap: 12px; }
+.site-nav__extra--right { margin-left: auto; }
+.site-nav__extra--center { margin: 0 auto; }
+.site-nav__extra .site-search input { max-width: 160px; }

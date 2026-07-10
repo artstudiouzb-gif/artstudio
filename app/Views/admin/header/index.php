@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Csrf;
+use App\Core\HeaderConfig;
 
 $pageTitle = 'Шапка сайта';
 $activeNav = 'header';
@@ -8,13 +9,63 @@ require __DIR__ . '/../layout/header.php';
 
 /** @var array $config */
 $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' => 'Facebook', 'linkedin' => 'LinkedIn', 'youtube' => 'YouTube', 'whatsapp' => 'WhatsApp'];
+
+$elements = HeaderConfig::ELEMENTS;
+// SVG-иконки элементов конструктора (единый линейный стиль, 1.6px).
+$elementIcons = [
+    'search' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
+    'language' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
+    'social' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="12" r="2.5"/><circle cx="17" cy="6" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="m8.2 10.8 6.6-3.6m-6.6 6 6.6 3.6"/></svg>',
+    'button' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="8" width="18" height="8" rx="4"/><path d="M8 12h8"/></svg>',
+    'theme' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/></svg>',
+    'a11y' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="5" r="2"/><path d="M4 9h16M12 9v6m0 0-3.5 6M12 15l3.5 6"/></svg>',
+    'phone' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+    'email' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>',
+    'snippet' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m8 8-4 4 4 4m8-8 4 4-4 4M14 5l-4 14"/></svg>',
+    'divider' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 4v16"/></svg>',
+];
+
+$renderChip = function (string $type) use ($elements, $elementIcons): string {
+    $label = $elements[$type] ?? $type;
+    return '<span class="hdr-chip hb-el" draggable="true" data-el="' . htmlspecialchars($type, ENT_QUOTES) . '">'
+        . '<span class="hb-el__grip" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" width="10" height="14"><circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg></span>'
+        . '<span class="hb-el__icon">' . ($elementIcons[$type] ?? '') . '</span>'
+        . '<span class="hb-el__label">' . htmlspecialchars($label, ENT_QUOTES) . '</span>'
+        . '<button type="button" class="hb-el__remove hdr-chip__remove" aria-label="Убрать" title="Убрать">&times;</button>'
+        . '</span>';
+};
+
+/**
+ * Зоны одной секции конструктора. $placed — раскладка left/center/right,
+ * $inputName — префикс скрытых полей. Использует общий drag-and-drop admin.js
+ * (селекторы data-hdr-*).
+ */
+$renderZones = function (array $placed, string $inputName) use ($renderChip): string {
+    ob_start(); ?>
+    <div class="hb-zones">
+        <?php foreach (['left' => 'Слева', 'center' => 'Центр', 'right' => 'Справа'] as $zone => $zoneLabel): ?>
+            <div class="hb-zone">
+                <div class="hb-zone__label"><?= $zoneLabel ?></div>
+                <div class="hb-zone__drop hdr-builder__dropzone" data-hdr-zone="<?= $zone ?>">
+                    <?php foreach ($placed[$zone] ?? [] as $type): ?>
+                        <?= $renderChip($type) ?>
+                    <?php endforeach; ?>
+                </div>
+                <input type="hidden" name="<?= $inputName ?>[<?= $zone ?>]" data-hdr-input="<?= $zone ?>" value="<?= htmlspecialchars(implode(',', $placed[$zone] ?? []), ENT_QUOTES) ?>">
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php return (string) ob_get_clean();
+};
+
+$labelsJson = htmlspecialchars(json_encode($elements, JSON_UNESCAPED_UNICODE), ENT_QUOTES);
 ?>
 <div class="form-card">
     <form method="post" action="/admin/header" class="form-grid">
         <?= Csrf::field() ?>
 
         <div class="header-builder__group">
-            <h3>Дизайн шапки</h3>
+            <h3>Дизайн меню и макет шапки</h3>
             <?php
             $layouts = [
                 'stacked' => ['Двухрядный', 'Логотип и утилиты сверху, меню — отдельной полосой во всю ширину.'],
@@ -36,88 +87,112 @@ $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' =>
                     </label>
                 <?php endforeach; ?>
             </div>
-        </div>
-
-        <div class="header-builder__group">
-            <h3>Конструктор: элементы по зонам</h3>
-            <p class="form-hint" style="margin-top:0;">
-                Перетаскивайте элементы между палитрой и зонами (Слева / Центр / Справа).
-                Логотип и меню размещаются отдельно (ниже). «Разделитель» можно добавлять
-                несколько раз. Порядок в зоне задаётся перетаскиванием. Вкладки
-                «Десктоп» и «Мобильный» задают разные наборы для больших и малых экранов.
-            </p>
-            <?php
-            $elements = \App\Core\HeaderConfig::ELEMENTS;
-            $renderChip = function (string $type) use ($elements): string {
-                $label = $elements[$type] ?? $type;
-                return '<span class="hdr-chip" draggable="true" data-el="' . htmlspecialchars($type, ENT_QUOTES) . '">'
-                    . '<span class="hdr-chip__grip" aria-hidden="true">⠿</span>'
-                    . '<span class="hdr-chip__label">' . htmlspecialchars($label, ENT_QUOTES) . '</span>'
-                    . '<button type="button" class="hdr-chip__remove" aria-label="Убрать" title="Убрать">&times;</button>'
-                    . '</span>';
-            };
-            // Рендер одного конструктора (десктоп или мобильный), $inputName —
-            // префикс имени скрытых полей (elements | elements_mobile).
-            $renderBuilder = function (array $placed, string $inputName) use ($elements, $renderChip): string {
-                $used = array_merge($placed['left'], $placed['center'], $placed['right']);
-                ob_start(); ?>
-                <div class="hdr-builder" data-hdr-builder data-labels="<?= htmlspecialchars(json_encode($elements, JSON_UNESCAPED_UNICODE), ENT_QUOTES) ?>">
-                    <div class="hdr-builder__palette">
-                        <div class="hdr-builder__palette-label">Доступные элементы</div>
-                        <div class="hdr-builder__dropzone hdr-builder__dropzone--palette" data-hdr-zone="palette">
-                            <?php foreach ($elements as $type => $label): ?>
-                                <?php if ($type === 'divider' || !in_array($type, $used, true)): ?>
-                                    <?= $renderChip($type) ?>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                    <div class="hdr-builder__zones">
-                        <?php foreach (['left' => 'Слева', 'center' => 'Центр', 'right' => 'Справа'] as $zone => $zoneLabel): ?>
-                            <div class="hdr-builder__zone">
-                                <div class="hdr-builder__zone-label"><?= $zoneLabel ?></div>
-                                <div class="hdr-builder__dropzone" data-hdr-zone="<?= $zone ?>">
-                                    <?php foreach ($placed[$zone] as $type): ?>
-                                        <?= $renderChip($type) ?>
-                                    <?php endforeach; ?>
-                                </div>
-                                <input type="hidden" name="<?= $inputName ?>[<?= $zone ?>]" data-hdr-input="<?= $zone ?>" value="<?= htmlspecialchars(implode(',', $placed[$zone]), ENT_QUOTES) ?>">
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+            <div class="hb-inline-fields">
+                <div class="form-field">
+                    <label for="logo_position">Логотип</label>
+                    <select id="logo_position" name="logo_position">
+                        <option value="left" <?= $config['logo_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
+                        <option value="center" <?= $config['logo_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
+                    </select>
                 </div>
-                <?php return (string) ob_get_clean();
-            };
-            ?>
-            <div class="hdr-tabs" data-hdr-tabs>
-                <button type="button" class="hdr-tabs__tab is-active" data-hdr-tab="desktop">🖥 Десктоп</button>
-                <button type="button" class="hdr-tabs__tab" data-hdr-tab="mobile">📱 Мобильный</button>
-            </div>
-            <div class="hdr-tabs__panel is-active" data-hdr-panel="desktop">
-                <?= $renderBuilder($config['elements'], 'elements') ?>
-            </div>
-            <div class="hdr-tabs__panel" data-hdr-panel="mobile">
-                <?= $renderBuilder($config['elements_mobile'], 'elements_mobile') ?>
+                <div class="form-field">
+                    <label for="menu_position">Выравнивание меню</label>
+                    <select id="menu_position" name="menu_position">
+                        <option value="left" <?= $config['menu_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
+                        <option value="center" <?= $config['menu_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
+                        <option value="right" <?= $config['menu_position'] === 'right' ? 'selected' : '' ?>>Справа</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Пункты меню</label>
+                    <a class="btn btn--small" href="/admin/menu">Управлять пунктами меню →</a>
+                    <span class="form-hint">Иконки и разделители пунктов — в разделе «Меню».</span>
+                </div>
             </div>
         </div>
 
         <div class="header-builder__group">
-            <h3>Расположение логотипа и меню</h3>
-            <div class="form-field">
-                <label for="logo_position">Логотип</label>
-                <select id="logo_position" name="logo_position">
-                    <option value="left" <?= $config['logo_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
-                    <option value="center" <?= $config['logo_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
-                </select>
-                <span class="form-hint">Для «Центрированного» макета логотип всегда по центру.</span>
+            <h3>Конструктор секций</h3>
+            <p class="form-hint" style="margin-top:0;">
+                Шапка состоит из трёх секций. Перетаскивайте элементы из палитры в зоны секций;
+                «Разделитель» можно использовать много раз, остальные — по одному в секции
+                (но можно повторить в разных секциях). Порядок — перетаскиванием.
+            </p>
+
+            <div class="hb-palette hdr-builder" data-hdr-builder data-labels="<?= $labelsJson ?>">
+                <div class="hb-palette__label">Палитра элементов</div>
+                <div class="hb-palette__items hdr-builder__dropzone" data-hdr-zone="palette">
+                    <?php foreach ($elements as $type => $label): ?>
+                        <?= $renderChip($type) ?>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
+            <?php // ---------- TOP SECTION ---------- ?>
+            <section class="hb-section hb-section--top hdr-builder" data-hdr-builder data-labels="<?= $labelsJson ?>">
+                <header class="hb-section__head">
+                    <span class="hb-section__badge">Top</span>
+                    <span class="hb-section__title">Верхняя полоса</span>
+                    <span class="hb-section__controls">
+                        <label class="hb-switch"><input type="checkbox" name="topbar_enabled" value="1" <?= !empty($config['topbar']['enabled']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Включена</label>
+                        <select name="topbar_style" class="hb-select" aria-label="Стиль полосы">
+                            <option value="navy" <?= ($config['topbar']['style'] ?? 'navy') === 'navy' ? 'selected' : '' ?>>Тёмная (navy)</option>
+                            <option value="light" <?= ($config['topbar']['style'] ?? '') === 'light' ? 'selected' : '' ?>>Светлая</option>
+                            <option value="teal" <?= ($config['topbar']['style'] ?? '') === 'teal' ? 'selected' : '' ?>>Бирюзовая</option>
+                        </select>
+                        <label class="hb-switch"><input type="checkbox" name="topbar_mobile" value="1" <?= !empty($config['topbar']['show_mobile']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Показывать на мобильном</label>
+                    </span>
+                </header>
+                <?= $renderZones($config['topbar']['zones'] ?? [], 'topbar_zones') ?>
+            </section>
+
+            <?php // ---------- MIDDLE SECTION ---------- ?>
+            <section class="hb-section hb-section--middle">
+                <header class="hb-section__head">
+                    <span class="hb-section__badge hb-section__badge--middle">Middle</span>
+                    <span class="hb-section__title">Основная секция (логотип + утилиты)</span>
+                    <span class="hb-section__controls">
+                        <span class="hb-tabs" data-hdr-tabs>
+                            <button type="button" class="hb-tabs__tab hdr-tabs__tab is-active" data-hdr-tab="desktop">Десктоп</button>
+                            <button type="button" class="hb-tabs__tab hdr-tabs__tab" data-hdr-tab="mobile">Мобильный</button>
+                        </span>
+                    </span>
+                </header>
+                <div class="hdr-tabs__panel is-active hdr-builder" data-hdr-panel="desktop" data-hdr-builder data-labels="<?= $labelsJson ?>">
+                    <?= $renderZones($config['elements'], 'elements') ?>
+                </div>
+                <div class="hdr-tabs__panel hdr-builder" data-hdr-panel="mobile" data-hdr-builder data-labels="<?= $labelsJson ?>">
+                    <?= $renderZones($config['elements_mobile'], 'elements_mobile') ?>
+                </div>
+                <p class="form-hint">Логотип размещается автоматически по настройке «Логотип» выше.</p>
+            </section>
+
+            <?php // ---------- BOTTOM SECTION ---------- ?>
+            <section class="hb-section hb-section--bottom hdr-builder" data-hdr-builder data-labels="<?= $labelsJson ?>">
+                <header class="hb-section__head">
+                    <span class="hb-section__badge hb-section__badge--bottom">Bottom</span>
+                    <span class="hb-section__title">Нижняя полоса (меню + элементы)</span>
+                    <span class="hb-section__controls"><span class="hb-note">Меню занимает полосу автоматически; элементы встают рядом.</span></span>
+                </header>
+                <?= $renderZones($config['bottombar']['zones'] ?? [], 'bottombar_zones') ?>
+            </section>
+        </div>
+
+        <div class="header-builder__group">
+            <h3>Данные элементов</h3>
+            <div class="hb-inline-fields">
+                <div class="form-field">
+                    <label for="contact_phone">Телефон (элемент «Телефон»)</label>
+                    <input type="text" id="contact_phone" name="contact_phone" value="<?= htmlspecialchars($config['contacts']['phone'] ?? '', ENT_QUOTES) ?>" placeholder="+998 71 203 10 00">
+                </div>
+                <div class="form-field">
+                    <label for="contact_email">E-mail (элемент «E-mail»)</label>
+                    <input type="text" id="contact_email" name="contact_email" value="<?= htmlspecialchars($config['contacts']['email'] ?? '', ENT_QUOTES) ?>" placeholder="info@strategy.uz">
+                </div>
             </div>
             <div class="form-field">
-                <label for="menu_position">Меню</label>
-                <select id="menu_position" name="menu_position">
-                    <option value="left" <?= $config['menu_position'] === 'left' ? 'selected' : '' ?>>Слева</option>
-                    <option value="center" <?= $config['menu_position'] === 'center' ? 'selected' : '' ?>>По центру</option>
-                    <option value="right" <?= $config['menu_position'] === 'right' ? 'selected' : '' ?>>Справа</option>
-                </select>
+                <label for="snippet">Сниппет (элемент «Сниппет», HTML проходит санитайзер)</label>
+                <textarea id="snippet" name="snippet" rows="2" style="font-family:monospace;"><?= htmlspecialchars($config['snippet'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
         </div>
 
@@ -184,20 +259,22 @@ $networks = ['telegram' => 'Telegram', 'instagram' => 'Instagram', 'facebook' =>
                 <input type="checkbox" id="cta_enabled" name="cta_enabled" value="1" <?= $config['cta']['enabled'] ? 'checked' : '' ?>>
                 <label for="cta_enabled">Показывать кнопку призыва к действию</label>
             </div>
-            <div class="form-field">
-                <label for="cta_text">Текст кнопки</label>
-                <input type="text" id="cta_text" name="cta_text" value="<?= htmlspecialchars($config['cta']['text'], ENT_QUOTES) ?>">
-            </div>
-            <div class="form-field">
-                <label for="cta_url">Ссылка кнопки</label>
-                <input type="text" id="cta_url" name="cta_url" value="<?= htmlspecialchars($config['cta']['url'], ENT_QUOTES) ?>">
-            </div>
-            <div class="form-field">
-                <label for="cta_style">Стиль</label>
-                <select id="cta_style" name="cta_style">
-                    <option value="filled" <?= $config['cta']['style'] === 'filled' ? 'selected' : '' ?>>Залитая</option>
-                    <option value="outline" <?= $config['cta']['style'] === 'outline' ? 'selected' : '' ?>>Контурная</option>
-                </select>
+            <div class="hb-inline-fields">
+                <div class="form-field">
+                    <label for="cta_text">Текст кнопки</label>
+                    <input type="text" id="cta_text" name="cta_text" value="<?= htmlspecialchars($config['cta']['text'], ENT_QUOTES) ?>">
+                </div>
+                <div class="form-field">
+                    <label for="cta_url">Ссылка кнопки</label>
+                    <input type="text" id="cta_url" name="cta_url" value="<?= htmlspecialchars($config['cta']['url'], ENT_QUOTES) ?>">
+                </div>
+                <div class="form-field">
+                    <label for="cta_style">Стиль</label>
+                    <select id="cta_style" name="cta_style">
+                        <option value="filled" <?= $config['cta']['style'] === 'filled' ? 'selected' : '' ?>>Залитая</option>
+                        <option value="outline" <?= $config['cta']['style'] === 'outline' ? 'selected' : '' ?>>Контурная</option>
+                    </select>
+                </div>
             </div>
         </div>
 
