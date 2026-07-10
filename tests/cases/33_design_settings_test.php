@@ -144,3 +144,30 @@ test('Setting::overrideInMemory меняет значение только в п
     \App\Models\Setting::set('site_name_probe', 'x');
     assert_same('light', \App\Models\Setting::get('design_header_style'));
 });
+
+test('Google-шрифты: save материализует стеки, пусто — возврат к PT', function () {
+    ensure_test_db();
+
+    DesignSettings::save(['font_google_heading' => 'playfair', 'font_google_body' => 'inter']);
+    assert_contains('Playfair Display', (string) \App\Models\Setting::get('font_heading', ''));
+    assert_contains('Inter', (string) \App\Models\Setting::get('font_family', ''));
+
+    $href = DesignSettings::googleFontsHref();
+    assert_true($href !== null, 'ссылка на css2 построена');
+    assert_contains('fonts.googleapis.com/css2', (string) $href);
+    assert_contains('Playfair+Display', (string) $href);
+    assert_contains('Inter', (string) $href);
+    assert_contains('display=swap', (string) $href);
+
+    // Сброс: обе роли возвращаются к встроенным PT, ссылка исчезает.
+    DesignSettings::save(['font_google_heading' => '', 'font_google_body' => '']);
+    assert_contains('PT Serif', (string) \App\Models\Setting::get('font_heading', ''));
+    assert_contains('PT Sans', (string) \App\Models\Setting::get('font_family', ''));
+    assert_true(DesignSettings::googleFontsHref() === null, 'без выбора ссылки нет');
+});
+
+test('Google-шрифты: неизвестный slug игнорируется', function () {
+    ensure_test_db();
+    DesignSettings::save(['font_google_heading' => 'evil-font']);
+    assert_same('', (string) \App\Models\Setting::get('design_font_google_heading', ''));
+});

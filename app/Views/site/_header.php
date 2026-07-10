@@ -384,6 +384,13 @@ if ($inlineMenu !== '') {
 <link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/montserrat-700-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/ptserif-700-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/fonts/ptsans-400-cyrillic.woff2'), ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>
+<?php // Google-шрифты (если выбраны в «Дизайне»); кириллица включена в css2. ?>
+<?php $googleFontsHref = \App\Core\DesignSettings::googleFontsHref(); ?>
+<?php if ($googleFontsHref !== null): ?>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="<?= htmlspecialchars($googleFontsHref, ENT_QUOTES) ?>">
+<?php endif; ?>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/gov-fonts.css'), ENT_QUOTES) ?>">
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/frontend.css'), ENT_QUOTES) ?>">

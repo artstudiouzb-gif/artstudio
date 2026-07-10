@@ -31,6 +31,34 @@ final class DesignSettings
         'custom' => ['Свои цвета', '', ''],
     ];
 
+    /**
+     * Каталог Google-шрифтов с поддержкой кириллицы:
+     * slug => [подпись, CSS-стек, параметр family для css2 API].
+     */
+    public const GOOGLE_FONTS = [
+        'pt-serif' => ['PT Serif (антиква)', "'PT Serif', Georgia, serif", 'PT+Serif:wght@400;700'],
+        'playfair' => ['Playfair Display (антиква)', "'Playfair Display', Georgia, serif", 'Playfair+Display:wght@500;700'],
+        'lora' => ['Lora (антиква)', "'Lora', Georgia, serif", 'Lora:wght@400;600;700'],
+        'merriweather' => ['Merriweather (антиква)', "'Merriweather', Georgia, serif", 'Merriweather:wght@400;700'],
+        'noto-serif' => ['Noto Serif (антиква)', "'Noto Serif', Georgia, serif", 'Noto+Serif:wght@400;600;700'],
+        'ibm-plex-serif' => ['IBM Plex Serif (антиква)', "'IBM Plex Serif', Georgia, serif", 'IBM+Plex+Serif:wght@400;600;700'],
+        'cormorant' => ['Cormorant Garamond (антиква)', "'Cormorant Garamond', Georgia, serif", 'Cormorant+Garamond:wght@500;600;700'],
+        'pt-sans' => ['PT Sans', "'PT Sans', system-ui, sans-serif", 'PT+Sans:wght@400;700'],
+        'inter' => ['Inter', "'Inter', system-ui, sans-serif", 'Inter:wght@400;600;700'],
+        'montserrat' => ['Montserrat', "'Montserrat', system-ui, sans-serif", 'Montserrat:wght@400;600;700'],
+        'roboto' => ['Roboto', "'Roboto', system-ui, sans-serif", 'Roboto:wght@400;500;700'],
+        'open-sans' => ['Open Sans', "'Open Sans', system-ui, sans-serif", 'Open+Sans:wght@400;600;700'],
+        'noto-sans' => ['Noto Sans', "'Noto Sans', system-ui, sans-serif", 'Noto+Sans:wght@400;600;700'],
+        'source-sans' => ['Source Sans 3', "'Source Sans 3', system-ui, sans-serif", 'Source+Sans+3:wght@400;600;700'],
+        'ibm-plex-sans' => ['IBM Plex Sans', "'IBM Plex Sans', system-ui, sans-serif", 'IBM+Plex+Sans:wght@400;600;700'],
+        'manrope' => ['Manrope', "'Manrope', system-ui, sans-serif", 'Manrope:wght@400;600;700'],
+        'rubik' => ['Rubik', "'Rubik', system-ui, sans-serif", 'Rubik:wght@400;500;700'],
+        'jost' => ['Jost', "'Jost', system-ui, sans-serif", 'Jost:wght@400;500;700'],
+        'raleway' => ['Raleway', "'Raleway', system-ui, sans-serif", 'Raleway:wght@400;600;700'],
+        'exo2' => ['Exo 2', "'Exo 2', system-ui, sans-serif", 'Exo+2:wght@400;600;700'],
+        'golos' => ['Golos Text', "'Golos Text', system-ui, sans-serif", 'Golos+Text:wght@400;600;700'],
+    ];
+
     /** Шрифтовые пресеты: значение опции font_style => [подпись, CSS-стек]. */
     public const FONTS = [
         'pt' => ['PT Serif / PT Sans (гос)', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"],
@@ -229,6 +257,45 @@ final class DesignSettings
         if ($font !== 'custom' && isset(self::FONTS[$font])) {
             Setting::set('font_family', self::FONTS[$font][1]);
         }
+
+        // Google-шрифты: отдельные роли «заголовки» и «текст». Пустое значение
+        // возвращает роль к стандартному стеку (PT Serif / PT Sans).
+        foreach (['heading' => ['font_heading', "'PT Serif', Georgia, 'Times New Roman', serif"],
+                  'body' => ['font_family', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"]] as $role => [$target, $default]) {
+            if (!array_key_exists('font_google_' . $role, $input)) {
+                continue;
+            }
+            $slug = (string) $input['font_google_' . $role];
+            $prev = (string) Setting::get('design_font_google_' . $role, '');
+            if ($slug !== '' && isset(self::GOOGLE_FONTS[$slug])) {
+                Setting::set('design_font_google_' . $role, $slug);
+                Setting::set($target, self::GOOGLE_FONTS[$slug][1]);
+            } elseif ($slug === '' && $prev !== '') {
+                Setting::set('design_font_google_' . $role, '');
+                Setting::set($target, $default);
+            }
+        }
+    }
+
+    /**
+     * Ссылка на css2 Google Fonts для выбранных ролей (или null, если
+     * Google-шрифты не используются). Кириллица включена в css2 по умолчанию.
+     */
+    public static function googleFontsHref(): ?string
+    {
+        $families = [];
+        foreach (['heading', 'body'] as $role) {
+            $slug = (string) Setting::get('design_font_google_' . $role, '');
+            if ($slug !== '' && isset(self::GOOGLE_FONTS[$slug])) {
+                $families[self::GOOGLE_FONTS[$slug][2]] = true;
+            }
+        }
+        if ($families === []) {
+            return null;
+        }
+
+        return 'https://fonts.googleapis.com/css2?family='
+            . implode('&family=', array_keys($families)) . '&display=swap';
     }
 
     /** Применяет готовую конфигурацию (встроенную или пользовательскую «user:slug»). */

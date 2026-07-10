@@ -114,6 +114,41 @@ foreach ($options as $key => $opt) {
         </section>
     <?php endforeach; ?>
 
+    <section class="design-section">
+        <h2 class="design-section__title">Google-шрифты</h2>
+        <p class="form-hint" style="margin:0 0 12px;">
+            Отдельные шрифты для заголовков и текста из каталога Google Fonts
+            (все — с поддержкой кириллицы, подключаются с fonts.googleapis.com).
+            «Стандарт» возвращает роль к встроенным PT Serif / PT Sans.
+        </p>
+        <?php
+        $gHeading = \App\Models\Setting::get('design_font_google_heading', '');
+        $gBody = \App\Models\Setting::get('design_font_google_body', '');
+        ?>
+        <div class="design-opt">
+            <div class="design-opt__label"><span>Шрифт заголовков</span></div>
+            <div class="design-opt__choices">
+                <select name="font_google_heading" class="form-select" style="min-width:280px;">
+                    <option value="">Стандарт (PT Serif)</option>
+                    <?php foreach (\App\Core\DesignSettings::GOOGLE_FONTS as $slug => $f): ?>
+                        <option value="<?= htmlspecialchars($slug, ENT_QUOTES) ?>" <?= $gHeading === $slug ? 'selected' : '' ?>><?= htmlspecialchars($f[0], ENT_QUOTES) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+        <div class="design-opt">
+            <div class="design-opt__label"><span>Шрифт текста</span></div>
+            <div class="design-opt__choices">
+                <select name="font_google_body" class="form-select" style="min-width:280px;">
+                    <option value="">Стандарт (PT Sans)</option>
+                    <?php foreach (\App\Core\DesignSettings::GOOGLE_FONTS as $slug => $f): ?>
+                        <option value="<?= htmlspecialchars($slug, ENT_QUOTES) ?>" <?= $gBody === $slug ? 'selected' : '' ?>><?= htmlspecialchars($f[0], ENT_QUOTES) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+    </section>
+
     <div class="design-actions">
         <button type="submit" class="btn btn--primary">Сохранить настройки дизайна</button>
     </div>
