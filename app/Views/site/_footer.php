@@ -69,7 +69,7 @@ $renderFooterWidget = function (array $col) use ($logo, $siteName, $address, $ph
             if (empty($footerSocial)) { return ''; }
             $h = '<div class="site-footer__social">';
             foreach ($footerSocial as $btn) {
-                $h .= '<a class="site-footer__social-link" href="' . htmlspecialchars((string) $btn['url'], ENT_QUOTES) . '" target="_blank" rel="noopener" aria-label="' . htmlspecialchars((string) $btn['network'], ENT_QUOTES) . '">' . htmlspecialchars(mb_strtoupper(mb_substr((string) $btn['network'], 0, 1)), ENT_QUOTES) . '</a>';
+                $h .= '<a class="site-footer__social-link" href="' . htmlspecialchars((string) $btn['url'], ENT_QUOTES) . '" target="_blank" rel="noopener" aria-label="' . htmlspecialchars((string) $btn['network'], ENT_QUOTES) . '">' . \App\Core\SocialIcons::glyph((string) $btn['network']) . '</a>';
             }
             return $h . '</div>';
         case 'subscribe':

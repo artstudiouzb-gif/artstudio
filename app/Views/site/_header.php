@@ -148,7 +148,7 @@ if (!empty($hcfg['social_buttons'])) {
     foreach ($hcfg['social_buttons'] as $btn) {
         $socialHtml .= '<a class="site-social__link site-social__link--' . htmlspecialchars($btn['network'], ENT_QUOTES) . '" href="'
             . htmlspecialchars($btn['url'], ENT_QUOTES) . '" target="_blank" rel="noopener" aria-label="' . htmlspecialchars($btn['network'], ENT_QUOTES) . '">'
-            . htmlspecialchars(mb_strtoupper(mb_substr($btn['network'], 0, 1)), ENT_QUOTES) . '</a>';
+            . \App\Core\SocialIcons::glyph((string) $btn['network']) . '</a>';
     }
     $socialHtml .= '</div>';
 }
