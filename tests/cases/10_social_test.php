@@ -93,3 +93,78 @@ test('SocialPost: очередь — enqueue/pending/markSent/markFailed', funct
     assert_same('sent', $after[0]['status']);
     assert_same('REMOTE_1', $after[0]['remote_id']);
 });
+
+// --- Telegram-канал ---
+
+test('Social: Telegram без фото — sendMessage с HTML-подписью и ссылкой', function () {
+    $seen = [];
+    $http = function ($m, $u, $b, $h) use (&$seen) {
+        $seen = ['url' => $u, 'body' => $b];
+        return ['status' => 200, 'body' => '{"ok":true,"result":{"message_id":42}}', 'error' => ''];
+    };
+    $res = (new SocialPublisher($http))->publish('telegram', ['token' => 'BOT:T', 'chat_id' => '@channel'], [
+        'message' => "Заголовок\n\nАнонс новости", 'link' => 'https://site/news/a', 'title' => 'Заголовок',
+    ]);
+    assert_true($res['ok']);
+    assert_same('42', $res['remote_id']);
+    assert_contains('/sendMessage', $seen['url']);
+    $payload = json_decode($seen['body'], true);
+    assert_same('@channel', $payload['chat_id']);
+    assert_same('HTML', $payload['parse_mode']);
+    assert_contains('<b>Заголовок</b>', $payload['text']);
+    assert_contains('Анонс новости', $payload['text']);
+    assert_contains('href="https://site/news/a"', $payload['text']);
+});
+
+test('Social: Telegram с одним фото — sendPhoto', function () {
+    $seen = [];
+    $http = function ($m, $u, $b, $h) use (&$seen) {
+        $seen = ['url' => $u, 'body' => $b];
+        return ['status' => 200, 'body' => '{"ok":true,"result":{"message_id":7}}', 'error' => ''];
+    };
+    $res = (new SocialPublisher($http))->publish('telegram', ['token' => 'T', 'chat_id' => '-100123'], [
+        'message' => 'Т', 'link' => 'https://site/news/b', 'title' => 'Т', 'image_url' => 'https://site/i.jpg',
+    ]);
+    assert_true($res['ok']);
+    assert_contains('/sendPhoto', $seen['url']);
+    $payload = json_decode($seen['body'], true);
+    assert_same('https://site/i.jpg', $payload['photo']);
+    assert_contains('href="https://site/news/b"', $payload['caption']);
+});
+
+test('Social: Telegram с галереей — sendMediaGroup, подпись у первого фото, максимум 10', function () {
+    $seen = [];
+    $http = function ($m, $u, $b, $h) use (&$seen) {
+        $seen = ['url' => $u, 'body' => $b];
+        return ['status' => 200, 'body' => '{"ok":true,"result":[{"message_id":11},{"message_id":12}]}', 'error' => ''];
+    };
+    $gallery = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $gallery[] = "https://site/g{$i}.jpg";
+    }
+    $res = (new SocialPublisher($http))->publish('telegram', ['token' => 'T', 'chat_id' => '@ch'], [
+        'message' => 'Заг', 'link' => 'https://site/news/c', 'title' => 'Заг',
+        'image_url' => 'https://site/cover.jpg', 'gallery' => $gallery,
+    ]);
+    assert_true($res['ok']);
+    assert_same('11', $res['remote_id']);
+    assert_contains('/sendMediaGroup', $seen['url']);
+    $payload = json_decode($seen['body'], true);
+    assert_same(10, count($payload['media']), 'лимит Bot API — 10 фото');
+    assert_same('https://site/cover.jpg', $payload['media'][0]['media']);
+    assert_contains('href="https://site/news/c"', $payload['media'][0]['caption']);
+    assert_true(empty($payload['media'][1]['caption']), 'подпись только у первого элемента');
+});
+
+test('Social: Telegram — ошибка Bot API возвращает description', function () {
+    $http = fn ($m, $u, $b, $h) => ['status' => 400, 'body' => '{"ok":false,"description":"Bad Request: chat not found"}', 'error' => ''];
+    $res = (new SocialPublisher($http))->publish('telegram', ['token' => 'T', 'chat_id' => '@x'], ['message' => 'x', 'link' => 'https://x']);
+    assert_false($res['ok']);
+    assert_contains('chat not found', $res['error']);
+});
+
+test('Social: Telegram без настроек — ошибка конфигурации', function () {
+    $res = (new SocialPublisher())->publish('telegram', ['token' => '', 'chat_id' => ''], ['message' => 'x', 'link' => 'https://x']);
+    assert_false($res['ok']);
+    assert_contains('chat_id', $res['error']);
+});

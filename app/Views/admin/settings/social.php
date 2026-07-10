@@ -8,12 +8,14 @@ require __DIR__ . '/../layout/header.php';
 
 /** @var array $config */
 $labels = [
+    'telegram' => 'Telegram-канал',
     'facebook' => 'Facebook (страница)',
     'linkedin' => 'LinkedIn (организация/профиль)',
     'instagram' => 'Instagram (Business-аккаунт)',
 ];
 $fieldLabels = [
     'token' => 'Access Token',
+    'chat_id' => 'Chat ID канала (@имя_канала или -100…)',
     'page_id' => 'ID страницы',
     'author' => 'Author URN (напр. urn:li:organization:123)',
     'user_id' => 'IG User ID',
@@ -25,7 +27,9 @@ $fieldLabels = [
         отправляется в включённые сети CLI-воркером
         (<code>app/Console/social_worker.php</code> по Cron). Токены получаются
         в кабинетах разработчика соответствующих платформ. Instagram требует
-        публичную обложку новости.
+        публичную обложку новости. Для Telegram: токен бота — у @BotFather,
+        бота нужно добавить администратором канала; если у новости есть
+        галерея, она уходит альбомом (до 10 фото) с подписью и ссылкой.
     </p>
     <form method="post" action="/admin/social" class="form-grid">
         <?= Csrf::field() ?>
