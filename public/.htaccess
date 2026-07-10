@@ -2,7 +2,18 @@
     RewriteEngine On
     RewriteBase /
 
-    # Существующие файлы и папки (assets, uploads, download.php) отдаются напрямую
+    # Исполняемые .php — только точки входа приложения. Любой другой прямой
+    # запрос к .php (например, файл в /uploads) получает 403 ещё до
+    # фронт-контроллера. Реализовано rewrite-правилом, а не «Require all
+    # denied + точечное разрешение»: та схема ломалась на LiteSpeed и части
+    # shared-хостингов (слияние Require-секций отличается от Apache 2.4),
+    # отдавая 403 даже index.php. Внутренние переписывания не задеваются:
+    # проверяется исходный REQUEST_URI, а не переписанный путь.
+    RewriteCond %{REQUEST_URI} \.php$ [NC]
+    RewriteCond %{REQUEST_URI} !(^|/)(index|download)\.php$ [NC]
+    RewriteRule .* - [F]
+
+    # Существующие файлы и папки (assets, uploads) отдаются напрямую
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
@@ -27,29 +38,29 @@
 Options -Indexes
 DirectoryIndex index.php
 
-# Единственные .php с разрешённым прямым доступом — точки входа приложения.
-# Это отменяет унаследованный из корневого .htaccess deny-all на .php (задача
-# 1.1) для fallback-сценария (docroot = корень проекта). Порядок важен:
-# сначала общий запрет, затем явные разрешения — последняя совпавшая секция
-# побеждает при слиянии, поэтому index/download.php гарантированно доступны.
-<IfModule mod_authz_core.c>
-    <FilesMatch "\.php$">
-        Require all denied
-    </FilesMatch>
-    <Files "index.php">
-        Require all granted
-    </Files>
-    <Files "download.php">
-        Require all granted
-    </Files>
-</IfModule>
-<IfModule !mod_authz_core.c>
-    <Files "index.php">
-        Order allow,deny
-        Allow from all
-    </Files>
-    <Files "download.php">
-        Order allow,deny
-        Allow from all
-    </Files>
+# Fallback: без mod_rewrite фронт-контроллер не работает, поэтому запрещаем
+# все .php с точечным разрешением точек входа (историческая схема; на
+# конфигурациях без mod_rewrite слияние Require обычно каноничное).
+<IfModule !mod_rewrite.c>
+    <IfModule mod_authz_core.c>
+        <FilesMatch "\.php$">
+            Require all denied
+        </FilesMatch>
+        <Files "index.php">
+            Require all granted
+        </Files>
+        <Files "download.php">
+            Require all granted
+        </Files>
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        <Files "index.php">
+            Order allow,deny
+            Allow from all
+        </Files>
+        <Files "download.php">
+            Order allow,deny
+            Allow from all
+        </Files>
+    </IfModule>
 </IfModule>
