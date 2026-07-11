@@ -13,17 +13,22 @@
     --gov-teal: var(--color-accent, #17999b);
     --gov-ink: #1f2b3d;
     --gov-muted: #6b7789;
+    /* Цвет заголовков/акцентного текста: тёмно-синий на светлой теме, светлый
+       на тёмной (чтобы навигационные заголовки карточек не пропадали). */
+    --gov-title: var(--gov-navy);
     --radius: 10px;
     --container-max: 1200px;
     /* Эмблема-звезда (два наложенных квадрата = 8-конечная звезда). */
     --gov-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='4.7' y='4.7' width='14.6' height='14.6' rx='1'/%3E%3Crect x='4.7' y='4.7' width='14.6' height='14.6' rx='1' transform='rotate(45 12 12)'/%3E%3C/svg%3E");
 }
 :root[data-theme="dark"] {
-    --gov-bg: #0f1520;
-    --gov-surface: #161d2b;
-    --gov-border: #263042;
+    /* Мягкая тёмная тема — тёмно-синий сланец вместо почти чёрного. */
+    --gov-bg: #172231;
+    --gov-surface: #212f45;
+    --gov-border: #34445d;
     --gov-ink: #e7ecf3;
-    --gov-muted: #98a3b5;
+    --gov-muted: #9aa7bb;
+    --gov-title: #e7ecf3;
 }
 
 body {
@@ -39,7 +44,7 @@ h1, h2, h3, h4, h5, h6,
 .block-news__title, .block-categories__title, .block-media__title,
 .block-contact-cards__title, .section-title, .site-footer__name {
     font-family: var(--font-heading, 'PT Serif', Georgia, serif);
-    color: var(--gov-navy);
+    color: var(--gov-title);
     letter-spacing: 0;
     font-weight: 700;
 }
@@ -51,7 +56,7 @@ a { color: var(--gov-teal); }
 /* --- Шапка: белая, эмблема + название, uppercase-меню с teal-подчёркиванием --- */
 .site-header { background: var(--gov-surface); border-bottom: 1px solid var(--gov-border); box-shadow: none; }
 .site-header__inner { max-width: var(--container-max); }
-.site-header__logo { color: var(--gov-navy); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; gap: 12px; align-items: center; }
+.site-header__logo { color: var(--gov-title); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; gap: 12px; align-items: center; }
 .site-header__logo span { font-size: 15px; line-height: 1.2; letter-spacing: .01em; text-transform: uppercase; max-width: 320px; }
 /* Эмблема-звезда перед названием (если нет загруженного логотипа). */
 .site-header--logo-left .site-header__logo:not(:has(img))::before,
@@ -64,15 +69,15 @@ a { color: var(--gov-teal); }
 body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-top-color: var(--gov-border); }
 .site-menu__link {
     text-transform: uppercase; font-size: 13px; letter-spacing: .04em; font-weight: 700;
-    color: var(--gov-navy); padding: 16px 2px;
+    color: var(--gov-title); padding: 16px 2px;
 }
 .site-menu__link::after { height: 3px; bottom: 0; background: var(--gov-teal); }
 .site-menu__link:hover, .site-menu__link:focus-visible { color: var(--gov-teal); }
-.site-lang-switcher__item { color: var(--gov-navy); font-weight: 700; font-size: 13px; }
+.site-lang-switcher__item { color: var(--gov-title); font-weight: 700; font-size: 13px; }
 .site-lang-switcher__item.is-active { color: var(--gov-teal); }
-.a11y-toggle, .site-theme-toggle, .site-search input, .site-search-toggle { color: var(--gov-navy); }
+.a11y-toggle, .site-theme-toggle, .site-search input, .site-search-toggle { color: var(--gov-title); }
 .site-search input { border-color: var(--gov-border); border-radius: 999px; }
-.site-burger { color: var(--gov-navy); border-color: var(--gov-border); }
+.site-burger { color: var(--gov-title); border-color: var(--gov-border); }
 
 /* Тёмная тема: элементы управления в сплошной (непрозрачной) шапке. Без этих
    переопределений иконки-утилиты, звезда-эмблема и мобильный бургер рисуются
@@ -114,11 +119,11 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 /* --- Полоса статистики (counters): белая карта с плитками и кружком-иконкой --- */
 .block-counters { background: var(--counters-bg, var(--gov-surface)); border: 1px solid var(--gov-border); border-radius: 14px; padding: clamp(20px, 3vw, 34px); box-shadow: 0 10px 30px rgba(19,42,92,.06); }
-.block-counters__title { color: var(--counters-text, var(--gov-navy)); }
+.block-counters__title { color: var(--counters-text, var(--gov-title)); }
 .block-counters__grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; }
 .counter { border: 0; border-right: 1px solid var(--gov-border); border-radius: 0; padding: 6px 26px; box-shadow: none; background: transparent; flex-direction: row; align-items: center; gap: 16px; }
 .counter:last-child { border-right: 0; }
-.counter__value, .counter__suffix { color: var(--counters-text, var(--gov-navy)); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: clamp(28px, 3.2vw, 40px); }
+.counter__value, .counter__suffix { color: var(--counters-text, var(--gov-title)); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: clamp(28px, 3.2vw, 40px); }
 .counter__label { color: var(--counters-text, var(--gov-muted)); font-size: .9rem; margin: 0; }
 .block-counters[style*="--counters-text"] .counter__label { opacity: .78; }
 @media (max-width: 720px) { .counter { border-right: 0; border-bottom: 1px solid var(--gov-border); padding: 14px 0; } .counter:last-child { border-bottom: 0; } }
@@ -126,17 +131,17 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 /* --- Секции: серифные заголовки с teal-акцентом --- */
 .block-news__head::after, .news-index__head::after { background: var(--gov-teal); }
 .block-news__all, .content-card__more, .news-card__more, .media-item__action { color: var(--gov-teal); }
-.news-card__date, .content-badge--active { background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-navy); }
+.news-card__date, .content-badge--active { background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-title); }
 
 /* --- Hero: плоский, светлый; серифный титул --- */
 .block-hero { background: var(--gov-surface); border: 1px solid var(--gov-border); }
-.block-hero__title { color: var(--hero-text, var(--gov-navy)); }
+.block-hero__title { color: var(--hero-text, var(--gov-title)); }
 .block-hero__subtitle { color: var(--hero-text, var(--gov-muted)); }
 
 /* --- Сетка категорий: активная плитка teal --- */
 .cat-tile.is-active { background: color-mix(in srgb, var(--gov-teal) 10%, var(--gov-surface)); border-color: var(--gov-teal); }
 .cat-tile.is-active .cat-tile__icon { background: color-mix(in srgb, var(--gov-teal) 16%, transparent); color: var(--gov-teal); }
-.cat-tile__icon, .media-item__icon, .contact-card__icon { background: color-mix(in srgb, var(--gov-navy) 7%, transparent); color: var(--gov-navy); }
+.cat-tile__icon, .media-item__icon, .contact-card__icon { background: color-mix(in srgb, var(--gov-navy) 7%, transparent); color: var(--gov-title); }
 
 /* --- Подписка / футер: глубокий navy без градиента --- */
 .subscribe-block, .block-subscribe .subscribe-block {
@@ -221,7 +226,7 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 }
 /* По умолчанию — тёмные (для hero без фото/видео, светлая секция). */
 .block-hero .content-crumbs--on-hero a,
-.block-hero .content-crumbs--on-hero span { color: var(--gov-navy); }
+.block-hero .content-crumbs--on-hero span { color: var(--gov-title); }
 /* На hero с медиа-фоном — светлые. */
 .block-hero--media .content-crumbs--on-hero a,
 .block-hero--media .content-crumbs--on-hero span { color: rgba(255, 255, 255, .82); }
@@ -239,7 +244,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .cms-block--hero + .cms-block--counters { padding-top: 0 !important; position: relative; z-index: 3; }
 .cms-block--hero + .cms-block--counters .block-counters { margin-top: clamp(-120px, -9vw, -80px); position: relative; z-index: 3; }
 .counter { flex-direction: row; align-items: center; gap: 16px; }
-.counter__icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--counters-text, var(--gov-navy)) 8%, transparent); color: var(--counters-text, var(--gov-navy)); }
+.counter__icon { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--counters-text, var(--gov-title)) 8%, transparent); color: var(--counters-text, var(--gov-title)); }
 .counter__icon svg { width: 26px; height: 26px; }
 .counter__num { display: flex; align-items: baseline; gap: 4px; }
 .counter__body { display: flex; flex-direction: column; gap: 2px; }
@@ -262,7 +267,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .feature-card:hover { box-shadow: 0 12px 32px rgba(19,42,92,.1); transform: translateY(-3px); }
 .feature-card__icon { color: var(--gov-teal); }
 .feature-card__icon svg { width: 34px; height: 34px; }
-.feature-card__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.12rem; color: var(--gov-navy); line-height: 1.25; }
+.feature-card__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.12rem; color: var(--gov-title); line-height: 1.25; }
 .feature-card__text { color: var(--gov-muted); font-size: .92rem; line-height: 1.5; flex: 1; }
 .feature-card__arrow { color: var(--gov-teal); font-size: 1.2rem; }
 
@@ -281,10 +286,10 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* Карусель проектов. */
 .section-head__tools { display: flex; align-items: center; gap: 16px; }
 .carousel-nav { display: inline-flex; gap: 8px; }
-.carousel-nav__btn { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-navy); font-size: 22px; line-height: 1; cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease; }
-.carousel-nav__btn:hover { background: var(--gov-navy); color: #fff; border-color: var(--gov-navy); }
+.carousel-nav__btn { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-title); font-size: 22px; line-height: 1; cursor: pointer; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.carousel-nav__btn:hover { background: var(--gov-navy); color: #fff; border-color: var(--gov-title); }
 .carousel-nav__btn[disabled] { opacity: .35; cursor: default; }
-.carousel-nav__btn[disabled]:hover { background: var(--gov-surface); color: var(--gov-navy); border-color: var(--gov-border); }
+.carousel-nav__btn[disabled]:hover { background: var(--gov-surface); color: var(--gov-title); border-color: var(--gov-border); }
 .imgcards-grid--carousel { display: flex; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 4px; }
 .imgcards-grid--carousel::-webkit-scrollbar { display: none; }
 .imgcards-grid--carousel .imgcard { flex: 0 0 calc((100% - 60px) / 4); scroll-snap-align: start; }
@@ -301,7 +306,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .mediacard__play svg { width: 22px; height: 22px; margin-left: 2px; }
 .mediacard:hover .mediacard__play { background: var(--gov-teal); color: #fff; }
 .mediacard__duration { position: absolute; right: 10px; bottom: 10px; background: rgba(11,26,48,.8); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
-.mediacard__title { display: block; font-weight: 700; font-family: var(--font-heading, 'PT Serif', serif); color: var(--gov-navy); line-height: 1.3; }
+.mediacard__title { display: block; font-weight: 700; font-family: var(--font-heading, 'PT Serif', serif); color: var(--gov-title); line-height: 1.3; }
 .mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }
 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
@@ -312,7 +317,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat-lead__media { display: block; aspect-ratio: 4/3; height: 100%; min-height: 210px; border-radius: var(--radius); background: #24425f center/cover no-repeat; }
 .newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-lead__body { display: flex; flex-direction: column; gap: 12px; }
-.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: var(--gov-navy); line-height: 1.3; }
+.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: var(--gov-title); line-height: 1.3; }
 .newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.55; font-size: .95rem; }
 .newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
 @media (min-width: 901px) { .newsfeat-side { border-left: 1px solid var(--gov-border); padding-left: 34px; } }
@@ -326,9 +331,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat-mini__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
-.newsfeat-mini__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsfeat-text { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--gov-ink); }
-.newsfeat-text__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.newsfeat-text__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsfeat-lead:hover .newsfeat-lead__title, .newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
 
 /* --- Медиа-галерея: переключатели --- */
@@ -380,7 +385,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .person-card__placeholder svg { opacity: .55; }
 .person-card__vacant { text-transform: uppercase; font-size: 12px; letter-spacing: .08em; font-weight: 700; color: var(--gov-muted); }
 .person-card__body { display: flex; flex-direction: column; gap: 6px; padding: 18px; text-align: center; flex: 1; }
-.person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-navy); }
+.person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-title); }
 .person-card__role { color: var(--gov-muted); font-size: .9rem; line-height: 1.4; flex: 1; }
 .person-card__more { color: var(--gov-teal); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; text-decoration: none; margin-top: 8px; }
 .person-card--vacant .person-card__role { color: var(--gov-ink); font-weight: 700; }
@@ -395,9 +400,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .timeline-item { position: relative; display: grid; grid-template-columns: 84px 1fr; gap: 12px; padding: 0 0 22px 28px; }
 .timeline-item:last-child { padding-bottom: 0; }
 .timeline-item::before { content: ''; position: absolute; left: 0; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--gov-navy); }
-.timeline-item__year { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; color: var(--gov-navy); }
+.timeline-item__year { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; color: var(--gov-title); }
 .timeline-item__text { color: var(--gov-muted); font-size: .93rem; line-height: 1.5; }
-.timeline-card__button { display: inline-block; margin-top: 24px; padding: 11px 22px; border: 1px solid var(--gov-navy); border-radius: var(--btn-radius, 8px); color: var(--gov-navy); font-weight: 700; font-size: .9rem; text-decoration: none; transition: background .15s ease, color .15s ease; }
+.timeline-card__button { display: inline-block; margin-top: 24px; padding: 11px 22px; border: 1px solid var(--gov-navy); border-radius: var(--btn-radius, 8px); color: var(--gov-title); font-weight: 700; font-size: .9rem; text-decoration: none; transition: background .15s ease, color .15s ease; }
 .timeline-card__button:hover { background: var(--gov-navy); color: #fff; }
 .timeline-cta { position: relative; border-radius: var(--radius); overflow: hidden; background: var(--gov-navy) center/cover no-repeat; display: flex; align-items: flex-start; min-height: 320px; }
 .timeline-cta__overlay { position: absolute; inset: 0; background: linear-gradient(100deg, rgba(15,33,60,.92) 25%, rgba(15,33,60,.55) 100%); }
@@ -417,7 +422,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsdocs-item__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsdocs-item__body { display: flex; flex-direction: column; gap: 5px; }
 .newsdocs-item__date { color: var(--gov-muted); font-size: .82rem; }
-.newsdocs-item__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.newsdocs-item__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsdocs-item__arrow { color: var(--gov-teal); font-size: 1.15rem; }
 .newsdocs-item:hover .newsdocs-item__title { color: var(--gov-teal); }
 .newsdocs-docs { display: flex; flex-direction: column; gap: 14px; }
@@ -425,9 +430,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .doc-card:hover { box-shadow: 0 10px 26px rgba(19,42,92,.1); }
 .doc-card__icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 10px; background: color-mix(in srgb, var(--gov-teal) 12%, var(--gov-surface)); color: var(--gov-teal); }
 .doc-card__body { display: flex; flex-direction: column; gap: 4px; }
-.doc-card__title { font-weight: 700; color: var(--gov-navy); font-size: .95rem; line-height: 1.35; }
+.doc-card__title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; }
 .doc-card__meta { color: var(--gov-muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
-.doc-card__dl { color: var(--gov-navy); }
+.doc-card__dl { color: var(--gov-title); }
 
 /* CTA-полоса (navy) «Есть вопросы или предложения?». */
 .block-ctaband { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; background: var(--gov-navy); border-radius: var(--radius); padding: 34px 38px; color: #fff; }
@@ -452,7 +457,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .profile__contact { display: flex; align-items: center; gap: 10px; color: var(--gov-ink); font-size: .95rem; }
 .profile__contact svg { color: var(--gov-teal); flex: 0 0 auto; }
 .profile__contact-label { color: var(--gov-muted); }
-.profile__contact a { color: var(--gov-navy); font-weight: 700; text-decoration: none; }
+.profile__contact a { color: var(--gov-title); font-weight: 700; text-decoration: none; }
 .profile__contact a:hover { color: var(--gov-teal); }
 .profile__button { display: inline-block; padding: 13px 26px; background: var(--gov-navy); color: #fff; border-radius: var(--btn-radius, 8px); font-weight: 700; font-size: .92rem; text-decoration: none; transition: opacity .15s ease; }
 .profile__button:hover { opacity: .92; }
@@ -480,7 +485,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .bio-career__item { position: relative; display: grid; grid-template-columns: 110px 1fr; gap: 14px; padding: 0 0 20px 26px; }
 .bio-career__item:last-child { padding-bottom: 0; }
 .bio-career__item::before { content: ''; position: absolute; left: 0; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--gov-navy); }
-.bio-career__years { font-weight: 700; color: var(--gov-navy); font-size: .93rem; white-space: nowrap; }
+.bio-career__years { font-weight: 700; color: var(--gov-title); font-size: .93rem; white-space: nowrap; }
 .bio-career__text { color: var(--gov-muted); font-size: .93rem; line-height: 1.5; }
 .bio-side { display: flex; flex-direction: column; gap: 26px; }
 .bio-edu { background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)); border-radius: var(--radius); padding: 28px; }
@@ -488,10 +493,10 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .bio-edu__item { position: relative; padding: 0 0 18px 24px; display: flex; flex-direction: column; gap: 3px; }
 .bio-edu__item::before { content: ''; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--gov-teal); }
 .bio-edu__years { color: var(--gov-muted); font-size: .85rem; }
-.bio-edu__degree { font-weight: 700; color: var(--gov-navy); font-size: .95rem; }
+.bio-edu__degree { font-weight: 700; color: var(--gov-title); font-size: .95rem; }
 .bio-edu__org { color: var(--gov-muted); font-size: .88rem; }
 .bio-extra { margin-top: 8px; }
-.bio-extra__title { font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; color: var(--gov-navy); font-size: 1rem; margin: 0 0 10px; }
+.bio-extra__title { font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; color: var(--gov-title); font-size: 1rem; margin: 0 0 10px; }
 .bio-extra__list { margin: 0; padding-left: 18px; color: var(--gov-muted); font-size: .9rem; line-height: 1.55; display: flex; flex-direction: column; gap: 6px; }
 .bio-quote { position: relative; margin: 0; background: var(--gov-navy); border-radius: var(--radius); padding: 30px 30px 26px; color: #fff; }
 .bio-quote__mark { font-family: var(--font-heading, 'PT Serif', serif); font-size: 2.6rem; line-height: 1; color: var(--gov-teal); display: block; margin-bottom: 8px; }
@@ -537,8 +542,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail__btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: var(--btn-radius, 8px); font-weight: 700; font-size: .92rem; text-decoration: none; transition: background .2s ease, color .2s ease, box-shadow .2s ease; cursor: pointer; }
 .newsdetail__btn--primary { background: var(--gov-navy); color: #fff; }
 .newsdetail__btn--primary:hover { background: color-mix(in srgb, var(--gov-navy) 88%, #000); box-shadow: 0 10px 24px rgba(19,42,92,.22); }
-.newsdetail__btn--ghost { border: 1px solid var(--gov-border); color: var(--gov-navy); background: var(--gov-surface); }
-.newsdetail__btn--ghost:hover { border-color: var(--gov-navy); }
+.newsdetail__btn--ghost { border: 1px solid var(--gov-border); color: var(--gov-title); background: var(--gov-surface); }
+.newsdetail__btn--ghost:hover { border-color: var(--gov-title); }
 
 /* --- Медиа-модуль 16:9 + миниатюры --- */
 .newsdetail-gallery { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
@@ -568,19 +573,19 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-points__icon { color: var(--gov-teal); margin-top: 1px; }
 .newsdetail-share__title { font-size: 1rem; margin: 0 0 12px; }
 .newsdetail-share__row { display: flex; flex-wrap: wrap; gap: 8px; }
-.newsdetail-share__btn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-navy); cursor: pointer; text-decoration: none; transition: background .15s ease, color .15s ease, border-color .15s ease; }
-.newsdetail-share__btn:hover { background: var(--gov-navy); border-color: var(--gov-navy); color: #fff; }
+.newsdetail-share__btn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-title); cursor: pointer; text-decoration: none; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+.newsdetail-share__btn:hover { background: var(--gov-navy); border-color: var(--gov-title); color: #fff; }
 .newsdetail-share__btn.is-copied { background: var(--gov-teal); border-color: var(--gov-teal); color: #fff; }
 
 /* --- Статья: editorial-типографика --- */
 .newsdetail-article { min-width: 0; }
 .newsdetail-article__content { font-size: 1.02rem; line-height: 1.75; color: var(--gov-ink); max-width: 70ch; }
-.newsdetail-article__content > p:first-child { font-size: 1.12rem; color: var(--gov-navy); font-weight: 500; }
+.newsdetail-article__content > p:first-child { font-size: 1.12rem; color: var(--gov-title); font-weight: 500; }
 .newsdetail-article__content h2, .newsdetail-article__content h3 { margin: 1.8em 0 .7em; line-height: 1.3; }
 .newsdetail-article__content p { margin: 0 0 1.1em; }
 .newsdetail-article__content ul, .newsdetail-article__content ol { margin: 0 0 1.2em; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; }
 .newsdetail-article__content li::marker { color: var(--gov-teal); }
-.newsdetail-article__content blockquote { margin: 1.6em 0; padding: 22px 26px; background: color-mix(in srgb, var(--gov-navy) 4%, var(--gov-bg)); border-left: 3px solid var(--gov-teal); border-radius: 0 12px 12px 0; font-family: var(--font-heading, 'PT Serif', serif); font-size: 1.08rem; line-height: 1.6; color: var(--gov-navy); }
+.newsdetail-article__content blockquote { margin: 1.6em 0; padding: 22px 26px; background: color-mix(in srgb, var(--gov-navy) 4%, var(--gov-bg)); border-left: 3px solid var(--gov-teal); border-radius: 0 12px 12px 0; font-family: var(--font-heading, 'PT Serif', serif); font-size: 1.08rem; line-height: 1.6; color: var(--gov-title); }
 .newsdetail-article__content blockquote p:last-child { margin: 0; }
 .newsdetail-article__content img { max-width: 100%; border-radius: 12px; }
 
@@ -592,9 +597,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-doc { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 14px; border: 1px solid var(--gov-border); border-radius: 10px; text-decoration: none; color: var(--gov-ink); transition: border-color .15s ease, box-shadow .15s ease; }
 .newsdetail-doc:hover { border-color: var(--gov-teal); box-shadow: 0 6px 18px rgba(19,42,92,.08); }
 .newsdetail-doc__icon { color: var(--gov-teal); }
-.newsdetail-doc__title { display: block; font-weight: 700; font-size: .88rem; color: var(--gov-navy); line-height: 1.35; }
+.newsdetail-doc__title { display: block; font-weight: 700; font-size: .88rem; color: var(--gov-title); line-height: 1.35; }
 .newsdetail-doc__meta { display: block; color: var(--gov-muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; margin-top: 3px; }
-.newsdetail-doc__dl { color: var(--gov-navy); }
+.newsdetail-doc__dl { color: var(--gov-title); }
 .newsdetail-subscribe { background: var(--gov-navy); border-radius: 12px; padding: 26px 24px; color: #fff; }
 .newsdetail-subscribe__title { font-size: 1.12rem; margin: 0 0 10px; color: #fff; }
 .newsdetail-subscribe__text { color: rgba(255,255,255,.8); font-size: .88rem; line-height: 1.55; margin: 0 0 16px; }
@@ -621,7 +626,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .relnews-card__media { aspect-ratio: 16/10; border-radius: 12px; background: #24425f center/cover no-repeat; }
 .relnews-card__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .relnews-card__date { color: var(--gov-muted); font-size: .82rem; }
-.relnews-card__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .96rem; flex: 1; }
+.relnews-card__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .96rem; flex: 1; }
 .relnews-card__arrow { color: var(--gov-teal); }
 .relnews-card:hover .relnews-card__title { color: var(--gov-teal); }
 
@@ -638,7 +643,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .adjnews__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .adjnews__label { text-transform: uppercase; font-size: 11px; letter-spacing: .08em; font-weight: 700; color: var(--gov-muted); }
 .adjnews__date { color: var(--gov-muted); font-size: .82rem; }
-.adjnews__title { font-weight: 700; color: var(--gov-navy); line-height: 1.35; font-size: .95rem; }
+.adjnews__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .adjnews:hover .adjnews__title { color: var(--gov-teal); }
 @media (prefers-reduced-motion: reduce) {
     .newsdetail-gallery__slide { transition: none; }
@@ -686,7 +691,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-adjacent--with-toc { grid-template-columns: minmax(0, 300px) 1fr 1fr; }
 @media (max-width: 1000px) { .newsdetail-adjacent--with-toc { grid-template-columns: 1fr; } }
 .newsdetail-toc { background: color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)); border-radius: 14px; padding: 20px 22px; }
-.newsdetail-toc__title { display: block; font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; color: var(--gov-navy); margin-bottom: 12px; }
+.newsdetail-toc__title { display: block; font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; color: var(--gov-title); margin-bottom: 12px; }
 .newsdetail-toc__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
 .newsdetail-toc__list a { display: flex; gap: 10px; align-items: baseline; color: var(--gov-ink); text-decoration: none; font-size: .9rem; line-height: 1.4; }
 .newsdetail-toc__list a:hover { color: var(--gov-teal-text); }
@@ -696,7 +701,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .block-banner--light { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); align-items: center; gap: 24px; background: transparent; border-radius: var(--radius); overflow: hidden; min-height: 360px; }
 @media (max-width: 900px) { .block-banner--light { grid-template-columns: 1fr; } .block-banner--light .block-banner__photo { display: none; } }
 .block-banner--light .block-banner__inner { padding: clamp(20px, 4vw, 48px) 0; text-align: left; }
-.block-banner--light .block-banner__title { color: var(--gov-navy); font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.15; margin: 0 0 16px; }
+.block-banner--light .block-banner__title { color: var(--gov-title); font-size: clamp(1.9rem, 3.4vw, 2.7rem); line-height: 1.15; margin: 0 0 16px; }
 .block-banner--light .block-banner__text { color: var(--gov-muted); font-size: 1.02rem; line-height: 1.6; max-width: 46ch; margin: 0 0 22px; }
 .block-banner--light .block-banner__button { display: inline-block; padding: 13px 26px; background: var(--gov-navy); color: #fff; border-radius: var(--btn-radius, 8px); font-weight: 700; text-decoration: none; }
 .block-banner__photo { position: relative; height: 100%; min-height: 320px; background: center/cover no-repeat; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22%); mask-image: linear-gradient(90deg, transparent 0, #000 22%); }
@@ -705,7 +710,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .block-anchornav { display: flex; gap: 26px; overflow-x: auto; border-bottom: 1px solid var(--gov-border); scrollbar-width: none; }
 .block-anchornav::-webkit-scrollbar { display: none; }
 .block-anchornav__link { padding: 14px 2px; white-space: nowrap; text-decoration: none; color: var(--gov-muted); font-weight: 700; font-size: .95rem; border-bottom: 3px solid transparent; margin-bottom: -1px; }
-.block-anchornav__link.is-active, .block-anchornav__link:hover { color: var(--gov-navy); border-bottom-color: var(--gov-teal); }
+.block-anchornav__link.is-active, .block-anchornav__link:hover { color: var(--gov-title); border-bottom-color: var(--gov-teal); }
 
 /* Этапы реализации — горизонтальный таймлайн со статусами. */
 .stages { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; position: relative; }
@@ -717,9 +722,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .stage__dot { position: absolute; top: 0; left: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--gov-surface); border: 2px solid var(--gov-border); }
 .stage--done .stage__dot { background: var(--gov-teal); border-color: var(--gov-teal); }
 .stage--active .stage__dot { background: var(--gov-surface); border-color: var(--gov-teal); }
-.stage__year { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.25rem; color: var(--gov-navy); }
+.stage__year { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.25rem; color: var(--gov-title); }
 .stage__label { color: var(--gov-muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
-.stage__title { font-weight: 700; color: var(--gov-navy); font-size: .98rem; }
+.stage__title { font-weight: 700; color: var(--gov-title); font-size: .98rem; }
 .stage__text { color: var(--gov-muted); font-size: .88rem; line-height: 1.5; flex: 1; }
 .stage__status { align-self: flex-start; padding: 5px 12px; border-radius: 999px; font-size: .78rem; font-weight: 700; background: color-mix(in srgb, var(--gov-navy) 7%, var(--gov-bg)); color: var(--gov-muted); }
 .stage--done .stage__status { background: color-mix(in srgb, var(--gov-teal) 14%, var(--gov-bg)); color: var(--gov-teal-text); }
@@ -736,7 +741,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .textimage__feature { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .textimage__feature-icon { color: var(--gov-teal); }
 .textimage__feature-icon svg { width: 30px; height: 30px; }
-.textimage__feature-label { font-weight: 700; color: var(--gov-navy); font-size: .88rem; line-height: 1.35; }
+.textimage__feature-label { font-weight: 700; color: var(--gov-title); font-size: .88rem; line-height: 1.35; }
 .textimage__media { display: block; aspect-ratio: 16/11; border-radius: var(--radius); background: #24425f center/cover no-repeat; }
 
 /* Сетка документов. */
@@ -750,9 +755,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .block-map__frame { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .block-map__image { position: absolute; inset: 0; background: center/cover no-repeat; }
 .block-map__image--empty { background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)), color-mix(in srgb, var(--gov-navy) 5%, var(--gov-bg)) 14px, color-mix(in srgb, var(--gov-navy) 8%, var(--gov-bg)) 14px, color-mix(in srgb, var(--gov-navy) 8%, var(--gov-bg)) 28px) ; }
-.block-map__pin { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -100%); color: var(--gov-navy); pointer-events: none; }
+.block-map__pin { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -100%); color: var(--gov-title); pointer-events: none; }
 .block-map__card { position: absolute; left: 24px; bottom: 24px; max-width: 300px; background: var(--gov-surface); border-radius: 12px; padding: 18px 20px; box-shadow: 0 14px 34px rgba(19,42,92,.16); display: flex; flex-direction: column; gap: 8px; }
-.block-map__card-title { font-weight: 700; color: var(--gov-navy); font-size: .95rem; line-height: 1.35; }
+.block-map__card-title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; }
 .block-map__card-address { color: var(--gov-muted); font-size: .86rem; line-height: 1.5; }
 .block-map__card-link { color: var(--gov-teal-text); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; text-decoration: none; }
 
@@ -871,7 +876,7 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 /* --- Выпадающее подменю (гос-тема) --- */
 .site-submenu { background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: 12px; box-shadow: 0 18px 44px rgba(11,26,48,.16); padding: 8px; min-width: 240px; margin-top: 6px; }
 .site-submenu::before { content: ''; position: absolute; top: -6px; left: 26px; width: 10px; height: 10px; background: var(--gov-surface); border-left: 1px solid var(--gov-border); border-top: 1px solid var(--gov-border); transform: rotate(45deg); }
-.site-submenu__link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: var(--gov-navy); font-weight: 600; font-size: .92rem; text-transform: none; letter-spacing: 0; }
+.site-submenu__link { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: var(--gov-title); font-weight: 600; font-size: .92rem; text-transform: none; letter-spacing: 0; }
 .site-submenu__link:hover, .site-submenu__link:focus-visible { background: color-mix(in srgb, var(--gov-teal) 9%, var(--gov-surface)); color: var(--gov-teal-text); }
 .site-menu__toggle { color: var(--gov-teal); background: transparent; border: 0; cursor: pointer; font-size: 10px; padding: 4px; }
 
@@ -908,7 +913,7 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .newslist-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newslist-lead__body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: clamp(20px, 3vw, 36px); }
 .newslist__date { color: var(--gov-muted); font-size: .85rem; }
-.newslist-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: clamp(1.3rem, 2.2vw, 1.7rem); color: var(--gov-navy); line-height: 1.25; }
+.newslist-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: clamp(1.3rem, 2.2vw, 1.7rem); color: var(--gov-title); line-height: 1.25; }
 .newslist-lead__excerpt { color: var(--gov-muted); line-height: 1.6; }
 .newslist-lead:hover .newslist-lead__title { color: var(--gov-teal); }
 
@@ -920,9 +925,9 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 
 /* Пагинация. */
 .listing-pager { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.listing-pager__item { display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-navy); font-weight: 700; text-decoration: none; }
+.listing-pager__item { display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-title); font-weight: 700; text-decoration: none; }
 .listing-pager__item:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
-.listing-pager__item.is-active { background: var(--gov-navy); border-color: var(--gov-navy); color: #fff; }
+.listing-pager__item.is-active { background: var(--gov-navy); border-color: var(--gov-title); color: #fff; }
 
 /* Сетка проектов. */
 .projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
@@ -944,22 +949,22 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 
 /* ===== Рубрикатор по бейджам (страница «Новости») ===== */
 .listing-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-top: -8px; }
-.listing-filter__item { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-navy); font-weight: 600; font-size: .9rem; text-decoration: none; transition: border-color .15s ease, color .15s ease; }
+.listing-filter__item { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--gov-border); background: var(--gov-surface); color: var(--gov-title); font-weight: 600; font-size: .9rem; text-decoration: none; transition: border-color .15s ease, color .15s ease; }
 .listing-filter__item:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
-.listing-filter__item.is-active { background: var(--gov-navy); border-color: var(--gov-navy); color: #fff; }
+.listing-filter__item.is-active { background: var(--gov-navy); border-color: var(--gov-title); color: #fff; }
 
 /* ===== Каталог (вакансии, тендеры, документы, мероприятия) ===== */
 .catlist-toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 .catlist-toolbar__search { position: relative; flex: 1 1 260px; max-width: 460px; }
 .catlist-toolbar__search svg { position: absolute; left: 14px; top: 50%; translate: 0 -50%; color: var(--gov-muted); pointer-events: none; }
-.catlist-toolbar__search input { width: 100%; height: 46px; padding: 0 14px 0 42px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font: inherit; }
+.catlist-toolbar__search input { width: 100%; height: 46px; padding: 0 14px 0 42px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font: inherit; }
 .catlist-toolbar__search input:focus-visible { outline: 2px solid var(--gov-teal); outline-offset: 1px; }
-.catlist-toolbar__sort { height: 46px; padding: 0 12px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font: inherit; }
+.catlist-toolbar__sort { height: 46px; padding: 0 12px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font: inherit; }
 .catlist-toolbar__btn { height: 46px; padding: 0 22px; border: 0; border-radius: 10px; background: var(--gov-navy); color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
 .catlist-toolbar__btn:hover { background: var(--gov-teal); }
 .catlist-toolbar__reset { color: var(--gov-teal-text); font-weight: 600; text-decoration: none; }
 .catlist-count { color: var(--gov-muted); margin: 0; }
-.catlist-count b { color: var(--gov-navy); }
+.catlist-count b { color: var(--gov-title); }
 
 .catlist { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
 @media (max-width: 900px) { .catlist { grid-template-columns: 1fr; } }
@@ -973,10 +978,10 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .catcard__status--off { background: rgba(23, 58, 99, .08); color: var(--gov-muted); }
 .catcard__created { margin-left: auto; color: var(--gov-muted); font-size: .82rem; }
 .catcard__title { margin: 0; font-size: 1.15rem; line-height: 1.3; }
-.catcard__title a { color: var(--gov-navy); text-decoration: none; }
+.catcard__title a { color: var(--gov-title); text-decoration: none; }
 .catcard__title a:hover { color: var(--gov-teal-text); }
 .catcard__meta { display: flex; flex-wrap: wrap; gap: 6px 22px; }
-.catcard__meta-item { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; color: var(--gov-navy); }
+.catcard__meta-item { display: flex; flex-direction: column; gap: 2px; font-size: .9rem; color: var(--gov-title); }
 .catcard__meta-item i { font-style: normal; font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--gov-muted); }
 .catcard__excerpt { margin: 0; color: var(--gov-muted); font-size: .9rem; line-height: 1.55; }
 .catcard__foot { display: flex; align-items: center; gap: 16px; margin-top: auto; padding-top: 6px; }
@@ -995,20 +1000,20 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .catdetail { display: flex; flex-direction: column; gap: clamp(24px, 3.4vw, 40px); padding-block: 10px clamp(40px, 5vw, 64px); }
 .catdetail__head { max-width: 900px; }
 .catdetail__eyebrow { display: inline-block; color: var(--gov-teal-text); font-size: .8rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.catdetail__title { margin: 12px 0 10px; font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.18; color: var(--gov-navy); }
+.catdetail__title { margin: 12px 0 10px; font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.18; color: var(--gov-title); }
 .catdetail__date { color: var(--gov-muted); font-size: .9rem; }
 .catdetail__grid { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: clamp(24px, 3.4vw, 48px); align-items: start; }
 @media (max-width: 900px) { .catdetail__grid { grid-template-columns: 1fr; } }
 .catdetail__body { display: flex; flex-direction: column; gap: 26px; max-width: 76ch; }
-.catdetail__subtitle { margin: 0 0 10px; font-size: 1.2rem; color: var(--gov-navy); }
+.catdetail__subtitle { margin: 0 0 10px; font-size: 1.2rem; color: var(--gov-title); }
 .catdetail__text { color: var(--gov-ink, #2b3b4e); line-height: 1.7; }
 .catdetail__text img { max-width: 100%; border-radius: 12px; }
 .catdetail__empty { color: var(--gov-muted); }
 .catdetail__card { position: sticky; top: 90px; display: flex; flex-direction: column; gap: 16px; padding: 24px; border: 1px solid var(--gov-border); border-radius: 14px; background: var(--gov-surface); }
-.catdetail__card-title { margin: 0; font-size: 1.05rem; color: var(--gov-navy); }
+.catdetail__card-title { margin: 0; font-size: 1.05rem; color: var(--gov-title); }
 .catdetail__facts { display: flex; flex-direction: column; gap: 12px; margin: 0; }
 .catdetail__fact dt { font-size: .74rem; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--gov-muted); }
-.catdetail__fact dd { margin: 2px 0 0; color: var(--gov-navy); font-weight: 600; }
+.catdetail__fact dd { margin: 2px 0 0; color: var(--gov-title); font-weight: 600; }
 .catdetail__download { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 0 18px; border-radius: 10px; background: var(--gov-navy); color: #fff; font-weight: 700; text-decoration: none; }
 .catdetail__download:hover { background: var(--gov-teal); }
 .catdetail__back { color: var(--gov-teal-text); font-weight: 600; font-size: .9rem; text-decoration: none; }
@@ -1016,9 +1021,9 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 
 /* Календарь мероприятий. */
 .gcal-nav { display: flex; align-items: center; gap: 14px; }
-.gcal-nav__btn { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font-weight: 700; text-decoration: none; }
+.gcal-nav__btn { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font-weight: 700; text-decoration: none; }
 .gcal-nav__btn:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
-.gcal-nav__label { font-family: var(--font-heading, 'PT Serif', serif); font-size: 1.25rem; color: var(--gov-navy); text-transform: capitalize; }
+.gcal-nav__label { font-family: var(--font-heading, 'PT Serif', serif); font-size: 1.25rem; color: var(--gov-title); text-transform: capitalize; }
 .gcal-nav__all { margin-left: auto; color: var(--gov-teal-text); font-weight: 700; font-size: .9rem; text-decoration: none; }
 .gcal-scroll { overflow-x: auto; }
 .gcal { width: 100%; min-width: 720px; border-collapse: collapse; border: 1px solid var(--gov-border); border-radius: 14px; overflow: hidden; background: var(--gov-surface); }
@@ -1027,17 +1032,17 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .gcal__cell--empty { background: color-mix(in srgb, var(--gov-surface) 55%, var(--gov-bg)); }
 .gcal__cell--today { box-shadow: inset 0 0 0 2px var(--gov-teal); }
 .gcal__cell--today .gcal__day { color: var(--gov-teal-text); }
-.gcal__day { display: block; font-weight: 700; color: var(--gov-navy); margin-bottom: 6px; }
+.gcal__day { display: block; font-weight: 700; color: var(--gov-title); margin-bottom: 6px; }
 .gcal__event { display: block; margin-top: 4px; padding: 5px 8px; border-radius: 8px; background: rgba(23, 153, 155, .12); color: var(--gov-teal-text); font-size: .78rem; font-weight: 600; line-height: 1.3; text-decoration: none; }
 .gcal__event:hover { background: var(--gov-teal); color: #fff; }
 .gcal-list { display: flex; flex-direction: column; gap: 14px; }
-.gcal-list__title { margin: 0; font-size: 1.3rem; color: var(--gov-navy); }
+.gcal-list__title { margin: 0; font-size: 1.3rem; color: var(--gov-title); }
 .gcal-list__items { display: flex; flex-direction: column; gap: 0; margin: 0; padding: 0; list-style: none; border: 1px solid var(--gov-border); border-radius: 14px; background: var(--gov-surface); overflow: hidden; }
 .gcal-list__item { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; padding: 16px 22px; }
 .gcal-list__item + .gcal-list__item { border-top: 1px solid var(--gov-border); }
-.gcal-list__date { font-weight: 700; color: var(--gov-navy); font-variant-numeric: tabular-nums; }
+.gcal-list__date { font-weight: 700; color: var(--gov-title); font-variant-numeric: tabular-nums; }
 .gcal-list__time { color: var(--gov-teal-text); font-weight: 700; font-size: .88rem; }
-.gcal-list__link { color: var(--gov-navy); font-weight: 600; text-decoration: none; }
+.gcal-list__link { color: var(--gov-title); font-weight: 600; text-decoration: none; }
 .gcal-list__link:hover { color: var(--gov-teal-text); }
 .gcal-list__loc { color: var(--gov-muted); font-size: .88rem; }
 
@@ -1062,9 +1067,9 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 /* ===== Капча публичных форм ===== */
 .captcha-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .captcha-row__img { border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-bg); }
-.captcha-row__refresh { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font-size: 1.2rem; cursor: pointer; }
+.captcha-row__refresh { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font-size: 1.2rem; cursor: pointer; }
 .captcha-row__refresh:hover { border-color: var(--gov-teal); color: var(--gov-teal-text); }
-.captcha-row input { width: 130px; height: 46px; padding: 0 14px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-navy); font: inherit; letter-spacing: .2em; text-transform: uppercase; }
+.captcha-row input { width: 130px; height: 46px; padding: 0 14px; border: 1px solid var(--gov-border); border-radius: 10px; background: var(--gov-surface); color: var(--gov-title); font: inherit; letter-spacing: .2em; text-transform: uppercase; }
 .captcha-row input:focus-visible { outline: 2px solid var(--gov-teal); outline-offset: 1px; }
 
 /* ============================================================================
