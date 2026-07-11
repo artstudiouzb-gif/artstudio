@@ -46,6 +46,11 @@ $on = fn (string $k, string $d = '0') => ($settings[$k] ?? $d) === '1';
                 <input type="number" id="perf_webp_quality" name="perf_webp_quality" min="40" max="95" value="<?= $val('perf_webp_quality', '82') ?>">
                 <span class="form-hint">Ниже — легче файлы, выше — качественнее. Применяется к новым загрузкам.</span>
             </div>
+            <div class="form-field">
+                <label for="perf_image_max_width">Макс. ширина оригинала (px, 1200–4000)</label>
+                <input type="number" id="perf_image_max_width" name="perf_image_max_width" min="1200" max="4000" value="<?= $val('perf_image_max_width', '2560') ?>">
+                <span class="form-hint">Загруженные фото шире этого значения автоматически уменьшаются — экономит вес страниц и место. Применяется к новым загрузкам.</span>
+            </div>
             <div class="form-field form-field--checkbox">
                 <input type="checkbox" id="perf_lazy_load" name="perf_lazy_load" value="1" <?= $on('perf_lazy_load', '1') ? 'checked' : '' ?>>
                 <label for="perf_lazy_load">Ленивая загрузка изображений (loading="lazy")</label>

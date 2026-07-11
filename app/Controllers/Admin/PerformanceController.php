@@ -38,6 +38,9 @@ final class PerformanceController
         $quality = SettingsValidator::nonNegativeInt((string) ($_POST['perf_webp_quality'] ?? ''), 82);
         Setting::set('perf_webp_quality', (string) max(40, min(95, $quality)));
 
+        $imgMaxW = SettingsValidator::nonNegativeInt((string) ($_POST['perf_image_max_width'] ?? ''), 2560);
+        Setting::set('perf_image_max_width', (string) max(1200, min(4000, $imgMaxW)));
+
         // CDN base: только http(s)-URL без хвостового слэша, иначе пусто.
         $cdn = trim((string) ($_POST['perf_cdn_url'] ?? ''));
         if ($cdn !== '' && preg_match('#^https?://[^\s]+$#i', $cdn) !== 1) {

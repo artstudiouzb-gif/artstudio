@@ -266,6 +266,18 @@ final class Uploader
         return max(40, min(95, $q));
     }
 
+    /** Макс. ширина хранимого оригинала (px) из настроек, по умолчанию 2560. */
+    public static function originalMaxWidth(): int
+    {
+        try {
+            $w = (int) \App\Models\Setting::get('perf_image_max_width', '2560');
+        } catch (\Throwable) {
+            $w = 2560;
+        }
+
+        return max(1200, min(4000, $w));
+    }
+
     public static function optimizeImage(string $path): void
     {
         if (!extension_loaded('gd')) {
@@ -328,6 +340,27 @@ final class Uploader
                 imagecopyresampled($resized, $src, 0, 0, 0, 0, $targetWidth, $targetHeight, $width, $height);
                 @imagewebp($resized, $base . '-' . $targetWidth . '.webp', $quality);
                 imagedestroy($resized);
+            }
+
+            // Даунскейл самого оригинала, если он неоправданно большой (фото
+            // прямо с телефона — 4000–6000px). WebP-варианты уже созданы выше;
+            // уменьшённый оригинал экономит вес страниц и место на диске, при
+            // этом работает и там, где картинка задаётся через CSS background.
+            $maxW = self::originalMaxWidth();
+            if ($width > $maxW) {
+                $newH = (int) round($height * ($maxW / $width));
+                $down = imagecreatetruecolor($maxW, $newH);
+                if ($type === IMAGETYPE_PNG) {
+                    imagealphablending($down, false);
+                    imagesavealpha($down, true);
+                }
+                imagecopyresampled($down, $src, 0, 0, 0, 0, $maxW, $newH, $width, $height);
+                if ($type === IMAGETYPE_JPEG) {
+                    @imagejpeg($down, $path, 85);
+                } else {
+                    @imagepng($down, $path);
+                }
+                imagedestroy($down);
             }
 
             imagedestroy($src);
