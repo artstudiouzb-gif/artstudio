@@ -10,7 +10,7 @@ if (count($crumbs) < 2) {
     return;
 }
 ?>
-<nav class="content-crumbs" aria-label="Хлебные крошки">
+<nav class="content-crumbs<?= !empty($crumbsClass) ? ' ' . htmlspecialchars((string) $crumbsClass, ENT_QUOTES) : '' ?>" aria-label="Хлебные крошки">
     <?php $last = count($crumbs) - 1; ?>
     <?php foreach ($crumbs as $i => $c): ?>
         <?php if (!empty($c['url']) && $i !== $last): ?>

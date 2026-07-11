@@ -20,7 +20,22 @@ if (empty($page['is_home']) && !$hideChrome) {
         ['label' => 'Главная', 'url' => \App\Core\Locale::url('/')],
         ['label' => (string) ($page['title'] ?? '')],
     ];
-    require __DIR__ . '/_crumbs.php';
+    // Если первый блок страницы — hero (шапка-герой), крошки встраиваем внутрь
+    // hero (поверх фона, сверху), а не отдельной серой полосой над ним.
+    $firstIsHero = (bool) preg_match('/^\s*<section\b[^>]*\bcms-block--hero\b/', $content);
+    if ($firstIsHero) {
+        $crumbsClass = 'content-crumbs--on-hero';
+        ob_start();
+        require __DIR__ . '/_crumbs.php';
+        $crumbsHtml = ob_get_clean();
+        unset($crumbsClass);
+        // Вставляем сразу после корневого <div class="block-hero …">.
+        if ($crumbsHtml !== '') {
+            $content = preg_replace('/(<div class="block-hero\b[^>]*>)/', '$1' . addcslashes($crumbsHtml, '\\$'), $content, 1);
+        }
+    } else {
+        require __DIR__ . '/_crumbs.php';
+    }
 }
 
 $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
