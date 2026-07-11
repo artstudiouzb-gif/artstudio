@@ -50,6 +50,7 @@ final class TeamMember
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
 
+        self::bustPageCache();
         return (int) Database::pdo()->lastInsertId();
     }
 
@@ -70,11 +71,18 @@ final class TeamMember
             ':sort_order' => $data['sort_order'] ?? 0,
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM team_members WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 }

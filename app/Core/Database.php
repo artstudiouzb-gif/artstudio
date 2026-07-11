@@ -31,6 +31,12 @@ final class Database
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
             ]);
+            // Синхронизируем часовой пояс сессии MySQL со временем PHP. Иначе
+            // NOW() в MySQL и published_at/created_at, записываемые из PHP,
+            // расходятся на разницу поясов, и свежие новости/записи с фильтром
+            // "published_at <= NOW()" прячутся до конца смещения (напр. на 3 часа).
+            $offset = (new \DateTimeImmutable())->format('P'); // напр. +03:00
+            self::$connection->exec("SET time_zone = '" . $offset . "'");
         } catch (PDOException $e) {
             // Бросаем исключение вместо exit — вызывающий код решает, что делать
             // (fail-safe 503 в рабочем режиме или продолжение в режиме установки).

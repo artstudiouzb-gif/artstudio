@@ -13,7 +13,7 @@ return [
         'env' => getenv('APP_ENV') ?: 'production',
         'debug' => filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN),
         'url' => getenv('APP_URL') ?: 'https://example.com',
-        'timezone' => getenv('APP_TIMEZONE') ?: 'Europe/Moscow',
+        'timezone' => getenv('APP_TIMEZONE') ?: 'Asia/Tashkent',
     ],
     // Критические ключи жизнеобеспечения — строго из файла/окружения, не из БД
     // (задача 115). Падение БД не влияет на их чтение.

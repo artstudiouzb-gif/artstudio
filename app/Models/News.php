@@ -90,6 +90,7 @@ final class News
         }
         $stmt = Database::pdo()->prepare('UPDATE news SET status = :s WHERE id = :id AND deleted_at IS NULL');
         $stmt->execute([':s' => $status, ':id' => $id]);
+        self::bustPageCache();
     }
 
     /** Полная копия новости с переводами и галереей (черновик, slug -copy). */
@@ -128,12 +129,24 @@ final class News
     {
         $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NULL WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function forceDelete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM news WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    /**
+     * Сбрасывает кэш скомпилированных блоков страниц: динамические блоки
+     * (новости на главной и т.п.) кэшируются в составе HTML страницы, поэтому
+     * при изменении новостей их нужно пересобрать.
+     */
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 
     /**
@@ -306,6 +319,7 @@ final class News
             ':author_id' => $data['author_id'],
         ]);
 
+        self::bustPageCache();
         return (int) Database::pdo()->lastInsertId();
     }
 
@@ -334,6 +348,7 @@ final class News
             ':published_at' => $data['published_at'],
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
@@ -341,6 +356,7 @@ final class News
         // Мягкое удаление: запись отправляется в корзину.
         $stmt = Database::pdo()->prepare('UPDATE news SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     /** Дополнительные поля детальной страницы (эскиз): бейдж, тезисы, мероприятие, документы. */
@@ -360,6 +376,7 @@ final class News
             ':source_note' => ($data['source_note'] ?? '') !== '' ? $data['source_note'] : null,
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     /** Счётчик просмотров детальной страницы (без учёта повторов — простая метрика). */

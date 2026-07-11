@@ -46,6 +46,7 @@ final class Project
         }
         $stmt = Database::pdo()->prepare('UPDATE projects SET status = :s WHERE id = :id AND deleted_at IS NULL');
         $stmt->execute([':s' => $status, ':id' => $id]);
+        self::bustPageCache();
     }
 
     /** Полная копия проекта с изображениями и полями (черновик, slug -copy). */
@@ -84,12 +85,14 @@ final class Project
     {
         $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NULL WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function forceDelete(int $id): void
     {
         $stmt = Database::pdo()->prepare('DELETE FROM projects WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
     }
 
     public static function published(): array
@@ -150,6 +153,7 @@ final class Project
             ':sort_order' => $data['sort_order'] ?? 0,
         ]);
 
+        self::bustPageCache();
         return (int) Database::pdo()->lastInsertId();
     }
 
@@ -168,6 +172,7 @@ final class Project
             ':sort_order' => $data['sort_order'] ?? 0,
             ':id' => $id,
         ]);
+        self::bustPageCache();
     }
 
     public static function delete(int $id): void
@@ -175,5 +180,11 @@ final class Project
         // Мягкое удаление: проект отправляется в корзину.
         $stmt = Database::pdo()->prepare('UPDATE projects SET deleted_at = NOW() WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        self::bustPageCache();
+    }
+
+    private static function bustPageCache(): void
+    {
+        \App\Core\Cache::forgetPrefix('page:');
     }
 }
