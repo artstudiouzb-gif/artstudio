@@ -357,8 +357,8 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 @media (max-width: 560px) { .newsfeat-side__texts { grid-template-columns: 1fr; } }
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
 .newsfeat__more { color: var(--gov-teal); text-transform: uppercase; font-size: 12px; letter-spacing: .05em; font-weight: 700; }
-.newsfeat-mini { display: grid; grid-template-columns: 96px 1fr; gap: 14px; text-decoration: none; color: var(--gov-ink); align-items: start; }
-.newsfeat-mini__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; }
+.newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
+.newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
 .newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
