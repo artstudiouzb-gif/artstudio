@@ -198,28 +198,41 @@
         var currentCallback = null; // режим выбора для WYSIWYG (вставка URL в контент)
         var loaded = false;
 
-        function open(targetSelector, callback) {
+        var loadedType = null;
+
+        function open(targetSelector, callback, type) {
             currentTarget = targetSelector ? document.querySelector(targetSelector) : null;
             currentCallback = callback || null;
+            type = type || 'image';
             modal.hidden = false;
-            if (loaded) { return; }
+            if (loaded && loadedType === type) { return; }
+            loaded = false; loadedType = type;
             grid.innerHTML = '<div class="media-modal__empty">Загрузка…</div>';
-            fetch('/admin/media/list', { credentials: 'same-origin' })
+            fetch('/admin/media/list?type=' + encodeURIComponent(type), { credentials: 'same-origin' })
                 .then(function (r) { return r.json(); })
                 .then(function (data) {
                     loaded = true;
                     grid.setAttribute('aria-busy', 'false');
                     var items = data.items || [];
-                    if (!items.length) { grid.innerHTML = '<div class="media-modal__empty">В библиотеке нет изображений.</div>'; return; }
+                    if (!items.length) { grid.innerHTML = '<div class="media-modal__empty">В библиотеке нет подходящих файлов.</div>'; return; }
                     grid.innerHTML = '';
                     items.forEach(function (it) {
                         var fig = document.createElement('button');
                         fig.type = 'button';
                         fig.className = 'media-modal__item';
                         fig.title = it.name;
-                        var img = document.createElement('img');
-                        img.src = it.url; img.alt = it.name; img.loading = 'lazy';
-                        fig.appendChild(img);
+                        var isVideo = /\.(mp4|webm|ogg|mov|m4v)$/i.test(it.url);
+                        if (isVideo) {
+                            // Видео не рисуем картинкой — плитка с названием файла.
+                            fig.classList.add('media-modal__item--file');
+                            fig.innerHTML = '<span class="media-modal__fileicon" aria-hidden="true">▶</span>'
+                                + '<span class="media-modal__filename"></span>';
+                            fig.querySelector('.media-modal__filename').textContent = it.name;
+                        } else {
+                            var img = document.createElement('img');
+                            img.src = it.url; img.alt = it.name; img.loading = 'lazy';
+                            fig.appendChild(img);
+                        }
                         fig.addEventListener('click', function () {
                             if (currentCallback) {
                                 currentCallback(it.url);
@@ -241,11 +254,19 @@
 
         document.addEventListener('click', function (e) {
             var btn = e.target.closest('[data-media-pick]');
-            if (btn) { e.preventDefault(); open(btn.getAttribute('data-media-target')); return; }
+            if (btn) { e.preventDefault(); open(btn.getAttribute('data-media-target'), null, btn.getAttribute('data-media-type')); return; }
             if (e.target.closest('[data-media-close]') || e.target === modal) { close(); }
         });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { close(); } });
     })();
+
+    // --- Живое значение ползунков прозрачности (overlay/подложка hero и др.) ---
+    document.addEventListener('input', function (e) {
+        var input = e.target.closest('input[type="range"][data-range-input]');
+        if (!input) { return; }
+        var out = document.querySelector('[data-range-output="' + input.getAttribute('data-range-input') + '"]');
+        if (out) { out.textContent = input.value; }
+    });
 
     // --- Поле изображения с превью (медиабиблиотека / URL / загрузка файла) ---
     (function () {

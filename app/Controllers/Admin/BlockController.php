@@ -564,14 +564,26 @@ final class BlockController
                 ];
             case 'hero':
                 $safe = static fn (string $u): string => ($u !== '' && \App\Core\UrlGuard::isSafeLink($u)) ? $u : '';
+                // #RRGGBB или пусто; иначе дефолт. Уровень прозрачности 0..100.
+                $hexColor = static fn (string $v, string $def): string => preg_match('/^#[0-9a-fA-F]{6}$/', $v) ? strtolower($v) : $def;
+                $pct = static fn ($v, int $def): int => is_numeric($v) ? max(0, min(100, (int) $v)) : $def;
+                $bgType = in_array($_POST['bg_type'] ?? 'image', ['none', 'image', 'video', 'youtube'], true) ? $_POST['bg_type'] : 'image';
                 return [
                     'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
                     'width' => ($_POST['hero_width'] ?? 'full') === 'standard' ? 'standard' : 'full',
                     'height' => ($_POST['hero_height'] ?? 'regular') === 'full' ? 'full' : 'regular',
                     'eyebrow' => TextProcessor::typographPlain(trim((string) ($_POST['eyebrow'] ?? '')), $locale),
                     'subtitle' => TextProcessor::typographPlain(trim((string) ($_POST['subtitle'] ?? '')), $locale),
+                    'bg_type' => $bgType,
                     'image' => trim((string) ($_POST['image'] ?? '')),
                     'video_url' => trim((string) ($_POST['video_url'] ?? '')),
+                    'youtube_url' => trim((string) ($_POST['youtube_url'] ?? '')),
+                    'overlay_color' => $hexColor(trim((string) ($_POST['overlay_color'] ?? '')), '#0b1a30'),
+                    'overlay_opacity' => $pct($_POST['overlay_opacity'] ?? null, 55),
+                    'text_position' => in_array($_POST['text_position'] ?? 'left', ['left', 'center', 'right'], true) ? $_POST['text_position'] : 'left',
+                    'panel_enabled' => !empty($_POST['panel_enabled']),
+                    'panel_color' => $hexColor(trim((string) ($_POST['panel_color'] ?? '')), '#0b1a30'),
+                    'panel_opacity' => $pct($_POST['panel_opacity'] ?? null, 40),
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
                     'button_url' => $safe(trim((string) ($_POST['button_url'] ?? ''))),
                     'button2_text' => trim((string) ($_POST['button2_text'] ?? '')),

@@ -1,36 +1,64 @@
 <?php
 
 use App\Core\UrlGuard;
+use App\Core\Video;
 
 /** @var array $data */
 $title = $data['title'] ?? '';
 $eyebrow = trim((string) ($data['eyebrow'] ?? ''));
 $subtitle = $data['subtitle'] ?? '';
 $image = trim((string) ($data['image'] ?? ''));
-$video = trim((string) ($data['video_url'] ?? ''));
+
+// Тип фона: none | image | video | youtube. Старые блоки без bg_type
+// определяются по заполненным полям (обратная совместимость).
+$bgType = (string) ($data['bg_type'] ?? '');
+$videoFile = trim((string) ($data['video_url'] ?? ''));
+$youtubeId = Video::youtubeId((string) ($data['youtube_url'] ?? ''));
+if ($bgType === '') {
+    $bgType = $youtubeId !== null ? 'youtube' : ($videoFile !== '' ? 'video' : ($image !== '' ? 'image' : 'none'));
+}
+
+$hasMedia = ($bgType === 'image' && $image !== '')
+    || ($bgType === 'video' && $videoFile !== '')
+    || ($bgType === 'youtube' && $youtubeId !== null);
+
+// Overlay (полупрозрачная заливка поверх медиа) и подложка под текстом.
+$hex2rgb = static function (string $hex): string {
+    $hex = ltrim($hex, '#');
+    return (int) hexdec(substr($hex, 0, 2)) . ',' . (int) hexdec(substr($hex, 2, 2)) . ',' . (int) hexdec(substr($hex, 4, 2));
+};
+$ovColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['overlay_color'] ?? '')) ? $data['overlay_color'] : '#0b1a30';
+$ovOpacity = max(0, min(100, (int) ($data['overlay_opacity'] ?? 55))) / 100;
+$panelOn = !empty($data['panel_enabled']);
+$panelColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['panel_color'] ?? '')) ? $data['panel_color'] : '#0b1a30';
+$panelOpacity = max(0, min(100, (int) ($data['panel_opacity'] ?? 40))) / 100;
+$textPos = in_array($data['text_position'] ?? 'left', ['left', 'center', 'right'], true) ? $data['text_position'] : 'left';
+
 $btnText = trim((string) ($data['button_text'] ?? ''));
 $btnUrl = trim((string) ($data['button_url'] ?? ''));
 $btn2Text = trim((string) ($data['button2_text'] ?? ''));
 $btn2Url = trim((string) ($data['button2_url'] ?? ''));
 $vBtnText = trim((string) ($data['video_button_text'] ?? ''));
 $vBtnUrl = trim((string) ($data['video_button_url'] ?? ''));
-$hasMedia = $image !== '' || $video !== '';
-?>
-<?php
+
 $heroWidth = ($data['width'] ?? 'full') === 'standard' ? 'standard' : 'full';
 $heroHeight = ($data['height'] ?? 'regular') === 'full' ? 'full' : 'regular';
 ?>
-<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= $video !== '' ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?>">
-    <?php if ($video !== ''): ?>
+<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>">
+    <?php if ($bgType === 'video' && $videoFile !== ''): ?>
         <video class="block-hero__video" autoplay muted loop playsinline <?= $image !== '' ? 'poster="' . htmlspecialchars($image, ENT_QUOTES) . '"' : '' ?> aria-hidden="true">
-            <source src="<?= htmlspecialchars($video, ENT_QUOTES) ?>" type="video/mp4">
+            <source src="<?= htmlspecialchars($videoFile, ENT_QUOTES) ?>" type="video/mp4">
         </video>
-    <?php elseif ($image !== ''): ?>
+    <?php elseif ($bgType === 'youtube' && $youtubeId !== null): ?>
+        <div class="block-hero__yt" aria-hidden="true">
+            <iframe src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3" title="" tabindex="-1" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
+    <?php elseif ($bgType === 'image' && $image !== ''): ?>
         <div class="block-hero__media" style="background-image:url('<?= htmlspecialchars($image, ENT_QUOTES) ?>')" aria-hidden="true"></div>
     <?php endif; ?>
-    <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true"></div><?php endif; ?>
+    <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="background: rgba(<?= $hex2rgb($ovColor) ?>, <?= $ovOpacity ?>);"></div><?php endif; ?>
     <div class="block-hero__inner">
-        <div class="block-hero__text">
+        <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $panelOn ? ' style="background: rgba(' . $hex2rgb($panelColor) . ', ' . $panelOpacity . ');"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
             <?php if ($title !== ''): ?><h1 class="block-hero__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h1><?php endif; ?>
             <?php if ($subtitle !== ''): ?><p class="block-hero__subtitle"><?= htmlspecialchars($subtitle, ENT_QUOTES) ?></p><?php endif; ?>

@@ -186,6 +186,25 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero__play-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(2px); }
 .block-hero__play-icon svg { width: 20px; height: 20px; }
 .block-hero__play:hover .block-hero__play-icon { background: var(--gov-teal); }
+
+/* YouTube-фон: iframe масштабируется, чтобы всегда закрывать секцию (cover). */
+.block-hero__yt { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.block-hero__yt iframe {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 100vw; height: 56.25vw; min-height: 100%; min-width: 177.78vh; border: 0;
+}
+
+/* Позиция текста в hero: слева (по умолчанию), по центру, справа. */
+.block-hero--pos-center .block-hero__text { margin-inline: auto; text-align: center; }
+.block-hero--pos-center .block-hero__eyebrow { justify-content: center; }
+.block-hero--pos-center .block-hero__actions { justify-content: center; }
+.block-hero--pos-right .block-hero__text { margin-left: auto; }
+.block-hero--pos-right .block-hero__eyebrow { justify-content: flex-start; }
+
+/* Подложка под текстом (цвет и прозрачность задаются инлайн из настроек). */
+.block-hero__text--panel { padding: clamp(22px, 3vw, 38px); border-radius: 16px; backdrop-filter: blur(3px); }
+.block-hero--pos-center .block-hero__text--panel { display: inline-block; }
+
 @media (max-width: 720px) { .block-hero__scrim { background: linear-gradient(180deg, rgba(11,26,48,.7), rgba(11,26,48,.9)); } }
 
 /* Полоса статистики — белая карта, «наезжает» на герой; иконка в кружке. */

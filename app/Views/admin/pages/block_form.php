@@ -421,11 +421,62 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 <label for="subtitle">Подзаголовок</label>
                 <textarea id="subtitle" name="subtitle" rows="2"><?= htmlspecialchars($data['subtitle'] ?? '', ENT_QUOTES) ?></textarea>
             </div>
-            <?= \App\Core\AdminUi::imageField('image', $data['image'] ?? '', ['label' => 'Фото/постер фона', 'hint' => 'Фоновое изображение героя (и постер для видео).']) ?>
+            <div class="form-field"><label for="bg_type">Фон секции</label>
+                <select id="bg_type" name="bg_type" data-hero-bg>
+                    <?php
+                    // Старые блоки без bg_type: определяем тип по заполненным полям.
+                    $bt = (string) ($data['bg_type'] ?? '');
+                    if ($bt === '') {
+                        $bt = \App\Core\Video::youtubeId($data['youtube_url'] ?? '') ? 'youtube'
+                            : (trim((string) ($data['video_url'] ?? '')) !== '' ? 'video'
+                            : (trim((string) ($data['image'] ?? '')) !== '' ? 'image' : 'none'));
+                    }
+                    ?>
+                    <option value="none" <?= $bt === 'none' ? 'selected' : '' ?>>Без фона (светлая секция)</option>
+                    <option value="image" <?= $bt === 'image' ? 'selected' : '' ?>>Фото</option>
+                    <option value="video" <?= $bt === 'video' ? 'selected' : '' ?>>Видео из медиа (mp4)</option>
+                    <option value="youtube" <?= $bt === 'youtube' ? 'selected' : '' ?>>Видео с YouTube</option>
+                </select>
+                <span class="form-hint">Выберите источник фона. Поля ниже подстраиваются под выбор.</span>
+            </div>
+            <?= \App\Core\AdminUi::imageField('image', $data['image'] ?? '', ['label' => 'Фото фона (и постер для видео)', 'hint' => 'Показывается как фон, а для видео — как заставка до загрузки.']) ?>
             <div class="form-field">
-                <label for="video_url">Видео-фон (URL mp4, необязательно)</label>
-                <input type="text" id="video_url" name="video_url" value="<?= htmlspecialchars($data['video_url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/hero.mp4">
-                <span class="form-hint">Загрузите mp4 в «Файлы» и вставьте ссылку. Видео зациклено, без звука.</span>
+                <label for="video_url">Видео-фон из медиа (mp4)</label>
+                <div class="image-field__controls">
+                    <input type="text" id="video_url" name="video_url" value="<?= htmlspecialchars($data['video_url'] ?? '', ENT_QUOTES) ?>" placeholder="/uploads/public/hero.mp4">
+                    <button type="button" class="btn btn--small" data-media-pick data-media-target="#video_url" data-media-type="video">Медиабиблиотека</button>
+                </div>
+                <span class="form-hint">Выберите mp4 из медиабиблиотеки или вставьте ссылку. Видео зациклено, без звука.</span>
+            </div>
+            <div class="form-field">
+                <label for="youtube_url">Ссылка на YouTube</label>
+                <input type="text" id="youtube_url" name="youtube_url" value="<?= htmlspecialchars($data['youtube_url'] ?? '', ENT_QUOTES) ?>" placeholder="https://www.youtube.com/watch?v=…">
+                <span class="form-hint">Ролик проигрывается фоном без звука, зациклено. Загрузка идёт с серверов YouTube.</span>
+            </div>
+            <div class="form-field"><label for="overlay_color">Затемнение фона (overlay) — цвет</label>
+                <input type="color" id="overlay_color" name="overlay_color" value="<?= htmlspecialchars($data['overlay_color'] ?? '#0b1a30', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field"><label for="overlay_opacity">Прозрачность overlay: <output data-range-output="overlay_opacity"><?= (int) ($data['overlay_opacity'] ?? 55) ?></output>%</label>
+                <input type="range" min="0" max="100" id="overlay_opacity" name="overlay_opacity" value="<?= (int) ($data['overlay_opacity'] ?? 55) ?>" data-range-input="overlay_opacity">
+                <span class="form-hint">0% — фон виден полностью, 100% — сплошная заливка. Помогает читаемости текста.</span>
+            </div>
+            <div class="form-field"><label for="text_position">Положение текста</label>
+                <select id="text_position" name="text_position">
+                    <?php $tp = $data['text_position'] ?? 'left'; ?>
+                    <option value="left" <?= $tp === 'left' ? 'selected' : '' ?>>Слева</option>
+                    <option value="center" <?= $tp === 'center' ? 'selected' : '' ?>>По центру</option>
+                    <option value="right" <?= $tp === 'right' ? 'selected' : '' ?>>Справа</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label class="hb-switch"><input type="checkbox" name="panel_enabled" value="1" <?= !empty($data['panel_enabled']) ? 'checked' : '' ?>><span class="hb-switch__track"></span> Подложка под текстом</label>
+                <span class="form-hint">Цветная полупрозрачная плашка под заголовком — для читаемости на пёстром фоне.</span>
+            </div>
+            <div class="form-field"><label for="panel_color">Цвет подложки</label>
+                <input type="color" id="panel_color" name="panel_color" value="<?= htmlspecialchars($data['panel_color'] ?? '#0b1a30', ENT_QUOTES) ?>">
+            </div>
+            <div class="form-field"><label for="panel_opacity">Прозрачность подложки: <output data-range-output="panel_opacity"><?= (int) ($data['panel_opacity'] ?? 40) ?></output>%</label>
+                <input type="range" min="0" max="100" id="panel_opacity" name="panel_opacity" value="<?= (int) ($data['panel_opacity'] ?? 40) ?>" data-range-input="panel_opacity">
             </div>
             <div class="form-field"><label for="button_text">Кнопка 1 — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>"></div>
             <div class="form-field"><label for="button_url">Кнопка 1 — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/o-nas"></div>
