@@ -5,8 +5,13 @@ $allText = trim((string) ($data['all_text'] ?? ''));
 $allUrl = trim((string) ($data['all_url'] ?? ''));
 $cols = (int) ($data['columns'] ?? 5);
 $items = $data['items'] ?? [];
+$cvar = static function (string $key, string $var) use ($data): string {
+    $v = (string) ($data[$key] ?? '');
+    return preg_match('/^#[0-9a-f]{6}$/i', $v) ? $var . ':' . $v . ';' : '';
+};
+$cardStyle = $cvar('card_bg', '--card-bg') . $cvar('text_color', '--cards-text');
 ?>
-<div class="block-cards" style="--cards-cols: <?= max(2, min(5, $cols)) ?>">
+<div class="block-cards" style="--cards-cols: <?= max(2, min(5, $cols)) ?>;<?= $cardStyle ?>">
     <?php if ($title !== '' || ($allText !== '' && $allUrl !== '')): ?>
         <div class="section-head">
             <?php if ($title !== ''): ?><h2 class="section-head__title"><?= htmlspecialchars($title, ENT_QUOTES) ?></h2><?php endif; ?>

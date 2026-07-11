@@ -1,0 +1,43 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Core\BlockRenderer;
+
+// Настраиваемые цвета блоков CTA, баннер, направления, CTA-полоса
+// (через CSS-переменные в инлайн-стиле).
+
+function render_color_block(string $type, array $data): string
+{
+    return BlockRenderer::render(['id' => 1, 'type' => $type, 'custom_css' => null, 'data' => json_encode($data)])['html'];
+}
+
+test('CTA: цвета фона/текста/кнопки отдаются переменными', function () {
+    $h = render_color_block('cta', ['title' => 'T', 'button_text' => 'X', 'button_url' => '/o-nas', 'bg_color' => '#111111', 'text_color' => '#eeeeee', 'button_color' => '#00aa88']);
+    assert_true(str_contains($h, '--cta-bg:#111111'), 'фон CTA');
+    assert_true(str_contains($h, '--cta-text:#eeeeee'), 'текст CTA');
+    assert_true(str_contains($h, '--cta-btn:#00aa88'), 'кнопка CTA');
+});
+
+test('Баннер: цвета отдаются переменными в обоих вариантах', function () {
+    $dark = render_color_block('banner', ['title' => 'T', 'style' => 'dark', 'bg_color' => '#0a0a0a', 'text_color' => '#ffffff']);
+    assert_true(str_contains($dark, '--banner-bg:#0a0a0a') && str_contains($dark, '--banner-text:#ffffff'), 'тёмный баннер');
+    $light = render_color_block('banner', ['title' => 'T', 'style' => 'light', 'button_color' => '#123456', 'button_text' => 'Go', 'button_url' => '/x']);
+    assert_true(str_contains($light, '--banner-btn:#123456'), 'светлый баннер кнопка');
+});
+
+test('Направления: цвет карточек и текста отдаются переменными', function () {
+    $h = render_color_block('cards_grid', ['title' => 'Направления', 'card_bg' => '#0b1a30', 'text_color' => '#ffffff', 'items' => [['title' => 'A', 'text' => 'b', 'icon_svg' => '', 'url' => '']]]);
+    assert_true(str_contains($h, '--card-bg:#0b1a30'), 'фон карточек');
+    assert_true(str_contains($h, '--cards-text:#ffffff'), 'текст карточек');
+});
+
+test('CTA-полоса: цвета отдаются переменными', function () {
+    $h = render_color_block('cta_band', ['title' => 'T', 'bg_color' => '#222222', 'text_color' => '#fafafa', 'button_color' => '#ffcc00', 'button_text' => 'X', 'button_url' => '/x']);
+    assert_true(str_contains($h, '--ctaband-bg:#222222') && str_contains($h, '--ctaband-text:#fafafa') && str_contains($h, '--ctaband-btn:#ffcc00'), 'цвета полосы');
+});
+
+test('Блоки без выбранных цветов не добавляют переменные', function () {
+    $h = render_color_block('cta', ['title' => 'T']);
+    assert_true(!str_contains($h, '--cta-bg') && !str_contains($h, '--cta-text') && !str_contains($h, '--cta-btn'), 'нет лишних переменных');
+});

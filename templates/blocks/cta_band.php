@@ -5,8 +5,13 @@ $text = trim((string) ($data['text'] ?? ''));
 $iconSvg = trim((string) ($data['icon_svg'] ?? ''));
 $btnText = trim((string) ($data['button_text'] ?? ''));
 $btnUrl = trim((string) ($data['button_url'] ?? ''));
+$cvar = static function (string $key, string $var) use ($data): string {
+    $v = (string) ($data[$key] ?? '');
+    return preg_match('/^#[0-9a-f]{6}$/i', $v) ? $var . ':' . $v . ';' : '';
+};
+$style = $cvar('bg_color', '--ctaband-bg') . $cvar('text_color', '--ctaband-text') . $cvar('button_color', '--ctaband-btn');
 ?>
-<div class="block-ctaband">
+<div class="block-ctaband"<?= $style !== '' ? ' style="' . $style . '"' : '' ?>>
     <div class="ctaband__lead">
         <span class="ctaband__icon">
             <?php if ($iconSvg !== ''): ?>

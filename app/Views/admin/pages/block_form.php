@@ -60,6 +60,11 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 <label for="button_url">Ссылка кнопки</label>
                 <input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>">
             </div>
+            <div class="colorfield-row">
+                <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона', '#eef2f7') ?>
+                <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#173a63') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#17999b') ?>
+            </div>
         <?php endif; ?>
 
         <?php if ($type === 'advantages'): ?>
@@ -328,6 +333,11 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 <label for="button_url">Ссылка кнопки</label>
                 <input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/catalog/documenty">
             </div>
+            <div class="colorfield-row">
+                <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона (без фото)', '#173a63') ?>
+                <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#ffffff') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#17999b') ?>
+            </div>
         <?php endif; ?>
 
         <?php if ($type === 'partners'): ?>
@@ -526,6 +536,10 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                         <?php foreach ([2,3,4,5] as $n): ?><option value="<?= $n ?>" <?= (int)($data['columns'] ?? 5)===$n?'selected':'' ?>><?= $n ?></option><?php endforeach; ?>
                     </select>
                 </div>
+                <div class="colorfield-row">
+                    <?= \App\Core\AdminUi::colorField('card_bg', $data['card_bg'] ?? '', 'Цвет карточек (фон)', '#ffffff') ?>
+                    <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста и иконок', '#173a63') ?>
+                </div>
             <?php endif; ?>
             <div>
                 <label>Элементы</label>
@@ -692,6 +706,11 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
             <div class="form-field"><label for="icon_svg">SVG-иконка (необязательно)</label><textarea id="icon_svg" name="icon_svg" placeholder="<svg ...>...</svg>"><?= htmlspecialchars($data['icon_svg'] ?? '', ENT_QUOTES) ?></textarea></div>
             <div class="form-field"><label for="button_text">Кнопка — текст</label><input type="text" id="button_text" name="button_text" value="<?= htmlspecialchars($data['button_text'] ?? '', ENT_QUOTES) ?>" placeholder="Связаться с нами"></div>
             <div class="form-field"><label for="button_url">Кнопка — ссылка</label><input type="text" id="button_url" name="button_url" value="<?= htmlspecialchars($data['button_url'] ?? '', ENT_QUOTES) ?>" placeholder="/kontakty"></div>
+            <div class="colorfield-row">
+                <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона полосы', '#173a63') ?>
+                <?= \App\Core\AdminUi::colorField('text_color', $data['text_color'] ?? '', 'Цвет текста', '#ffffff') ?>
+                <?= \App\Core\AdminUi::colorField('button_color', $data['button_color'] ?? '', 'Цвет кнопки', '#ffffff') ?>
+            </div>
         <?php endif; ?>
 
         <?php if ($type === 'person_profile'): ?>

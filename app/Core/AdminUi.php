@@ -66,4 +66,25 @@ final class AdminUi
 
         return $html;
     }
+
+    /**
+     * Поле выбора цвета с галочкой «по умолчанию». Значение читается
+     * контроллером через BlockController::color() — при включённой галочке
+     * $name_off цвет сбрасывается (color-input всегда шлёт значение).
+     */
+    public static function colorField(string $name, ?string $value, string $label, string $defaultHex = '#173a63', string $offLabel = 'По умолчанию'): string
+    {
+        $esc = static fn (string $s): string => htmlspecialchars($s, ENT_QUOTES);
+        $val = ($value !== null && $value !== '') ? $value : $defaultHex;
+        $off = ($value === null || $value === '');
+
+        $html = '<div class="form-field colorfield">';
+        $html .= '<label for="' . $esc($name) . '">' . $esc($label) . '</label>';
+        $html .= '<input type="color" id="' . $esc($name) . '" name="' . $esc($name) . '" value="' . $esc($val) . '">';
+        $html .= '<label class="colorfield__off"><input type="checkbox" name="' . $esc($name) . '_off" value="1"'
+            . ($off ? ' checked' : '') . '> ' . $esc($offLabel) . '</label>';
+        $html .= '</div>';
+
+        return $html;
+    }
 }

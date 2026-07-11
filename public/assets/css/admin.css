@@ -728,3 +728,10 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 
 /* Панель под полем SVG-иконки: выбрать файл из медиа / очистить. */
 .icon-field__tools { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* Ряд полей выбора цвета (фон/текст/кнопка) в конструкторе блоков. */
+.colorfield-row { display: flex; flex-wrap: wrap; gap: 16px; margin: 6px 0 14px; }
+.colorfield { min-width: 150px; }
+.colorfield input[type="color"] { width: 100%; height: 38px; padding: 2px; cursor: pointer; }
+.colorfield__off { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 400; font-size: 12px; color: var(--admin-muted); }
+.colorfield__off input { width: auto; }

@@ -341,6 +341,12 @@ final class BlockController
         return preg_match('/^#[0-9a-fA-F]{6}$/', $v) ? strtolower($v) : '';
     }
 
+    /** Цвет из поля $field: '' если включена галочка «$field_off» (по умолчанию). */
+    private static function color(string $field): string
+    {
+        return empty($_POST[$field . '_off']) ? self::hexOrEmpty($_POST[$field] ?? '') : '';
+    }
+
     private function collectData(string $type, string $locale = 'ru'): array
     {
         switch ($type) {
@@ -370,6 +376,9 @@ final class BlockController
                     'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
                     'button_url' => $buttonUrl,
+                    'bg_color' => self::color('bg_color'),
+                    'text_color' => self::color('text_color'),
+                    'button_color' => self::color('button_color'),
                 ];
             case 'advantages':
                 $items = [];
@@ -530,6 +539,9 @@ final class BlockController
                     'style' => ($_POST['style'] ?? 'dark') === 'light' ? 'light' : 'dark',
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
                     'button_url' => $bannerUrl,
+                    'bg_color' => self::color('bg_color'),
+                    'text_color' => self::color('text_color'),
+                    'button_color' => self::color('button_color'),
                 ];
             case 'faq':
                 $items = [];
@@ -636,6 +648,8 @@ final class BlockController
                     'all_text' => trim((string) ($_POST['all_text'] ?? '')),
                     'all_url' => (trim((string) ($_POST['all_url'] ?? '')) !== '' && \App\Core\UrlGuard::isSafeLink(trim((string) ($_POST['all_url'] ?? '')))) ? trim((string) ($_POST['all_url'] ?? '')) : '',
                     'columns' => max(2, min(5, $cols)),
+                    'card_bg' => self::color('card_bg'),
+                    'text_color' => self::color('text_color'),
                     'items' => $items,
                 ];
             case 'news_feature':
@@ -783,6 +797,9 @@ final class BlockController
                     'icon_svg' => $iconSvg,
                     'button_text' => trim((string) ($_POST['button_text'] ?? '')),
                     'button_url' => $this->safeUrlField('button_url'),
+                    'bg_color' => self::color('bg_color'),
+                    'text_color' => self::color('text_color'),
+                    'button_color' => self::color('button_color'),
                 ];
             case 'person_profile':
                 return [
