@@ -5,6 +5,13 @@ on:
     branches: ['**']
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Lint + Tests (PHP ${{ matrix.php }})
@@ -84,3 +91,14 @@ jobs:
       # блокировку.
       - name: PHPStan (advisory, non-blocking)
         run: phpstan analyse --no-progress --error-format=table || true
+
+  javascript:
+    name: JavaScript syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check JavaScript syntax
+        run: find public/assets/js -type f -name '*.js' -print0 | xargs -0 -n1 node --check
