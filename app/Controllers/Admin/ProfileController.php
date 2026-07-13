@@ -101,6 +101,10 @@ final class ProfileController
         }
 
         User::updateTelegramChatId($userId, null);
+        $updatedUser = User::findById($userId);
+        if ($updatedUser) {
+            Auth::syncTwoFactorSetup($updatedUser);
+        }
         \App\Core\Logger::security('Отвязан Telegram для кодов входа', [
             'user' => (string) ($_SESSION['username'] ?? ''),
             'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
@@ -204,7 +208,11 @@ final class ProfileController
         $raw = trim((string) ($_POST['phone'] ?? ''));
         if ($raw === '') {
             User::updatePhone($userId, null);
-            Flash::success('Телефон удалён — вход будет выполняться без кода подтверждения.');
+            $updatedUser = User::findById($userId);
+            if ($updatedUser) {
+                Auth::syncTwoFactorSetup($updatedUser);
+            }
+            Flash::success('Телефон удалён. Если другого канала подтверждения нет, доступ ограничен до настройки 2FA.');
         } else {
             $phone = \App\Core\TelegramGateway::normalizePhone($raw);
             if ($phone === null) {
@@ -213,7 +221,10 @@ final class ProfileController
                 exit;
             }
             User::updatePhone($userId, $phone);
-            Auth::completeTwoFactorSetup();
+            $updatedUser = User::findById($userId);
+            if ($updatedUser) {
+                Auth::syncTwoFactorSetup($updatedUser);
+            }
             Flash::success('Телефон сохранён. Коды входа будут приходить в Telegram (Verification Codes).');
         }
 

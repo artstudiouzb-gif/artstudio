@@ -302,6 +302,17 @@ final class Auth
         unset($_SESSION['2fa_setup_required']);
     }
 
+    /** Синхронизирует ограничения текущей сессии после изменения каналов 2FA. */
+    public static function syncTwoFactorSetup(array $user): void
+    {
+        if (self::hasCodeChannel($user)) {
+            self::completeTwoFactorSetup();
+            return;
+        }
+
+        $_SESSION['2fa_setup_required'] = true;
+    }
+
     /**
      * Супер-администратор имеет полный доступ. Роль 'editor' ограничена
      * только управлением контентом. Исторически роль называлась 'admin' —

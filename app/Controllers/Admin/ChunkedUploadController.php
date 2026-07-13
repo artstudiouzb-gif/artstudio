@@ -18,6 +18,7 @@ use App\Core\Uploader;
 final class ChunkedUploadController
 {
     private const MAX_ASSEMBLED_BYTES = 200 * 1024 * 1024; // 200 МБ
+    private const STALE_AFTER_SECONDS = 24 * 60 * 60;
 
     public function chunk(): void
     {
@@ -53,7 +54,9 @@ final class ChunkedUploadController
 
         // Изолируем временные файлы по пользователю: клиентский upload_id не
         // должен позволять одной сессии пересечься с загрузкой другой.
-        $dir = APP_ROOT . '/storage/cache/chunks/user-' . (int) Auth::id();
+        $rootDir = APP_ROOT . '/storage/cache/chunks';
+        $this->cleanupStaleUploads($rootDir);
+        $dir = $rootDir . '/user-' . (int) Auth::id();
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
             $this->json(['ok' => false, 'error' => 'Нет каталога для сборки'], 500);
         }
@@ -89,6 +92,10 @@ final class ChunkedUploadController
         $in = fopen($_FILES['chunk']['tmp_name'], 'rb');
         $out = fopen($partPath, 'ab');
         if ($in === false || $out === false) {
+            if (is_resource($in)) { fclose($in); }
+            if (is_resource($out)) { fclose($out); }
+            flock($lock, LOCK_UN);
+            fclose($lock);
             $this->json(['ok' => false, 'error' => 'Ошибка записи чанка'], 500);
         }
         stream_copy_to_stream($in, $out);
@@ -142,6 +149,36 @@ final class ChunkedUploadController
         @unlink($lockPath);
 
         $this->json(['ok' => true, 'done' => true, 'file_id' => (int) $file['id'], 'name' => $file['original_name']]);
+    }
+
+    /** Удаляет брошенные загрузки старше суток, не трогая активные lock-файлы. */
+    private function cleanupStaleUploads(string $rootDir): void
+    {
+        if (!is_dir($rootDir)) {
+            return;
+        }
+
+        $cutoff = time() - self::STALE_AFTER_SECONDS;
+        foreach (glob($rootDir . '/user-*/*.lock') ?: [] as $lockPath) {
+            if ((int) @filemtime($lockPath) >= $cutoff) {
+                continue;
+            }
+            $lock = @fopen($lockPath, 'c');
+            if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
+                if (is_resource($lock)) { fclose($lock); }
+                continue;
+            }
+
+            $base = substr($lockPath, 0, -5);
+            foreach ([$base . '.part', $base . '.json'] as $stalePath) {
+                if (is_file($stalePath) && (int) @filemtime($stalePath) < $cutoff) {
+                    @unlink($stalePath);
+                }
+            }
+            flock($lock, LOCK_UN);
+            fclose($lock);
+            @unlink($lockPath);
+        }
     }
 
     private function json(array $payload, int $code = 200): never
