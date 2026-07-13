@@ -2,6 +2,17 @@
 
 use App\Core\Csrf;
 
+/** @var string $entityType */
+/** @var string $entityLabel */
+/** @var string $editUrl */
+/** @var array<string,mixed> $entity */
+/** @var array<int,array<string,mixed>> $revisions */
+$entityType = $entityType ?? '';
+$entityLabel = $entityLabel ?? '';
+$editUrl = $editUrl ?? '#';
+$entity = $entity ?? [];
+$revisions = $revisions ?? [];
+
 $pageTitle = 'История ' . $entityLabel;
 $activeNav = match ($entityType) {
     'page' => 'pages',
