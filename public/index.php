@@ -48,7 +48,7 @@ if (!APP_INSTALLED) {
 // полный доступ (чтобы можно было наполнять сайт при закрытом фронтенде). ---
 $maintenancePath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 if (\App\Models\Setting::get('maintenance_mode', '0') === '1'
-    && !\App\Core\Auth::check()
+    && !(\App\Core\Session::hasCookie() && \App\Core\Auth::check())
     && !str_starts_with($maintenancePath, '/admin')
     && !str_starts_with($maintenancePath, '/repo')
     && !str_starts_with($maintenancePath, '/assets')) {
@@ -336,13 +336,17 @@ $router->get('/{slug}', [SitePageController::class, 'show']);
 
 // Журнал действий администраторов: центральная запись изменяющих запросов
 // панели (кто/что/когда/откуда; тело запроса не сохраняется).
-\App\Models\AuditLog::record();
+if (\App\Core\Session::hasCookie()) {
+    \App\Models\AuditLog::record();
+}
 
 // Onboarding второго фактора: после корректного пароля пользователь без
 // Telegram получает ограниченную сессию и может открыть только профиль,
 // настройки доставки кода и выход. Остальная админка остаётся закрытой.
 $guardPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
-if (\App\Core\Auth::check() && \App\Core\Auth::requiresTwoFactorSetup()) {
+if (\App\Core\Session::hasCookie()
+    && \App\Core\Auth::check()
+    && \App\Core\Auth::requiresTwoFactorSetup()) {
     $allowedSetupPaths = ['/admin/profile', '/admin/settings', '/admin/logout'];
     $allowed = false;
     foreach ($allowedSetupPaths as $allowedPath) {

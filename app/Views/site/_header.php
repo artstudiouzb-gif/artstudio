@@ -361,7 +361,6 @@ if ($inlineMenu !== '') {
 <?php if (!empty($metaDescription)): ?>
 <meta name="description" content="<?= htmlspecialchars($metaDescription, ENT_QUOTES) ?>">
 <?php endif; ?>
-<meta name="csrf-token" content="<?= htmlspecialchars(\App\Core\Csrf::token(), ENT_QUOTES) ?>">
 <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
 <?php // hreflang: текущий путь на языках, где контент реально существует
       // ($activeLangs уже отфильтрован по Locale::contentLangs выше),

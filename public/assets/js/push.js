@@ -8,10 +8,6 @@
     }
     var host = document.querySelector('[data-push-optin]') || document.querySelector('.site-footer__subscribe') || document.querySelector('.site-footer');
     if (!host || Notification.permission === 'denied') { return; }
-    var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-    var csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
-    if (!csrfToken) { return; }
-
     function urlB64ToUint8Array(base64String) {
         var padding = '='.repeat((4 - (base64String.length % 4)) % 4);
         var base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -39,29 +35,33 @@
 
             btn.addEventListener('click', function () {
                 btn.disabled = true;
-                reg.pushManager.getSubscription().then(function (current) {
-                    if (current) {
-                        // Отписка.
-                        return fetch('/push/unsubscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-                            body: JSON.stringify({ endpoint: current.endpoint })
-                        }).then(function () { return current.unsubscribe(); }).then(function () { setState(false); });
-                    }
-                    // Подписка: разрешение -> ключ -> subscribe -> сервер.
-                    return Notification.requestPermission().then(function (perm) {
-                        if (perm !== 'granted') { return; }
-                        return fetch('/push/key').then(function (r) { return r.json(); }).then(function (data) {
+                fetch('/push/key').then(function (response) {
+                    if (!response.ok) { throw new Error('push unavailable'); }
+                    return response.json();
+                }).then(function (config) {
+                    if (!config.csrf_token) { throw new Error('csrf unavailable'); }
+                    return reg.pushManager.getSubscription().then(function (current) {
+                        if (current) {
+                            // Отписка.
+                            return fetch('/push/unsubscribe', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': config.csrf_token },
+                                body: JSON.stringify({ endpoint: current.endpoint })
+                            }).then(function () { return current.unsubscribe(); }).then(function () { setState(false); });
+                        }
+                        // Подписка: разрешение -> subscribe -> сервер.
+                        return Notification.requestPermission().then(function (perm) {
+                            if (perm !== 'granted') { return; }
                             return reg.pushManager.subscribe({
                                 userVisibleOnly: true,
-                                applicationServerKey: urlB64ToUint8Array(data.key)
+                                applicationServerKey: urlB64ToUint8Array(config.key)
+                            }).then(function (sub) {
+                                return fetch('/push/subscribe', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': config.csrf_token },
+                                    body: JSON.stringify(sub.toJSON())
+                                }).then(function () { setState(true); });
                             });
-                        }).then(function (sub) {
-                            return fetch('/push/subscribe', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
-                                body: JSON.stringify(sub.toJSON())
-                            }).then(function () { setState(true); });
                         });
                     });
                 }).catch(function () { /* молча: пользователь мог отклонить */ })

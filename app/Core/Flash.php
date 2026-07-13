@@ -8,6 +8,7 @@ final class Flash
 {
     public static function set(string $type, string $message): void
     {
+        Session::start();
         $_SESSION['flash'][] = ['type' => $type, 'message' => $message];
     }
 
@@ -26,6 +27,10 @@ final class Flash
      */
     public static function pull(): array
     {
+        if (session_status() !== PHP_SESSION_ACTIVE && !Session::hasCookie()) {
+            return [];
+        }
+        Session::start();
         $messages = $_SESSION['flash'] ?? [];
         unset($_SESSION['flash']);
 
