@@ -3,13 +3,15 @@
 use App\Core\Csrf;
 use App\Models\SessionRegistry;
 
-$pageTitle = 'Профиль и безопасность';
-$activeNav = 'profile';
-require __DIR__ . '/../layout/header.php';
-
 /** @var array $sessions */
 /** @var string $currentHash */
 /** @var array|null $profileUser */
+$sessions = $sessions ?? [];
+$currentHash = $currentHash ?? '';
+$profileUser = $profileUser ?? null;
+$pageTitle = 'Профиль и безопасность';
+$activeNav = 'profile';
+require __DIR__ . '/../layout/header.php';
 
 function ua_short(?string $ua): string
 {

@@ -144,6 +144,7 @@ final class News
     {
         $stmt = Database::pdo()->prepare('DELETE FROM news WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        ContentRevision::deleteForEntity('news', $id);
         self::bustPageCache();
     }
 

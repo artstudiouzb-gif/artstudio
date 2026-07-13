@@ -60,8 +60,12 @@ $languages = Language::active();
     </div>
 <?php endif; ?>
 <?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
-<form method="post" action="<?= $action ?>" enctype="multipart/form-data">
+<?php if ($isEdit): ?>
+    <div style="margin-bottom:16px;"><a class="btn btn--small" href="/admin/revisions/news/<?= (int) $news['id'] ?>">История версий</a></div>
+<?php endif; ?>
+<form method="post" action="<?= $action ?>" enctype="multipart/form-data" data-content-draft="news:<?= $isEdit ? (int) $news['id'] : 'new' ?>" data-record-updated="<?= htmlspecialchars((string) ($news['updated_at'] ?? ''), ENT_QUOTES) ?>">
     <?= Csrf::field() ?>
+    <?php if ($isEdit): ?><input type="hidden" name="expected_updated_at" value="<?= htmlspecialchars((string) $news['updated_at'], ENT_QUOTES) ?>"><?php endif; ?>
     <div class="entry-grid">
     <div class="entry-main">
     <div class="form-card">

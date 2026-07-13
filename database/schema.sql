@@ -197,6 +197,21 @@ CREATE TABLE IF NOT EXISTS block_revisions (
     CONSTRAINT fk_block_revisions_block FOREIGN KEY (block_id) REFERENCES blocks(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Полная история версий сущностей контента (страницы, новости, проекты).
+CREATE TABLE IF NOT EXISTS content_revisions (
+    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    entity_type     VARCHAR(20) NOT NULL,
+    entity_id       INT UNSIGNED NOT NULL,
+    snapshot        LONGTEXT NOT NULL,
+    snapshot_hash   CHAR(64) NOT NULL,
+    created_by      INT UNSIGNED NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_content_revisions_entity (entity_type, entity_id, id),
+    KEY idx_content_revisions_created (created_at),
+    CONSTRAINT fk_content_revisions_user
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ---------------------------------------------------------------------------
 -- Проекты (портфолио)
 -- ---------------------------------------------------------------------------
@@ -821,7 +836,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_10_webpush.sql'),
     ('2026_07_11_pages_lead.sql'),
     ('2026_07_11_featured_home.sql'),
-    ('2026_07_12_videos.sql')
+    ('2026_07_12_videos.sql'),
+    ('2026_07_13_content_revisions.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

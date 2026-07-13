@@ -754,3 +754,104 @@
         }
     });
 })();
+
+/* Локальное автосохранение контентных форм. Не сохраняем CSRF, файлы и
+   пароли; черновик остаётся только в браузере редактора. */
+(function () {
+    'use strict';
+
+    var currentUrl = new URL(window.location.href);
+    var savedDraft = currentUrl.searchParams.get('draft_saved');
+    if (savedDraft) {
+        try { localStorage.removeItem('artstudio:draft:' + savedDraft); } catch (e) {}
+        currentUrl.searchParams.delete('draft_saved');
+        window.history.replaceState({}, document.title, currentUrl.pathname + currentUrl.search + currentUrl.hash);
+    }
+
+    document.querySelectorAll('form[data-content-draft]').forEach(function (form) {
+        var key = 'artstudio:draft:' + form.getAttribute('data-content-draft');
+        var dirty = false;
+
+        function fields() {
+            var values = {};
+            Array.prototype.forEach.call(form.elements, function (el) {
+                if (!el.name || el.disabled || el.type === 'file' || el.type === 'password'
+                    || el.name === 'csrf_token' || el.name === 'expected_updated_at') { return; }
+                if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) { return; }
+                if (values[el.name] !== undefined) {
+                    if (!Array.isArray(values[el.name])) { values[el.name] = [values[el.name]]; }
+                    values[el.name].push(el.value);
+                } else {
+                    values[el.name] = el.value;
+                }
+            });
+            return values;
+        }
+
+        function save() {
+            if (!dirty) { return; }
+            try {
+                localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), values: fields() }));
+            } catch (e) {}
+        }
+
+        function apply(values) {
+            form.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(function (el) {
+                el.checked = false;
+            });
+            Object.keys(values || {}).forEach(function (name) {
+                var controls = form.querySelectorAll('[name="' + CSS.escape(name) + '"]');
+                var inputValues = Array.isArray(values[name]) ? values[name].map(String) : [String(values[name])];
+                controls.forEach(function (el) {
+                    if (el.type === 'checkbox' || el.type === 'radio') {
+                        el.checked = inputValues.indexOf(el.value) !== -1;
+                    } else {
+                        el.value = inputValues[0] || '';
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                        el.dispatchEvent(new Event('arteditor:restore'));
+                    }
+                });
+            });
+            dirty = true;
+        }
+
+        form.addEventListener('input', function () { dirty = true; });
+        form.addEventListener('change', function () { dirty = true; });
+        form.addEventListener('submit', function () {
+            save();
+            dirty = false;
+        });
+        window.setInterval(save, 20000);
+        window.addEventListener('beforeunload', function (event) {
+            save();
+            if (dirty) {
+                event.preventDefault();
+                event.returnValue = '';
+            }
+        });
+
+        try {
+            var draft = JSON.parse(localStorage.getItem(key) || 'null');
+            if (!draft || !draft.savedAt || !draft.values) { return; }
+            if (Date.now() - Number(draft.savedAt) > 7 * 24 * 60 * 60 * 1000) {
+                localStorage.removeItem(key);
+                return;
+            }
+            var banner = document.createElement('div');
+            banner.className = 'alert alert--warning content-draft-banner';
+            banner.innerHTML = '<span>Найден локальный черновик от ' + new Date(draft.savedAt).toLocaleString() + '.</span> '
+                + '<button type="button" class="btn btn--small" data-draft-restore>Восстановить</button> '
+                + '<button type="button" class="btn btn--small" data-draft-discard>Удалить</button>';
+            form.parentNode.insertBefore(banner, form);
+            banner.querySelector('[data-draft-restore]').addEventListener('click', function () {
+                apply(draft.values);
+                banner.remove();
+            });
+            banner.querySelector('[data-draft-discard]').addEventListener('click', function () {
+                localStorage.removeItem(key);
+                banner.remove();
+            });
+        } catch (e) {}
+    });
+})();

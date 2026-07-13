@@ -16,8 +16,12 @@ $action = $isEdit ? '/admin/projects/' . (int) $project['id'] . '/edit' : '/admi
 ?>
 <div class="form-card">
     <?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
-    <form method="post" action="<?= $action ?>" enctype="multipart/form-data" class="form-grid">
+    <?php if ($isEdit): ?>
+        <div style="margin-bottom:16px;"><a class="btn btn--small" href="/admin/revisions/project/<?= (int) $project['id'] ?>">История версий</a></div>
+    <?php endif; ?>
+    <form method="post" action="<?= $action ?>" enctype="multipart/form-data" class="form-grid" data-content-draft="project:<?= $isEdit ? (int) $project['id'] : 'new' ?>" data-record-updated="<?= htmlspecialchars((string) ($project['updated_at'] ?? ''), ENT_QUOTES) ?>">
         <?= Csrf::field() ?>
+        <?php if ($isEdit): ?><input type="hidden" name="expected_updated_at" value="<?= htmlspecialchars((string) $project['updated_at'], ENT_QUOTES) ?>"><?php endif; ?>
 
         <div class="form-field">
             <label for="title">Название проекта</label>

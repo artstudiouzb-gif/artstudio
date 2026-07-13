@@ -99,6 +99,7 @@ final class Page
     {
         $stmt = Database::pdo()->prepare('DELETE FROM pages WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        ContentRevision::deleteForEntity('page', $id);
     }
 
     public static function findBySlug(string $slug, ?string $lang = null): ?array

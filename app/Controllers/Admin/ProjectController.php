@@ -13,6 +13,7 @@ use App\Core\View;
 use App\Models\Project;
 use App\Models\ProjectField;
 use App\Models\ProjectImage;
+use App\Models\ContentRevision;
 
 final class ProjectController
 {
@@ -69,7 +70,7 @@ final class ProjectController
         ProjectField::replaceAll($id, $this->collectFields());
 
         Flash::success('Проект создан.');
-        header('Location: /admin/projects');
+        header('Location: /admin/projects/' . $id . '/edit?draft_saved=project%3Anew');
         exit;
     }
 
@@ -105,6 +106,16 @@ final class ProjectController
             return;
         }
 
+        if (!ContentRevision::isFresh('project', $id, (string) ($_POST['expected_updated_at'] ?? ''))) {
+            View::render('admin/projects/form', [
+                'project' => $project,
+                'images' => ProjectImage::forProject($id),
+                'fields' => ProjectField::forProject($id),
+                'error' => 'Проект уже был изменён в другой вкладке или другим пользователем. Текущие данные перезагружены; восстановите локальный черновик и проверьте изменения.',
+            ]);
+            return;
+        }
+
         [$data, $error] = $this->collectInput($id, $project);
 
         if ($error !== null) {
@@ -117,12 +128,13 @@ final class ProjectController
             return;
         }
 
+        ContentRevision::capture('project', $id, Auth::id());
         Project::update($id, $data);
         ProjectImage::replaceAll($id, $this->collectImages());
         ProjectField::replaceAll($id, $this->collectFields());
 
         Flash::success('Проект обновлён.');
-        header('Location: /admin/projects');
+        header('Location: /admin/projects/' . $id . '/edit?draft_saved=project%3A' . $id);
         exit;
     }
 

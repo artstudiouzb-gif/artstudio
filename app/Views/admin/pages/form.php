@@ -69,8 +69,12 @@ foreach ($blocks as $b) {
 ?>
 <div class="form-card">
     <?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
-    <form method="post" action="<?= $action ?>" class="form-grid">
+    <?php if ($isEdit): ?>
+        <div style="margin-bottom:16px;"><a class="btn btn--small" href="/admin/revisions/page/<?= (int) $page['id'] ?>">История версий</a></div>
+    <?php endif; ?>
+    <form method="post" action="<?= $action ?>" class="form-grid" data-content-draft="page:<?= $isEdit ? (int) $page['id'] : 'new' ?>" data-record-updated="<?= htmlspecialchars((string) ($page['updated_at'] ?? ''), ENT_QUOTES) ?>">
         <?= Csrf::field() ?>
+        <?php if ($isEdit): ?><input type="hidden" name="expected_updated_at" value="<?= htmlspecialchars((string) $page['updated_at'], ENT_QUOTES) ?>"><?php endif; ?>
 
         <div data-lang-tabs>
             <div class="lang-tabs">

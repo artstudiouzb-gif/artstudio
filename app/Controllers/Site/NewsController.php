@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Site;
 
 use App\Core\AppUrl;
+use App\Core\Config;
 use App\Core\Locale;
 use App\Core\View;
 use App\Models\News;

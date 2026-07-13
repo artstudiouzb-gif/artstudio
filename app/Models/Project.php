@@ -92,6 +92,7 @@ final class Project
     {
         $stmt = Database::pdo()->prepare('DELETE FROM projects WHERE id = :id');
         $stmt->execute([':id' => $id]);
+        ContentRevision::deleteForEntity('project', $id);
         self::bustPageCache();
     }
 

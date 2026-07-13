@@ -2,6 +2,8 @@
 
 use App\Models\Setting;
 
+/** @var string $logo */
+$logo = $logo ?? '';
 $siteName = Setting::get('site_name', 'ArtStudio');
 /** @var string $canonicalUrl — задаётся в _header.php (та же область видимости View) */
 $printUrl = $canonicalUrl ?? '';
