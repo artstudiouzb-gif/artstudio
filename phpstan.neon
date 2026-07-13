@@ -5,8 +5,8 @@ parameters:
         - public/index.php
     excludePaths:
         - tests/*
-    # Проект без Composer/vendor: классы грузятся собственным автолоадером,
-    # поэтому подсказываем PHPStan, где искать исходники.
+    # Production-код по-прежнему использует собственный автолоадер; Composer
+    # подключён только для воспроизводимых инструментов разработки.
     scanDirectories:
         - app
     treatPhpDocTypesAsCertain: false
