@@ -195,6 +195,10 @@
         area.addEventListener('blur', function () { saveSelection(); sync(); });
         area.addEventListener('keyup', saveSelection);
         area.addEventListener('mouseup', saveSelection);
+        textarea.addEventListener('arteditor:restore', function () {
+            area.innerHTML = textarea.value || '';
+            if (sourceMode) { textarea.style.display = 'block'; }
+        });
 
         // Вставка из Word/буфера: чистим на сервере (TextProcessor), здесь
         // только гарантируем text/plain для явно «грязных» источников не надо —

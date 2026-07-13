@@ -15,6 +15,7 @@ use App\Controllers\Admin\MenuController as AdminMenuController;
 use App\Controllers\Admin\NewsController as AdminNewsController;
 use App\Controllers\Admin\PageController as AdminPageController;
 use App\Controllers\Admin\ProjectController as AdminProjectController;
+use App\Controllers\Admin\ContentRevisionController as AdminContentRevisionController;
 use App\Controllers\Admin\SettingsController;
 use App\Controllers\Admin\TeamController as AdminTeamController;
 use App\Controllers\Admin\WidgetController as AdminWidgetController;
@@ -96,6 +97,10 @@ $router->post('/admin/demo-content', [DashboardController::class, 'seedDemo']);
 // --- Admin: массовые операции + быстрый поиск (этап 12.4) ---
 $router->post('/admin/bulk/{type}', [\App\Controllers\Admin\BulkController::class, 'handle']);
 $router->get('/admin/search', [\App\Controllers\Admin\SearchController::class, 'query']);
+
+// --- Admin: история версий страниц, новостей и проектов ---
+$router->get('/admin/revisions/{type}/{id}', [AdminContentRevisionController::class, 'index']);
+$router->post('/admin/revisions/{type}/{id}/{revisionId}/restore', [AdminContentRevisionController::class, 'restore']);
 
 // --- Admin: новости ---
 $router->get('/admin/news', [AdminNewsController::class, 'index']);

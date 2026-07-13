@@ -13,6 +13,7 @@ use App\Models\Block;
 use App\Models\Language;
 use App\Models\Page;
 use App\Models\PageTranslation;
+use App\Models\ContentRevision;
 
 final class PageController
 {
@@ -66,7 +67,7 @@ final class PageController
         $this->saveTranslations($id);
 
         Flash::success('Страница создана. Теперь добавьте блоки контента.');
-        header('Location: /admin/pages/' . $id . '/edit');
+        header('Location: /admin/pages/' . $id . '/edit?draft_saved=page%3Anew');
         exit;
     }
 
@@ -150,6 +151,18 @@ final class PageController
             return;
         }
 
+        if (!ContentRevision::isFresh('page', $id, (string) ($_POST['expected_updated_at'] ?? ''))) {
+            $blockLang = $this->resolveBlockLang();
+            View::render('admin/pages/form', [
+                'page' => $page,
+                'translations' => PageTranslation::forPage($id),
+                'error' => 'Страница уже была изменена в другой вкладке или другим пользователем. Текущие данные перезагружены; восстановите локальный черновик и проверьте изменения.',
+                'blocks' => Block::forPage($id, $blockLang),
+                'blockLang' => $blockLang,
+            ]);
+            return;
+        }
+
         [$data, $error] = $this->collectInput($id, $page);
 
         if ($error !== null) {
@@ -164,12 +177,13 @@ final class PageController
             return;
         }
 
+        ContentRevision::capture('page', $id, Auth::id());
         Page::update($id, $data);
         $this->saveTranslations($id);
         \App\Core\Cache::forgetPrefix('page:' . $id);
 
         Flash::success('Страница обновлена.');
-        header('Location: /admin/pages/' . $id . '/edit');
+        header('Location: /admin/pages/' . $id . '/edit?draft_saved=page%3A' . $id);
         exit;
     }
 

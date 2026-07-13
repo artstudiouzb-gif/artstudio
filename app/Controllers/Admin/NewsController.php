@@ -15,6 +15,7 @@ use App\Core\View;
 use App\Models\Language;
 use App\Models\News;
 use App\Models\NewsTranslation;
+use App\Models\ContentRevision;
 
 final class NewsController
 {
@@ -78,7 +79,7 @@ final class NewsController
         }
 
         Flash::success('Новость создана.');
-        header('Location: /admin/news/' . $id . '/edit');
+        header('Location: /admin/news/' . $id . '/edit?draft_saved=news%3Anew');
         exit;
     }
 
@@ -140,6 +141,16 @@ final class NewsController
             return;
         }
 
+        if (!ContentRevision::isFresh('news', $id, (string) ($_POST['expected_updated_at'] ?? ''))) {
+            View::render('admin/news/form', [
+                'news' => $news,
+                'translations' => NewsTranslation::forNews($id),
+                'gallery' => \App\Models\NewsImage::forNews($id),
+                'error' => 'Новость уже была изменена в другой вкладке или другим пользователем. Текущие данные перезагружены; восстановите локальный черновик и проверьте изменения.',
+            ]);
+            return;
+        }
+
         [$data, $error] = $this->collectInput($id, $news);
 
         if ($error !== null) {
@@ -152,6 +163,7 @@ final class NewsController
         }
 
         $wasPublished = ($news['status'] ?? '') === 'published';
+        ContentRevision::capture('news', $id, Auth::id());
         News::update($id, $data);
         News::updateExtras($id, $this->collectExtras());
         $this->saveTranslations($id);
@@ -167,7 +179,7 @@ final class NewsController
         }
 
         Flash::success('Новость обновлена.');
-        header('Location: /admin/news');
+        header('Location: /admin/news/' . $id . '/edit?draft_saved=news%3A' . $id);
         exit;
     }
 

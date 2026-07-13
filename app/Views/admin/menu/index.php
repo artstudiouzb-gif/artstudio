@@ -16,7 +16,7 @@ $urlTypeLabels = ['page' => 'Страница', 'news_index' => 'Раздел н
 /**
  * Встроенная форма редактирования пункта (раскрывается по клику).
  */
-$renderEditForm = function (array $item) use ($pages, $languages): string {
+$renderEditForm = function (array $item) use ($languages): string {
     $id = (int) $item['id'];
     $isDivider = !empty($item['is_divider']);
     $out = '<form method="post" action="/admin/menu/' . $id . '/edit" class="menu-node__edit form-grid">' . Csrf::field();

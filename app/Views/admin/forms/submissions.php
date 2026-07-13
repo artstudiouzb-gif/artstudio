@@ -2,12 +2,13 @@
 
 use App\Core\Csrf;
 
+/** @var array $form */
+/** @var array $submissions */
+$form = $form ?? [];
+$submissions = $submissions ?? [];
 $pageTitle = 'Заявки: ' . $form['name'];
 $activeNav = 'forms';
 require __DIR__ . '/../layout/header.php';
-
-/** @var array $form */
-/** @var array $submissions */
 ?>
 <a href="/admin/forms" class="btn btn--small" style="margin-bottom:16px;">&larr; Все формы</a>
 
