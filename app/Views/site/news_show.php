@@ -1,7 +1,6 @@
 <?php
 
 use App\Core\AssetCollector;
-use App\Core\Config;
 use App\Core\DateFormatter;
 use App\Core\Locale;
 use App\Models\News;
@@ -61,7 +60,7 @@ $docs = is_array($docs) ? $docs : [];
 $videoUrl = trim((string) ($news['video_url'] ?? ''));
 $pressUrl = trim((string) ($news['press_release_url'] ?? ''));
 
-$base = rtrim((string) Config::get('app.url', ''), '/');
+$base = \App\Core\AppUrl::base();
 $pageUrl = $base . Locale::url('news/' . $news['slug'], $lang);
 $shareTitle = rawurlencode((string) $news['title']);
 $shareUrl = rawurlencode($pageUrl);
@@ -114,11 +113,11 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
             <div class="newsdetail-share<?= $extraClass ?>">
                 <h2 class="newsdetail-share__title"><?= htmlspecialchars(t('Поделиться'), ENT_QUOTES) ?></h2>
                 <div class="newsdetail-share__row">
-                    <a class="newsdetail-share__btn" href="https://t.me/share/url?url=<?= $shareUrl ?>&text=<?= $shareTitle ?>" target="_blank" rel="noopener" aria-label="Поделиться в Telegram"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M21.9 4.6 19 19.3c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.6 13.4l-4.5-1.4c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.3 1.3z"/></svg></a>
-                    <a class="newsdetail-share__btn" href="https://www.facebook.com/sharer/sharer.php?u=<?= $shareUrl ?>" target="_blank" rel="noopener" aria-label="Поделиться в Facebook"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg></a>
-                    <a class="newsdetail-share__btn" href="https://x.com/intent/post?url=<?= $shareUrl ?>&text=<?= $shareTitle ?>" target="_blank" rel="noopener" aria-label="Поделиться в X"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.7 3H21l-7.1 8.2L22 21h-6.6l-5.1-6.1L4.5 21H1.2l7.6-8.7L1 3h6.8l4.6 5.6L17.7 3zm-1.2 16h1.8L6.9 4.9H5L16.5 19z"/></svg></a>
-                    <a class="newsdetail-share__btn" href="https://www.linkedin.com/sharing/share-offsite/?url=<?= $shareUrl ?>" target="_blank" rel="noopener" aria-label="Поделиться в LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M6.5 8.8H3.6V21h2.9V8.8zM5 7.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4zM21 14.2c0-3.2-1.7-4.7-4-4.7-1.8 0-2.6 1-3.1 1.7V8.8H11V21h2.9v-6.5c0-1.7.8-2.7 2.2-2.7 1.3 0 2 .9 2 2.7V21H21v-6.8z"/></svg></a>
-                    <button type="button" class="newsdetail-share__btn" data-copy-link="<?= htmlspecialchars($pageUrl, ENT_QUOTES) ?>" aria-label="Скопировать ссылку"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 1 0-6.4-6.4L11.6 6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 1 0 6.4 6.4l1.6-1.6"/></svg></button>
+                    <a class="newsdetail-share__btn" href="https://t.me/share/url?url=<?= $shareUrl ?>&text=<?= $shareTitle ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars(t('Поделиться в Telegram'), ENT_QUOTES) ?>"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M21.9 4.6 19 19.3c-.2 1-.8 1.2-1.6.8l-4.5-3.3-2.2 2.1c-.2.2-.4.4-.9.4l.3-4.6 8.4-7.6c.4-.3-.1-.5-.6-.2L7.6 13.4l-4.5-1.4c-1-.3-1-1 .2-1.4l17.3-6.7c.8-.3 1.5.2 1.3 1.3z"/></svg></a>
+                    <a class="newsdetail-share__btn" href="https://www.facebook.com/sharer/sharer.php?u=<?= $shareUrl ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars(t('Поделиться в Facebook'), ENT_QUOTES) ?>"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1z"/></svg></a>
+                    <a class="newsdetail-share__btn" href="https://x.com/intent/post?url=<?= $shareUrl ?>&text=<?= $shareTitle ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars(t('Поделиться в X'), ENT_QUOTES) ?>"><svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M17.7 3H21l-7.1 8.2L22 21h-6.6l-5.1-6.1L4.5 21H1.2l7.6-8.7L1 3h6.8l4.6 5.6L17.7 3zm-1.2 16h1.8L6.9 4.9H5L16.5 19z"/></svg></a>
+                    <a class="newsdetail-share__btn" href="https://www.linkedin.com/sharing/share-offsite/?url=<?= $shareUrl ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars(t('Поделиться в LinkedIn'), ENT_QUOTES) ?>"><svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M6.5 8.8H3.6V21h2.9V8.8zM5 7.4a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4zM21 14.2c0-3.2-1.7-4.7-4-4.7-1.8 0-2.6 1-3.1 1.7V8.8H11V21h2.9v-6.5c0-1.7.8-2.7 2.2-2.7 1.3 0 2 .9 2 2.7V21H21v-6.8z"/></svg></a>
+                    <button type="button" class="newsdetail-share__btn" data-copy-link="<?= htmlspecialchars($pageUrl, ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Скопировать ссылку'), ENT_QUOTES) ?>"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 1 0-6.4-6.4L11.6 6"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 1 0 6.4 6.4l1.6-1.6"/></svg></button>
                 </div>
             </div>
 <?php };
@@ -221,7 +220,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                 <?php if (count($heroSlides) > 1): ?>
                     <div class="newsdetail-gallery__thumbs">
                         <?php foreach ($heroSlides as $i => $s): ?>
-                            <button type="button" class="newsdetail-gallery__thumb<?= $i === 0 ? ' is-active' : '' ?>" data-ndg-thumb="<?= $i ?>" aria-label="Фото <?= $i + 1 ?>" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')"></button>
+                            <button type="button" class="newsdetail-gallery__thumb<?= $i === 0 ? ' is-active' : '' ?>" data-ndg-thumb="<?= $i ?>" aria-label="<?= htmlspecialchars(t('Фото'), ENT_QUOTES) ?> <?= $i + 1 ?>" style="background-image:url('<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>')"></button>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
@@ -306,7 +305,7 @@ $shareBlock = static function (string $extraClass) use ($shareUrl, $shareTitle, 
                     <?php if (Setting::get('form_consent_enabled', '0') === '1'): ?>
                         <label class="newsdetail-subscribe__consent">
                             <input type="checkbox" name="consent" value="1" required>
-                            <span><?= htmlspecialchars((string) Setting::get('form_consent_text', 'Я даю согласие на обработку персональных данных'), ENT_QUOTES) ?></span>
+                            <span><?= htmlspecialchars((string) Setting::get('form_consent_text', t('Я даю согласие на обработку персональных данных')), ENT_QUOTES) ?></span>
                         </label>
                     <?php endif; ?>
                 </form>

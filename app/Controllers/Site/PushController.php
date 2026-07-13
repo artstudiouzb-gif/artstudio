@@ -23,7 +23,7 @@ final class PushController
             echo '{"error":"disabled"}';
             exit;
         }
-        echo json_encode(['key' => WebPush::publicKey()]);
+        echo json_encode(['key' => WebPush::publicKey(), 'csrf_token' => Csrf::token()]);
         exit;
     }
 

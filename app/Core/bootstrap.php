@@ -77,33 +77,8 @@ if (is_file($configFile)) {
     ErrorHandler::register(true);
 }
 
-if (PHP_SAPI !== 'cli' && session_status() !== PHP_SESSION_ACTIVE) {
-    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
-
-    $sessionName = (string) Config::get('session.name', 'asc_session');
-    $sessionLifetime = (int) Config::get('session.lifetime', 7200);
-
-    session_name($sessionName);
-    ini_set('session.use_strict_mode', '1');
-    ini_set('session.use_only_cookies', '1');
-    ini_set('session.cookie_httponly', '1');
-
-    session_set_cookie_params([
-        'lifetime' => $sessionLifetime,
-        'path' => '/',
-        'domain' => '',
-        'secure' => $isHttps,
-        'httponly' => true,
-        'samesite' => 'Lax',
-    ]);
-
-    session_start();
-
-    if (!empty($_SESSION['last_activity']) && (time() - (int) $_SESSION['last_activity']) > $sessionLifetime) {
-        $_SESSION = [];
-        session_destroy();
-        session_start();
-    }
-    $_SESSION['last_activity'] = time();
+// Для обычного публичного GET без cookie сессию не создаём. Компоненты,
+// которым она нужна (Auth, CSRF, Flash, CAPTCHA), запускают её сами.
+if (PHP_SAPI !== 'cli' && \App\Core\Session::hasCookie()) {
+    \App\Core\Session::start();
 }

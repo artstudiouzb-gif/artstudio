@@ -42,7 +42,7 @@ $entryUrl = static fn (array $e): string => Locale::url('catalog/' . $type['slug
     </div>
 
     <div class="gcal-scroll">
-        <table class="gcal" aria-label="Календарь на <?= htmlspecialchars($calLabel, ENT_QUOTES) ?>">
+        <table class="gcal" aria-label="<?= htmlspecialchars(t('Календарь на'), ENT_QUOTES) ?> <?= htmlspecialchars($calLabel, ENT_QUOTES) ?>">
             <thead>
                 <tr>
                     <?php foreach ($weekdays as $wd): ?>

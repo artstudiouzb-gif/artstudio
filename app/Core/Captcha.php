@@ -35,6 +35,7 @@ final class Captcha
     /** Генерирует код, кладёт его в сессию и возвращает (для рендера PNG). */
     public static function issue(): string
     {
+        Session::start();
         $code = '';
         for ($i = 0; $i < self::LENGTH; $i++) {
             $code .= self::ALPHABET[random_int(0, strlen(self::ALPHABET) - 1)];
@@ -54,6 +55,7 @@ final class Captcha
      */
     public static function verify(?string $input): bool
     {
+        Session::start();
         $state = $_SESSION[self::SESSION_KEY] ?? null;
         unset($_SESSION[self::SESSION_KEY]);
 

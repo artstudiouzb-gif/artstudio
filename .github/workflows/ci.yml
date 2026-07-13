@@ -82,15 +82,21 @@ jobs:
         with:
           php-version: '8.2'
           extensions: mbstring, gd, curl, dom, fileinfo, pdo_mysql
-          tools: phpstan
+          tools: composer:v2
           coverage: none
+
+      - name: Validate Composer configuration
+        run: composer validate --strict --no-check-lock
+
+      - name: Install development tools
+        run: composer install --no-interaction --prefer-dist --no-progress
 
       # Пока без базлайна — шаг информативный: находки видны в логе, но НЕ роняют
       # пайплайн (иначе постоянный красный крест приучает игнорировать CI).
       # Когда находки разберут и заведут baseline — уберите «|| true» и включите
       # блокировку.
       - name: PHPStan (advisory, non-blocking)
-        run: phpstan analyse --no-progress --error-format=table || true
+        run: composer analyse || true
 
   javascript:
     name: JavaScript syntax

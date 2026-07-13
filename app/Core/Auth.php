@@ -25,6 +25,7 @@ final class Auth
      */
     public static function attemptLogin(string $username, string $password): array
     {
+        Session::start();
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $identifier = $ip . '|' . mb_strtolower($username);
 
@@ -108,6 +109,7 @@ final class Auth
      */
     public static function resendCode(): bool
     {
+        Session::start();
         $userId = $_SESSION['pending_user_id'] ?? null;
         if (!$userId) {
             return false;
@@ -130,6 +132,7 @@ final class Auth
      */
     public static function completeTwoFactor(string $code): bool
     {
+        Session::start();
         $userId = $_SESSION['pending_user_id'] ?? null;
         if (!$userId || (time() - (int) ($_SESSION['pending_since'] ?? 0)) > self::CODE_TTL) {
             self::clearPending();
@@ -229,6 +232,7 @@ final class Auth
 
     public static function check(): bool
     {
+        Session::start();
         if (empty($_SESSION['user_id'])) {
             return false;
         }
@@ -267,6 +271,7 @@ final class Auth
 
     public static function id(): ?int
     {
+        Session::start();
         return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
     }
 
@@ -289,22 +294,26 @@ final class Auth
 
     public static function role(): string
     {
+        Session::start();
         return (string) ($_SESSION['role'] ?? 'editor');
     }
 
     public static function requiresTwoFactorSetup(): bool
     {
+        Session::start();
         return !empty($_SESSION['2fa_setup_required']);
     }
 
     public static function completeTwoFactorSetup(): void
     {
+        Session::start();
         unset($_SESSION['2fa_setup_required']);
     }
 
     /** Синхронизирует ограничения текущей сессии после изменения каналов 2FA. */
     public static function syncTwoFactorSetup(array $user): void
     {
+        Session::start();
         if (self::hasCodeChannel($user)) {
             self::completeTwoFactorSetup();
             return;
@@ -335,6 +344,7 @@ final class Auth
 
     public static function logout(): void
     {
+        Session::start();
         // Снимаем сессию с реестра активных сессий.
         try {
             if (session_status() === PHP_SESSION_ACTIVE) {

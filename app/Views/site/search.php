@@ -5,7 +5,7 @@ use App\Core\Locale;
 /** @var string $query */
 /** @var array $results */
 
-$metaTitle = $query !== '' ? ('Поиск: ' . $query) : 'Поиск по сайту';
+$metaTitle = $query !== '' ? (t('Поиск:') . ' ' . $query) : t('Поиск по сайту');
 $metaDescription = '';
 $robotsNoindex = true; // страницы результатов поиска не индексируем
 require __DIR__ . '/_header.php';
@@ -13,7 +13,7 @@ require __DIR__ . '/_header.php';
 <div class="site-search-page">
     <h1><?= htmlspecialchars(t('Поиск по сайту'), ENT_QUOTES) ?></h1>
     <form method="get" action="<?= htmlspecialchars(Locale::url('search'), ENT_QUOTES) ?>" class="site-search-page__form" role="search">
-        <input type="search" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES) ?>" placeholder="<?= htmlspecialchars(t('Что вы ищете?'), ENT_QUOTES) ?>" aria-label="Поисковый запрос" autofocus>
+        <input type="search" name="q" value="<?= htmlspecialchars($query, ENT_QUOTES) ?>" placeholder="<?= htmlspecialchars(t('Что вы ищете?'), ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Поисковый запрос'), ENT_QUOTES) ?>" autofocus>
         <button type="submit"><?= htmlspecialchars(t('Найти'), ENT_QUOTES) ?></button>
     </form>
 
@@ -22,9 +22,9 @@ require __DIR__ . '/_header.php';
     <?php elseif ($query !== ''): ?>
         <p class="site-search-page__count">
             <?php if (empty($results)): ?>
-                По запросу «<?= htmlspecialchars($query, ENT_QUOTES) ?>» ничего не найдено.
+                <?= htmlspecialchars(t('По запросу'), ENT_QUOTES) ?> «<?= htmlspecialchars($query, ENT_QUOTES) ?>» <?= htmlspecialchars(t('ничего не найдено.'), ENT_QUOTES) ?>
             <?php else: ?>
-                Найдено результатов: <?= count($results) ?>
+                <?= htmlspecialchars(t('Найдено результатов:'), ENT_QUOTES) ?> <?= count($results) ?>
             <?php endif; ?>
         </p>
         <ul class="site-search-results">

@@ -125,7 +125,7 @@ artstudio/
 php tests/run.php
 ```
 
-Нативный тест-раннер без PHPUnit; 282 теста. Без переменных окружения
+Нативный тест-раннер без PHPUnit; более 295 тестов. Без переменных окружения
 выполняются только unit-тесты; с `TEST_DB_HOST`, `TEST_DB_DATABASE`,
 `TEST_DB_USERNAME`, `TEST_DB_PASSWORD` — также тесты БД и консистентности
 миграций (schema.sql и миграции обязаны сходиться).
@@ -153,7 +153,19 @@ php scripts/smoke.php https://asr.artstudio.uz --admin ЛОГИН:ПАРОЛЬ
 `.github/workflows/ci.yml` на каждый push/PR: `php -l` по всем файлам и полный
 прогон тестов (PHP 8.2 и 8.3) с сервисной БД MariaDB. Отдельный
 информативный (не блокирующий) шаг статического анализа PHPStan — см.
-`phpstan.neon`; когда ошибки будут разобраны, снимите `continue-on-error`.
+`phpstan.neon`.
+
+Composer используется только для инструментов разработки и не участвует в
+работе CMS на production. Установка и локальный запуск анализа:
+
+```bash
+composer install
+composer analyse
+composer test
+```
+
+Папка `vendor/` не загружается в Git. Версия PHPStan закреплена в
+`composer.json`; production-автозагрузка `App\` → `app/` не изменена.
 
 ## Документация
 

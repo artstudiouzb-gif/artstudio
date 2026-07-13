@@ -24,16 +24,21 @@ final class View
             require $__file;
         };
 
-        // Для публичных страниц с настроенным CDN — переписываем ссылки на
-        // загрузки на CDN-хост (буферизуем только когда CDN реально задан).
-        if (str_starts_with($template, 'site/') && Asset::cdnBase() !== '') {
-            ob_start();
+        // Буфер гарантирует, что лениво запущенная в шаблоне сессия ещё может
+        // безопасно выставить cookie. Заодно здесь же применяем CDN rewrite.
+        ob_start();
+        try {
             $renderTo($file, $data);
-            echo Asset::rewriteMedia((string) ob_get_clean());
-            return;
+            $html = (string) ob_get_clean();
+        } catch (\Throwable $e) {
+            ob_end_clean();
+            throw $e;
         }
 
-        $renderTo($file, $data);
+        if (str_starts_with($template, 'site/') && Asset::cdnBase() !== '') {
+            $html = Asset::rewriteMedia($html);
+        }
+        echo $html;
     }
 
     public static function renderPartial(string $template, array $data = []): string

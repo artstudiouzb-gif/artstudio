@@ -3,8 +3,8 @@
 use App\Core\Locale;
 
 /** @var array $items */
-$metaTitle = 'Проекты';
-$metaDescription = 'Проекты и инициативы Агентства.';
+$metaTitle = t('Проекты');
+$metaDescription = t('Проекты и инициативы Агентства.');
 require __DIR__ . '/_header.php';
 
 $crumbs = [

@@ -5,7 +5,7 @@ use App\Core\Locale;
 /** @var array $albums */
 
 $metaTitle = t('Фотоальбомы');
-$metaDescription = 'Фотогалереи и альбомы мероприятий';
+$metaDescription = t('Фотогалереи и альбомы мероприятий');
 require __DIR__ . '/_header.php';
 ?>
 <div class="content-list">

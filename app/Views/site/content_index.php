@@ -28,7 +28,11 @@ $longFields = array_values(array_filter($fields, static fn ($f) => $f['field_typ
 $fileFields = array_values(array_filter($fields, static fn ($f) => $f['field_type'] === 'file'));
 // Типы с датой проведения (мероприятия) получают карточку с датой-плиткой.
 $isEvents = array_filter($fields, static fn ($f) => $f['name'] === 'event_date' && $f['field_type'] === 'date') !== [];
-$months = ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК'];
+$months = match (Locale::current()) {
+    'uz' => ['YAN', 'FEV', 'MAR', 'APR', 'MAY', 'IYN', 'IYL', 'AVG', 'SEN', 'OKT', 'NOY', 'DEK'],
+    'en' => ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'],
+    default => ['ЯНВ', 'ФЕВ', 'МАР', 'АПР', 'МАЙ', 'ИЮН', 'ИЮЛ', 'АВГ', 'СЕН', 'ОКТ', 'НОЯ', 'ДЕК'],
+};
 
 $baseUrl = Locale::url('catalog/' . $type['slug']);
 $qs = static function (array $overrides) use ($q, $sort): string {
@@ -50,7 +54,7 @@ $qs = static function (array $overrides) use ($q, $sort): string {
             <input type="search" name="q" value="<?= htmlspecialchars($q, ENT_QUOTES) ?>" placeholder="<?= htmlspecialchars(t('Поиск в разделе'), ENT_QUOTES) ?>" aria-label="<?= htmlspecialchars(t('Поиск в разделе'), ENT_QUOTES) ?>">
         </div>
         <select class="catlist-toolbar__sort" name="sort" data-auto-submit aria-label="<?= htmlspecialchars(t('Сортировка'), ENT_QUOTES) ?>">
-            <option value="new" <?= $sort === 'new' ? 'selected' : '' ?>>Сначала новые</option>
+            <option value="new" <?= $sort === 'new' ? 'selected' : '' ?>><?= htmlspecialchars(t('Сначала новые'), ENT_QUOTES) ?></option>
             <option value="old" <?= $sort === 'old' ? 'selected' : '' ?>><?= htmlspecialchars(t('Сначала старые'), ENT_QUOTES) ?></option>
             <option value="title" <?= $sort === 'title' ? 'selected' : '' ?>><?= htmlspecialchars(t('По алфавиту'), ENT_QUOTES) ?></option>
         </select>
@@ -79,7 +83,7 @@ $qs = static function (array $overrides) use ($q, $sort): string {
                     <div class="catcard__main">
                         <div class="catcard__top">
                             <?php if ($hasDeadline): ?>
-                                <span class="catcard__status<?= !empty($entry['is_archived']) ? ' catcard__status--off' : '' ?>"><?= !empty($entry['is_archived']) ? 'Архив' : 'Приём открыт' ?></span>
+                                <span class="catcard__status<?= !empty($entry['is_archived']) ? ' catcard__status--off' : '' ?>"><?= htmlspecialchars(t(!empty($entry['is_archived']) ? 'Архив' : 'Приём открыт'), ENT_QUOTES) ?></span>
                             <?php endif; ?>
                             <time class="catcard__created"><?= htmlspecialchars(date('d.m.Y', strtotime((string) $entry['created_at'])), ENT_QUOTES) ?></time>
                         </div>
@@ -119,7 +123,7 @@ $qs = static function (array $overrides) use ($q, $sort): string {
         </div>
 
         <?php if ($pages > 1): ?>
-            <nav class="listing-pager" aria-label="Страницы">
+            <nav class="listing-pager" aria-label="<?= htmlspecialchars(t('Страницы'), ENT_QUOTES) ?>">
                 <?php for ($p = 1; $p <= $pages; $p++): ?>
                     <?php if ($p === $page): ?>
                         <span class="listing-pager__item is-active" aria-current="page"><?= $p ?></span>
