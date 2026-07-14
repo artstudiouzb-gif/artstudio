@@ -14,13 +14,70 @@
 </div>
 
 <script nonce="<?= \App\Core\SecurityHeaders::nonce() ?>">
-/* Мобильный тумблер сайдбара (нативно, без внешних библиотек). */
+/* Навигация админки: мобильная панель и запоминаемое сворачивание на десктопе. */
 (function () {
     var t = document.querySelector('[data-sidebar-toggle]');
     var s = document.querySelector('[data-sidebar]');
+    var backdrop = document.querySelector('[data-sidebar-backdrop]');
+    var collapse = document.querySelector('[data-sidebar-collapse]');
+
+    function setMobileOpen(open) {
+        document.body.classList.toggle('sidebar-open', open);
+        if (s) {
+            var mobile = window.matchMedia('(max-width: 960px)').matches;
+            s.inert = mobile && !open;
+            if (mobile) s.setAttribute('aria-hidden', open ? 'false' : 'true');
+            else s.removeAttribute('aria-hidden');
+        }
+        if (t) {
+            t.setAttribute('aria-expanded', open ? 'true' : 'false');
+            t.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+        }
+    }
+
+    function syncCollapsedState() {
+        if (!collapse) return;
+        var collapsed = document.documentElement.classList.contains('admin-nav-collapsed');
+        collapse.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        collapse.setAttribute('title', collapsed ? 'Развернуть меню' : 'Свернуть меню');
+        var label = collapse.querySelector('span');
+        if (label) label.textContent = collapsed ? 'Развернуть меню' : 'Свернуть меню';
+    }
+
     if (t && s) {
-        t.addEventListener('click', function () { document.body.classList.toggle('sidebar-open'); });
-        s.addEventListener('click', function (e) { if (e.target.closest('.admin-nav-item')) { document.body.classList.remove('sidebar-open'); } });
+        setMobileOpen(false);
+        t.addEventListener('click', function () {
+            var opening = !document.body.classList.contains('sidebar-open');
+            setMobileOpen(opening);
+            if (opening) {
+                var current = s.querySelector('[aria-current="page"]') || s.querySelector('.admin-nav-item');
+                if (current) current.focus();
+            }
+        });
+        s.addEventListener('click', function (e) {
+            if (e.target.closest('.admin-nav-item') && window.matchMedia('(max-width: 960px)').matches) {
+                setMobileOpen(false);
+            }
+        });
+        if (backdrop) backdrop.addEventListener('click', function () { setMobileOpen(false); t.focus(); });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && document.body.classList.contains('sidebar-open')) {
+                setMobileOpen(false);
+                t.focus();
+            }
+        });
+        window.addEventListener('resize', function () {
+            if (!window.matchMedia('(max-width: 960px)').matches) setMobileOpen(false);
+        });
+    }
+
+    if (collapse) {
+        syncCollapsedState();
+        collapse.addEventListener('click', function () {
+            var collapsed = document.documentElement.classList.toggle('admin-nav-collapsed');
+            try { localStorage.setItem('artstudio:admin-sidebar-collapsed', collapsed ? '1' : '0'); } catch (e) {}
+            syncCollapsedState();
+        });
     }
 })();
 </script>

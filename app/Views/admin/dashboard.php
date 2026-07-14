@@ -7,7 +7,17 @@ require __DIR__ . '/layout/header.php';
 /** @var array $user */
 /** @var array $counts */
 ?>
-<p>Добро пожаловать, <strong><?= htmlspecialchars($user['username'] ?? '', ENT_QUOTES) ?></strong>.</p>
+<section class="admin-welcome" aria-labelledby="admin-welcome-title">
+    <div>
+        <h2 id="admin-welcome-title">Добро пожаловать, <?= htmlspecialchars($user['username'] ?? '', ENT_QUOTES) ?></h2>
+        <p>Управляйте содержимым сайта и быстро переходите к основным действиям.</p>
+    </div>
+    <div class="admin-welcome__actions">
+        <a href="/admin/news/create" class="btn btn--primary">Добавить новость</a>
+        <a href="/admin/pages/create" class="btn">Добавить страницу</a>
+        <a href="/" target="_blank" rel="noopener" class="btn">Открыть сайт</a>
+    </div>
+</section>
 
 <div class="stat-grid">
     <a href="/admin/news" class="stat-card">

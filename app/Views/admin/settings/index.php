@@ -92,7 +92,7 @@ require __DIR__ . '/../layout/header.php';
                 <label for="admin_brand_accent">Акцентный цвет панели</label>
                 <input type="color" id="admin_brand_accent" name="admin_brand_accent" style="width:64px;height:38px;padding:4px;"
                        value="<?= htmlspecialchars(\App\Core\AdminBrand::accent(), ENT_QUOTES) ?>">
-                <span class="form-hint">Кнопки, ссылки и активные пункты меню админки. Стандартный — фиолетовый <?= \App\Core\AdminBrand::DEFAULT_ACCENT ?>; оттенки (hover, подсветка) вычисляются автоматически.</span>
+                <span class="form-hint">Кнопки, ссылки и активные пункты меню админки. Стандартный — синий <?= \App\Core\AdminBrand::DEFAULT_ACCENT ?>; оттенки (hover, подсветка) вычисляются автоматически.</span>
             </div>
         </fieldset>
 

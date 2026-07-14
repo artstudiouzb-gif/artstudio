@@ -35,6 +35,11 @@ $navIcon = static function (string $name): string {
         'profile' => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
         'repository' => '<path d="M12 2 4 6v6c0 5 3.4 7.7 8 10 4.6-2.3 8-5 8-10V6l-8-4Z"/><path d="m9 12 2 2 4-4"/>',
         'design' => '<circle cx="13.5" cy="6.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17" cy="14" r="2.5"/><path d="M12 22a10 10 0 1 1 10-10c0 2-1.5 3-3 3h-2a2 2 0 0 0-1 3.7A2 2 0 0 1 12 22Z"/>',
+        'albums' => '<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m5 17 4-4 3 3 3-3 4 4"/>',
+        'videos' => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3z"/>',
+        'redirects' => '<path d="M4 7h10a5 5 0 0 1 5 5v5"/><path d="m15 13 4 4 4-4"/>',
+        'subscribers' => '<path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/>',
+        'audit' => '<path d="M9 3h6l1 3h3v15H5V6h3z"/><path d="M9 11h6M9 15h4"/>',
     ];
     $body = $p[$name] ?? '<circle cx="12" cy="12" r="9"/>';
 
@@ -110,10 +115,18 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
 <title><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?> — <?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></title>
 <link rel="stylesheet" href="<?= htmlspecialchars(\App\Core\Asset::url('/assets/css/admin.css'), ENT_QUOTES) ?>">
 <?= \App\Core\AdminBrand::styleTag() ?>
+<script nonce="<?= \App\Core\SecurityHeaders::nonce() ?>">
+try {
+    if (localStorage.getItem('artstudio:admin-sidebar-collapsed') === '1') {
+        document.documentElement.classList.add('admin-nav-collapsed');
+    }
+} catch (e) {}
+</script>
 </head>
 <body class="admin-body">
+<a class="admin-skip-link" href="#admin-content">Перейти к содержимому</a>
 <header class="admin-topbar">
-    <button type="button" class="admin-topbar__toggle" data-sidebar-toggle aria-label="Меню">
+    <button type="button" class="admin-topbar__toggle" data-sidebar-toggle aria-label="Открыть меню" aria-controls="admin-sidebar" aria-expanded="false">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
     <a href="/admin" class="admin-topbar__brand">
@@ -185,8 +198,8 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
 </header>
 
 <div class="admin-shell">
-    <aside class="admin-sidebar" data-sidebar>
-        <a href="/admin" class="admin-nav-item <?= $activeNav === 'dashboard' ? 'is-active' : '' ?>">
+    <aside class="admin-sidebar" id="admin-sidebar" data-sidebar aria-label="Основная навигация">
+        <a href="/admin" class="admin-nav-item <?= $activeNav === 'dashboard' ? 'is-active' : '' ?>" title="Дашборд"<?= $activeNav === 'dashboard' ? ' aria-current="page"' : '' ?>>
             <?= $navIcon('dashboard') ?><span>Дашборд</span>
         </a>
         <?php foreach ($navGroups as $navGroupLabel => $navGroupItems): ?>
@@ -194,18 +207,23 @@ $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0
             <div class="admin-sidebar__label"><?= htmlspecialchars($navGroupLabel, ENT_QUOTES) ?></div>
             <?php foreach ($navGroupItems as $navKey => [$navUrl, $navText]): ?>
                 <?php $navIc = str_starts_with($navKey, 'content:') ? 'content_types' : $navKey; ?>
-                <a href="<?= $navUrl ?>" class="admin-nav-item <?= $activeNav === $navKey ? 'is-active' : '' ?>">
+                <a href="<?= $navUrl ?>" class="admin-nav-item <?= $activeNav === $navKey ? 'is-active' : '' ?>" title="<?= htmlspecialchars($navText, ENT_QUOTES) ?>"<?= $activeNav === $navKey ? ' aria-current="page"' : '' ?>>
                     <?= $navIcon($navIc) ?><span><?= htmlspecialchars($navText, ENT_QUOTES) ?></span>
                 </a>
             <?php endforeach; ?>
         <?php endforeach; ?>
         <div class="admin-sidebar__label">Аккаунт</div>
-        <a href="/admin/profile" class="admin-nav-item <?= $activeNav === 'profile' ? 'is-active' : '' ?>">
+        <a href="/admin/profile" class="admin-nav-item <?= $activeNav === 'profile' ? 'is-active' : '' ?>" title="Профиль"<?= $activeNav === 'profile' ? ' aria-current="page"' : '' ?>>
             <?= $navIcon('profile') ?><span>Профиль</span>
         </a>
+        <button type="button" class="admin-sidebar__collapse" data-sidebar-collapse aria-expanded="true" title="Свернуть меню">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 18-6-6 6-6"/><path d="M20 5v14"/></svg>
+            <span>Свернуть меню</span>
+        </button>
     </aside>
+    <button type="button" class="admin-sidebar-backdrop" data-sidebar-backdrop aria-label="Закрыть меню" tabindex="-1"></button>
 
-    <main class="admin-main">
+    <main class="admin-main" id="admin-content" tabindex="-1">
         <?php foreach (Flash::pull() as $flash): ?>
             <div class="alert alert--<?= htmlspecialchars($flash['type'], ENT_QUOTES) ?>">
                 <?= htmlspecialchars($flash['message'], ENT_QUOTES) ?>

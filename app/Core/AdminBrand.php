@@ -14,7 +14,7 @@ use App\Models\Setting;
 final class AdminBrand
 {
     public const DEFAULT_NAME = 'ArtStudio';
-    public const DEFAULT_ACCENT = '#5b52e5';
+    public const DEFAULT_ACCENT = '#2271b1';
 
     /** Название панели для топбара и <title>. */
     public static function name(): string
