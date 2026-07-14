@@ -28,6 +28,9 @@ return [
     'Скачать' => 'Download',
     'Скачать пресс-релиз' => 'Download press release',
     'Скачать все фото' => 'Download all photos',
+    'Печать' => 'Print',
+    'Распечатать' => 'Print',
+    'Распечатать страницу' => 'Print page',
 
     // Плейсхолдеры / поиск
     'Поиск' => 'Search',

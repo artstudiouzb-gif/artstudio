@@ -28,6 +28,9 @@ return [
     'Скачать' => 'Yuklab olish',
     'Скачать пресс-релиз' => 'Press-relizni yuklab olish',
     'Скачать все фото' => 'Barcha suratlarni yuklab olish',
+    'Печать' => 'Chop etish',
+    'Распечатать' => 'Chop etish',
+    'Распечатать страницу' => 'Sahifani chop etish',
 
     // Плейсхолдеры / поиск
     'Поиск' => 'Qidiruv',
