@@ -70,7 +70,25 @@ require __DIR__ . '/../layout/header.php';
         <?php endif; ?>
         <?php foreach ($items as $item): ?>
             <tr>
-                <td><?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?></td>
+                <td>
+                    <div class="file-cell">
+                        <?php if (str_starts_with((string) $item['mime_type'], 'image/')): ?>
+                            <?php 
+                            $thumbUrl = $item['access_type'] === 'public' 
+                                ? FileEntry::publicUrl($item) 
+                                : '/download.php?file_id=' . (int) $item['id'] . '&token=' . htmlspecialchars((string) $item['access_token'], ENT_QUOTES); 
+                            ?>
+                            <div class="file-thumbnail">
+                                <img src="<?= htmlspecialchars($thumbUrl, ENT_QUOTES) ?>" alt="" loading="lazy">
+                            </div>
+                        <?php else: ?>
+                            <div class="file-thumbnail file-thumbnail--icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </div>
+                        <?php endif; ?>
+                        <span class="file-name"><?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?></span>
+                    </div>
+                </td>
                 <td><?= htmlspecialchars($item['mime_type'], ENT_QUOTES) ?></td>
                 <td><?= Format::fileSize((int) $item['size']) ?></td>
                 <td>
