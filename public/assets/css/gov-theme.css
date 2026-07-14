@@ -36,8 +36,9 @@ body {
     color: var(--gov-ink);
     font-family: var(--font-family, 'PT Sans', system-ui, sans-serif);
     font-size: var(--base-font-size, 16px);
-    line-height: var(--base-line-height, 1.6);
+    line-height: 1.68;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Полноширинные блоки (width:100vw, hero и фоновые подложки) выступают на
@@ -53,7 +54,7 @@ h1, h2, h3, h4, h5, h6,
 .block-contact-cards__title, .section-title, .site-footer__name {
     font-family: var(--font-heading, 'PT Serif', Georgia, serif);
     color: var(--gov-title);
-    letter-spacing: 0;
+    letter-spacing: -0.01em;
     font-weight: 700;
 }
 :root[data-theme="dark"] h1, :root[data-theme="dark"] h2, :root[data-theme="dark"] h3 { color: var(--gov-ink); }
@@ -78,8 +79,19 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .site-menu__link {
     text-transform: uppercase; font-size: 13px; letter-spacing: .04em; font-weight: 700;
     color: var(--gov-title); padding: 16px 2px;
+    position: relative;
+    transition: color 0.2s ease-in-out;
 }
-.site-menu__link::after { height: 3px; bottom: 0; background: var(--gov-teal); }
+.site-menu__link::after {
+    height: 3px; bottom: 0; background: var(--gov-teal);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.25s ease-in-out;
+}
+.site-menu__link:hover::after, .site-menu__link:focus-visible::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
 .site-menu__link:hover, .site-menu__link:focus-visible { color: var(--gov-teal); }
 .site-lang-switcher__item { color: var(--gov-title); font-weight: 700; font-size: 13px; }
 .site-lang-switcher__item.is-active { color: var(--gov-teal); }
@@ -116,20 +128,35 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 /* --- Кнопки --- */
 .block-hero__button, .block-cta a, .content-detail__download, .site-search__submit,
-.block-cta__button, .btn-cta {
-    background: var(--gov-navy); color: #fff; border-radius: var(--btn-radius, 8px); font-family: var(--font-family, 'PT Sans', sans-serif);
-    box-shadow: none;
+.block-cta__button, .btn-cta, .btn {
+    background: linear-gradient(to bottom, var(--gov-navy) 0%, color-mix(in srgb, var(--gov-navy) 90%, #000) 100%) !important;
+    color: #fff !important;
+    border-radius: var(--btn-radius, 8px) !important;
+    font-family: var(--font-family, 'PT Sans', sans-serif);
+    box-shadow: 0 2px 4px rgba(19,42,92,.1) !important;
+    transition: all 0.2s ease-in-out !important;
+    text-decoration: none !important;
+    border: none !important;
 }
-.block-hero__button:hover, .btn-cta:hover { background: color-mix(in srgb, var(--gov-navy) 88%, #000); box-shadow: 0 8px 20px rgba(19,42,92,.2); }
+.block-hero__button:hover, .btn-cta:hover, .btn:hover {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--gov-navy) 95%, #fff) 0%, var(--gov-navy) 100%) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(19,42,92,.25) !important;
+}
 
-/* --- Карточки: плоские, светлая рамка --- */
+/* --- Карточки: классические, с мягкими контурами и микро-тенями --- */
 .news-card, .content-card, .contact-card, .counter, .cat-tile, .site-search-results__item,
 .block-testimonials__item, .testimonial, .team-card, .project-card {
-    background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius);
-    box-shadow: none;
+    background: var(--gov-surface);
+    border: 1px solid var(--gov-border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(15, 27, 45, 0.01), 0 8px 24px -16px rgba(15, 27, 45, 0.06);
+    transition: all 0.2s ease-in-out;
 }
-.news-card:hover, .content-card:hover, .contact-card:hover, .cat-tile:hover {
-    box-shadow: 0 10px 30px rgba(19,42,92,.08); transform: translateY(-3px); border-color: var(--gov-border);
+.news-card:hover, .content-card:hover, .contact-card:hover, .cat-tile:hover, .team-card:hover, .project-card:hover {
+    box-shadow: 0 8px 24px rgba(19,42,92,.06);
+    transform: translateY(-2px);
+    border-color: var(--gov-teal);
 }
 
 /* --- Полоса статистики (counters): белая карта с плитками и кружком-иконкой --- */
