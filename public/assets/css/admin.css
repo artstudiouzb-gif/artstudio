@@ -360,9 +360,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .file-name { font-weight: 500; color: #2c3338; word-break: break-all; }
 
 .badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-.badge--published { background: #e8f6ee; color: #12854a; }
+.badge--published, .badge--success { background: #e8f6ee; color: #12854a; }
 .badge--draft { background: #f1f2f4; color: #6b7280; }
-/* Точка-статус (как в Statamic перед заголовком). */
+.badge--danger { background: #fde8e8; color: #9b1c1c; }
 .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #c7ccd4; margin-right: 8px; vertical-align: middle; }
 .status-dot--published { background: var(--admin-success); }
 
@@ -975,3 +975,243 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 .colorfield input[type="color"] { width: 100%; height: 38px; padding: 2px; cursor: pointer; }
 .colorfield__off { display: flex; align-items: center; gap: 6px; margin-top: 6px; font-weight: 400; font-size: 12px; color: var(--admin-muted); }
 .colorfield__off input { width: auto; }
+
+/* ============================================================================
+   Dark Mode Support (Автоматический темный режим под тему ОС)
+   ============================================================================ */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --admin-topbar-bg: #0f172a;
+        --admin-topbar-text: #f8fafc;
+        --admin-sidebar-bg: #1e293b;
+        --admin-sidebar-text: #cbd5e1;
+        --admin-sidebar-muted: #64748b;
+        --admin-sidebar-hover: #334155;
+        --admin-sidebar-active: #475569;
+        --admin-bg: #0f172a;
+        --admin-surface: #1e293b;
+        --admin-text: #f1f5f9;
+        --admin-muted: #94a3b8;
+        --admin-border: #334155;
+        --admin-border-strong: #475569;
+        --admin-accent-soft: rgba(59, 130, 246, 0.12);
+    }
+    body {
+        background-color: var(--admin-bg) !important;
+        color: var(--admin-text) !important;
+    }
+    input, select, textarea {
+        background-color: #1e293b !important;
+        color: var(--admin-text) !important;
+        border-color: var(--admin-border-strong) !important;
+    }
+    input[type="file"]::file-selector-button {
+        background: #0f172a !important;
+        color: var(--admin-text) !important;
+        border-color: var(--admin-border-strong) !important;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background: #1e293b !important;
+    }
+    input::placeholder, textarea::placeholder {
+        color: #64748b !important;
+    }
+    code {
+        background: #334155 !important;
+        color: #f8fafc !important;
+    }
+    .btn {
+        background: #1e293b !important;
+        color: var(--admin-text) !important;
+        border-color: var(--admin-border-strong) !important;
+    }
+    .btn:hover {
+        background: #334155 !important;
+        border-color: var(--admin-accent) !important;
+        color: #fff !important;
+        text-decoration: none !important;
+    }
+    .btn--primary {
+        background: var(--admin-accent) !important;
+        color: #fff !important;
+        border-color: var(--admin-accent) !important;
+    }
+    .btn--primary:hover {
+        background: var(--admin-accent-hover) !important;
+    }
+    .admin-search__results {
+        background: #1e293b !important;
+        border-color: var(--admin-border) !important;
+        box-shadow: 0 16px 40px rgba(0,0,0,.5) !important;
+    }
+    .admin-search__item {
+        color: var(--admin-text) !important;
+        border-bottom-color: var(--admin-border) !important;
+    }
+    .admin-search__item:hover {
+        background: var(--admin-sidebar-hover) !important;
+    }
+    /* Lists, tables, cards */
+    .admin-table th {
+        background-color: #1e293b !important;
+        border-bottom-color: var(--admin-border) !important;
+        color: var(--admin-text) !important;
+    }
+    .admin-table td {
+        border-bottom-color: var(--admin-border) !important;
+    }
+    .admin-table tr:hover td {
+        background-color: var(--admin-sidebar-hover) !important;
+    }
+    /* Stat cards */
+    .stat-grid a.stat-card {
+        background-color: #1e293b !important;
+        border: 1px solid var(--admin-border) !important;
+        color: var(--admin-text) !important;
+    }
+    .stat-grid a.stat-card:hover {
+        background-color: var(--admin-sidebar-hover) !important;
+        border-color: var(--admin-accent) !important;
+        text-decoration: none !important;
+    }
+    .stat-card__value {
+        color: var(--admin-accent) !important;
+    }
+    /* Forms, cards, blocks editor */
+    .form-card, .design-preset, .revision-item, .audit-item, .block-list-item, .menu-node__inner {
+        background-color: #1e293b !important;
+        border-color: var(--admin-border) !important;
+        color: var(--admin-text) !important;
+    }
+    .design-preset:hover, .block-list-item:hover, .menu-node__inner:hover {
+        border-color: var(--admin-border-strong) !important;
+    }
+    .design-preset.is-active, .menu-node.is-active > .menu-node__inner {
+        border-color: var(--admin-accent) !important;
+        background-color: var(--admin-accent-soft) !important;
+    }
+    /* Block editor fields */
+    .block-list-item__body {
+        border-top-color: var(--admin-border) !important;
+    }
+    .art-editor__area {
+        background-color: #1e293b !important;
+        border-color: var(--admin-border) !important;
+    }
+    .hb-switch__track {
+        background: #334155 !important;
+    }
+    .hb-switch {
+        color: var(--admin-text) !important;
+    }
+    /* WYSIWYG editor */
+    trix-editor, .trix-content, .editor-statusbar {
+        background-color: #1e293b !important;
+        color: var(--admin-text) !important;
+        border-color: var(--admin-border) !important;
+    }
+    trix-toolbar {
+        background-color: #0f172a !important;
+        border-color: var(--admin-border) !important;
+    }
+    trix-toolbar button {
+        background-color: #1e293b !important;
+        border-color: var(--admin-border-strong) !important;
+        color: var(--admin-text) !important;
+    }
+    /* Modals, alerts, flash messages */
+    .flash-message {
+        background-color: #1e293b !important;
+        border-color: var(--admin-border) !important;
+        color: var(--admin-text) !important;
+    }
+    .flash-message--success {
+        border-left-color: var(--admin-success) !important;
+    }
+    .flash-message--error {
+        border-left-color: var(--admin-danger) !important;
+    }
+    .fb-move {
+        background: #1e293b !important;
+        color: #fff !important;
+        border-color: var(--admin-border) !important;
+    }
+    .fb-move:hover {
+        background: var(--admin-accent) !important;
+        border-color: var(--admin-accent) !important;
+    }
+    .reorder-bar {
+        background: #1e293b !important;
+        border-color: var(--admin-border) !important;
+        box-shadow: 0 12px 34px rgba(0,0,0,.4) !important;
+    }
+    .reorder-bar__text {
+        color: var(--admin-text) !important;
+    }
+    .badge--published, .badge--success { background: rgba(16, 185, 129, 0.12) !important; color: #10b981 !important; }
+    .badge--draft { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; }
+    .badge--danger { background: rgba(239, 68, 68, 0.12) !important; color: #ef4444 !important; }
+    .badge { background: rgba(148, 163, 184, 0.12) !important; color: #94a3b8 !important; }
+}
+
+/* --- Сетка дашборда и лог действий --- */
+.dashboard-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 24px; }
+@media (max-width: 960px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+.activity-feed { display: flex; flex-direction: column; gap: 14px; }
+.activity-item { padding: 10px 0; }
+.activity-item:not(:last-child) { border-bottom: 1px solid var(--admin-border); }
+.activity-item__meta { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+.activity-item__time { color: var(--admin-muted); font-size: 12px; }
+.activity-item__desc { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.activity-item__badge {
+    display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em; color: #fff; line-height: 1.2;
+}
+.activity-item__badge--post { background: var(--admin-success, #008a20); }
+.activity-item__badge--put, .activity-item__badge--patch { background: var(--admin-accent, #2271b1); }
+.activity-item__badge--delete { background: var(--admin-danger, #b32d2e); }
+.activity-item__badge--auth { background: #64748b; }
+
+/* Бейджи статусов для списков и таблиц */
+.status-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    line-height: 1.2; width: max-content;
+}
+.status-badge--success { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+.status-badge--warning { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+.status-badge--danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.status-badge--info { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.status-badge--neutral { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
+
+/* Drag and Drop Uploader */
+.dropzone {
+    border: 2px dashed var(--admin-border-strong);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    background: var(--admin-surface);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
+    margin-top: 6px;
+}
+.dropzone:hover, .dropzone.is-dragover {
+    border-color: var(--admin-accent);
+    background: var(--admin-accent-soft);
+}
+.dropzone input[type="file"] {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0; cursor: pointer;
+}
+.dropzone__text {
+    font-size: 14px;
+    color: var(--admin-muted);
+}
+.dropzone__text strong {
+    color: var(--admin-accent);
+}
+
+

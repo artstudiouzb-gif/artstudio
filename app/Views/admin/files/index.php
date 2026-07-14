@@ -15,7 +15,10 @@ require __DIR__ . '/../layout/header.php';
         <?= Csrf::field() ?>
         <div class="form-field">
             <label for="file">Файл</label>
-            <input type="file" id="file" name="file" required>
+            <div class="dropzone" id="dropzone_standard">
+                <input type="file" id="file" name="file" required>
+                <div class="dropzone__text">Перетащите файл сюда или <strong>выберите на диске</strong><br><small id="standard_filename" style="display:block;margin-top:6px;font-weight:600;color:var(--admin-accent);"></small></div>
+            </div>
         </div>
         <div class="form-field">
             <label for="access_type">Доступ</label>
@@ -36,7 +39,10 @@ require __DIR__ . '/../layout/header.php';
     <div class="form-grid">
         <div class="form-field">
             <label for="chunk_file">Файл</label>
-            <input type="file" id="chunk_file">
+            <div class="dropzone" id="dropzone_chunk">
+                <input type="file" id="chunk_file">
+                <div class="dropzone__text">Перетащите большой файл сюда или <strong>выберите на диске</strong><br><small id="chunk_filename" style="display:block;margin-top:6px;font-weight:600;color:var(--admin-accent);"></small></div>
+            </div>
         </div>
         <div class="form-field">
             <label for="chunk_access">Доступ</label>
@@ -145,5 +151,43 @@ require __DIR__ . '/../layout/header.php';
         <?php endforeach; ?>
     </tbody>
 </table>
+
+<script nonce="<?= \App\Core\SecurityHeaders::nonce() ?>">
+(function() {
+    'use strict';
+    
+    function initDropzone(dropzoneId, inputId, labelId) {
+        var dz = document.getElementById(dropzoneId);
+        var input = document.getElementById(inputId);
+        var label = document.getElementById(labelId);
+        if (!dz || !input) return;
+        
+        ['dragenter', 'dragover'].forEach(function(eventName) {
+            dz.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                dz.classList.add('is-dragover');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(function(eventName) {
+            dz.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                dz.classList.remove('is-dragover');
+            }, false);
+        });
+        
+        input.addEventListener('change', function() {
+            if (input.files && input.files[0]) {
+                label.textContent = 'Выбран: ' + input.files[0].name + ' (' + (input.files[0].size / 1024 / 1024).toFixed(2) + ' МБ)';
+            } else {
+                label.textContent = '';
+            }
+        });
+    }
+    
+    initDropzone('dropzone_standard', 'file', 'standard_filename');
+    initDropzone('dropzone_chunk', 'chunk_file', 'chunk_filename');
+})();
+</script>
 
 <?php require __DIR__ . '/../layout/footer.php'; ?>
