@@ -46,6 +46,8 @@ html[data-a11y="1"][data-a11y-images="off"] .repo-main img,
 html[data-a11y="1"][data-a11y-images="off"] .repo-main picture,
 html[data-a11y="1"][data-a11y-images="off"] .repo-main svg,
 html[data-a11y="1"][data-a11y-images="off"] .repo-main video { display: none !important; }
+html[data-a11y="1"][data-a11y-images="off"] .site-content *,
+html[data-a11y="1"][data-a11y-images="off"] .repo-main * { background-image: none !important; }
 
 /* Упрощаем раскладку — одна колонка, скрываем декоративные хром-элементы. */
 html[data-a11y="1"] .site-social,
