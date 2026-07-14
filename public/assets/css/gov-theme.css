@@ -818,7 +818,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 
 /* --- Поведение шапки: липкая и прозрачная (Pro Max; body-префикс перебивает
    легаси-режимы design-header-* из старой дизайн-системы) --- */
-body .site-header--sticky { position: sticky; top: 0; z-index: 200; }
+body .site-header--sticky { position: sticky; top: var(--hdr-panel-height, 0px); z-index: 200; }
 body .site-header--sticky.is-scrolled { box-shadow: 0 8px 28px rgba(11,26,48,.14); }
 
 /* Прозрачная шапка: накладывается на первый экран; текст/иконки белые.
@@ -828,7 +828,7 @@ body .site-header--transparent:not(.is-scrolled) { background: transparent; bord
    с «липкой» после прокрутки переключается в fixed со сплошным фоном. */
 body .site-header.site-header--transparent { position: absolute; left: 0; right: 0; top: var(--hdr-top, 0px); z-index: 200; }
 .site-topbar { position: relative; z-index: 210; }
-body .site-header.site-header--transparent.site-header--sticky.is-scrolled { position: fixed; top: 0 !important; animation: hdr-slide-down .25s ease; }
+body .site-header.site-header--transparent.site-header--sticky.is-scrolled { position: fixed; top: var(--hdr-panel-height, 0px) !important; animation: hdr-slide-down .25s ease; }
 @keyframes hdr-slide-down { from { transform: translateY(-100%); } to { transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { body .site-header.site-header--transparent.site-header--sticky.is-scrolled { animation: none; } }
 body:has(.site-header--transparent) .site-content { margin-top: 0; }
@@ -840,6 +840,7 @@ body .site-header--transparent:not(.is-scrolled) .site-lang-switcher__item,
 body .site-header--transparent:not(.is-scrolled) .a11y-toggle,
 body .site-header--transparent:not(.is-scrolled) .site-theme-toggle,
 body .site-header--transparent:not(.is-scrolled) .site-search-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-burger,
 body .site-header--transparent:not(.is-scrolled) .hdr-contact { color: #fff; }
 /* Отдельный (светлый) логотип для прозрачного режима.
    Стандартный логотип прячем ТОЛЬКО когда реально задан светлый вариант —
@@ -867,7 +868,8 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero { pad
 /* Кнопка для слабовидящих: иконка, текст — в aria-label/title. */
 body .site-header .a11y-toggle span { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 body .site-header .a11y-toggle { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gov-border); padding: 0; }
-body .site-header--transparent:not(.is-scrolled) .a11y-toggle { border-color: rgba(255,255,255,.4); }
+body .site-header--transparent:not(.is-scrolled) .a11y-toggle,
+body .site-header--transparent:not(.is-scrolled) .site-burger { border-color: rgba(255,255,255,.4); }
 /* Поиск: по умолчанию только иконка-лупа; поле выезжает по клику. */
 body .site-header .site-search { display: none; }
 body .site-header .site-search.is-open { display: inline-flex; animation: hdr-search-in .2s ease; }
@@ -875,6 +877,11 @@ body .site-header .site-search.is-open { display: inline-flex; animation: hdr-se
 @media (prefers-reduced-motion: reduce) { body .site-header .site-search.is-open { animation: none; } }
 body .site-header .site-search-toggle { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gov-border); background: transparent; cursor: pointer; }
 body .site-header--transparent:not(.is-scrolled) .site-search-toggle { border-color: rgba(255,255,255,.4); }
+/* Настройка типа поиска должна иметь приоритет над базовым компактным видом шапки. */
+body.design-search-inline .site-header .site-search { display: inline-flex; }
+body.design-search-inline .site-header .site-search-toggle { display: none; }
+body.design-search-overlay .site-header .site-search { display: none; }
+body.design-search-overlay .site-header .site-search-toggle { display: grid; }
 /* Убираем светлую полосу после topbar в прозрачном режиме: контент стартует без верхнего паддинга. */
 body:has(.site-header--transparent) .site-content { padding-top: 0; }
 
@@ -1249,6 +1256,16 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
         width: 100%;
         min-height: 44px;
         white-space: normal;
+    }
+    /* Раскрытая панель имеет собственный сплошной фон и не должна наследовать
+       белый текст прозрачной шапки поверх hero. Переменные темы сохраняют
+       правильный контраст и в светлом, и в тёмном режиме. */
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link {
+        color: var(--gov-title);
+    }
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:hover,
+    body.design-mmenu-burger.mobile-menu-open .site-header--transparent:not(.is-scrolled) .site-menu__link:focus-visible {
+        color: var(--gov-teal-text, var(--gov-teal));
     }
 
     .newsfeat-grid, .block-newsdocs { gap: 24px; }
