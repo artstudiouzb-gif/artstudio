@@ -23,8 +23,8 @@ final class Lang
     {
         $lang = $lang ?? Locale::current();
 
-        // Язык по умолчанию — исходный: ключ и есть перевод.
-        if ($lang === Language::defaultCode()) {
+        // Язык по умолчанию — исходный (RU): ключ и есть перевод.
+        if ($lang === 'ru') {
             return $key;
         }
 
