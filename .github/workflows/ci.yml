@@ -155,13 +155,15 @@ jobs:
         run: |
           mysql -h 127.0.0.1 -P 3306 -uroot artstudio_browser < database/schema.sql
           mysql -h 127.0.0.1 -P 3306 -uroot artstudio_browser <<'SQL'
+          SET @default_lang = (SELECT code FROM languages WHERE is_default = 1 LIMIT 1);
+          SET @default_lang = COALESCE(@default_lang, 'uz');
           INSERT INTO pages (title, slug, status, is_home, layout_type)
-          VALUES ('Главная', 'home', 'published', 1, 'no_sidebar')
+          VALUES (IF(@default_lang = 'uz', 'Bosh sahifa', 'Главная'), 'home', 'published', 1, 'no_sidebar')
           ON DUPLICATE KEY UPDATE title = VALUES(title), status = 'published';
           SET @home_id = (SELECT id FROM pages WHERE slug = 'home' ORDER BY id ASC LIMIT 1);
           UPDATE pages SET is_home = IF(id = @home_id, 1, 0);
           INSERT INTO page_translations (page_id, lang, title)
-          VALUES (@home_id, 'uz', 'Bosh sahifa')
+          VALUES (@home_id, IF(@default_lang = 'uz', 'ru', 'uz'), IF(@default_lang = 'uz', 'Главная', 'Bosh sahifa'))
           ON DUPLICATE KEY UPDATE title = VALUES(title);
           INSERT INTO menu_items (lang, title, url_type, url_value, sort_order, is_active)
           SELECT '', 'Главная', 'page', 'home', 0, 1

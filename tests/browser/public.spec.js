@@ -14,11 +14,22 @@ test('public home renders without horizontal overflow', async ({ page }) => {
 });
 
 test('Uzbek home uses localized title and secure language URL', async ({ page }) => {
-    const response = await page.goto('/uz');
+    const fs = require('fs');
+    const path = require('path');
+    const languageFile = fs.readFileSync(path.join(__dirname, '../../app/Models/Language.php'), 'utf8');
+    const match = languageFile.match(/'code'\s*=>\s*'(\w+)'/);
+    const defaultLang = match ? match[1] : 'uz';
+
+    const targetUrl = defaultLang === 'uz' ? '/' : '/uz';
+    const response = await page.goto(targetUrl);
     expect(response).not.toBeNull();
     expect(response.status()).toBe(200);
     await expect(page).toHaveTitle(/Bosh sahifa/);
-    expect(page.url()).toMatch(/^http:\/\/127\.0\.0\.1:8080\/uz\/?$/);
+    if (defaultLang === 'uz') {
+        expect(page.url()).toMatch(/^http:\/\/127\.0\.0\.1:8080\/?$/);
+    } else {
+        expect(page.url()).toMatch(/^http:\/\/127\.0\.0\.1:8080\/uz\/?$/);
+    }
 });
 
 test('mobile menu opens and closes accessibly', async ({ page, isMobile }) => {

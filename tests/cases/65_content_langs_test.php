@@ -28,15 +28,17 @@ test('Page::availableLangs: дефолтный язык + перевод + св�
     $langs = Page::availableLangs($pageId);
     assert_same([\App\Models\Language::defaultCode()], $langs);
 
+    $nonDefaultLang = \App\Models\Language::defaultCode() === 'uz' ? 'ru' : 'uz';
+
     // Перевод с пустым title не считается наполненным.
     $pdo->prepare('INSERT INTO page_translations (page_id, lang, title) VALUES (?, ?, ?)')
-        ->execute([$pageId, 'uz', '  ']);
-    assert_true(!in_array('uz', Page::availableLangs($pageId), true), 'пустой перевод не в счёт');
+        ->execute([$pageId, $nonDefaultLang, '  ']);
+    assert_true(!in_array($nonDefaultLang, Page::availableLangs($pageId), true), 'пустой перевод не в счёт');
 
     // Заголовок появился — язык доступен.
     $pdo->prepare('UPDATE page_translations SET title = ? WHERE page_id = ? AND lang = ?')
-        ->execute(['Sahifa', $pageId, 'uz']);
-    assert_true(in_array('uz', Page::availableLangs($pageId), true));
+        ->execute(['Sahifa', $pageId, $nonDefaultLang]);
+    assert_true(in_array($nonDefaultLang, Page::availableLangs($pageId), true));
 
     // Свой стек блоков тоже делает язык доступным (без строки перевода).
     $pdo->prepare("INSERT INTO blocks (page_id, lang, type, data, sort_order) VALUES (?, 'en', 'text', '{}', 1)")
