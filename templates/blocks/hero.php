@@ -51,7 +51,13 @@ if ($heroBg !== '') {
     $rgb = $hex2rgb($heroBg);
     // Направление градиента — от стороны с текстом к прозрачному краю.
     $dir = $textPos === 'right' ? '270deg' : ($textPos === 'center' ? '180deg' : '90deg');
-    $heroRootStyle = 'background: linear-gradient(' . $dir . ', rgba(' . $rgb . ',.96) 0%, rgba(' . $rgb . ',.92) 42%, rgba(' . $rgb . ',.55) 72%, rgba(' . $rgb . ',.12) 100%);';
+    $heroRootStyle = 'background: linear-gradient(' . $dir . ', rgba(' . $rgb . ',.96) 0%, rgba(' . $rgb . ',.92) 42%, rgba(' . $rgb . ',.55) 72%, rgba(' . $rgb . ',.12) 100%)'
+        // Инлайновый background перебивает navy темы, и сквозь полупрозрачные
+        // участки градиента просвечивал белый фон страницы — hero выглядел
+        // светлее задуманного. Под медиа подкладываем сплошной navy-слой;
+        // hero без медиа не трогаем (там градиент поверх фона темы задуман).
+        . ($hasMedia ? ', linear-gradient(var(--gov-navy, #173a63), var(--gov-navy, #173a63))' : '')
+        . ';';
 }
 
 $btnText = trim((string) ($data['button_text'] ?? ''));
