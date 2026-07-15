@@ -89,7 +89,7 @@ final class SecurityHeaders
      * — только по nonce; хосты Google Fonts и счётчиков добавляются по
      * фактически включённым настройкам.
      *
-     * @param array{google_fonts?: bool, ga?: bool, ym?: bool} $opts
+     * @param array{google_fonts?: bool, ga?: bool, ym?: bool, counter_scripts?: list<string>} $opts
      */
     public static function publicCsp(string $nonce, array $opts = []): string
     {
@@ -111,6 +111,18 @@ final class SecurityHeaders
         if (!empty($opts['ym'])) {
             $script[] = 'https://mc.yandex.ru';
             $connect[] = 'https://mc.yandex.ru';
+        }
+        $allowedCounterScripts = [
+            'https://mc.yandex.ru',
+            'https://top.mail.ru',
+            'https://top-fwz1.mail.ru',
+            'https://counter.yadro.ru',
+        ];
+        foreach ((array) ($opts['counter_scripts'] ?? []) as $source) {
+            if (in_array($source, $allowedCounterScripts, true)) {
+                $script[] = $source;
+                $connect[] = $source;
+            }
         }
 
         return "default-src 'self'; "
@@ -137,7 +149,7 @@ final class SecurityHeaders
      * Опции публичной CSP из настроек. БД может быть недоступна (503 в
      * bootstrap) — тогда консервативный набор без внешних хостов.
      *
-     * @return array{google_fonts: bool, ga: bool, ym: bool}
+     * @return array{google_fonts: bool, ga: bool, ym: bool, counter_scripts: list<string>}
      */
     private static function publicCspOptions(): array
     {
@@ -146,10 +158,28 @@ final class SecurityHeaders
                 'google_fonts' => DesignSettings::googleFontsHref() !== null,
                 'ga' => Analytics::gaId() !== '',
                 'ym' => Analytics::ymId() !== '',
+                'counter_scripts' => self::footerCounterScriptSources(),
             ];
         } catch (\Throwable) {
-            return ['google_fonts' => false, 'ga' => false, 'ym' => false];
+            return ['google_fonts' => false, 'ga' => false, 'ym' => false, 'counter_scripts' => []];
         }
+    }
+
+    /** @return list<string> */
+    private static function footerCounterScriptSources(): array
+    {
+        $code = (string) \App\Models\Setting::get('footer_counters', '');
+        $sources = [
+            'https://mc.yandex.ru',
+            'https://top.mail.ru',
+            'https://top-fwz1.mail.ru',
+            'https://counter.yadro.ru',
+        ];
+
+        return array_values(array_filter(
+            $sources,
+            static fn (string $source): bool => str_contains($code, substr($source, 8))
+        ));
     }
 
     /**

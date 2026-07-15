@@ -124,7 +124,7 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
                 <?php endif; ?>
             </div>
             <div class="site-footer__bottom-col site-footer__bottom-col--right">
-                <?php $footerCounters = Setting::get('footer_counters', ''); ?>
+                <?php $footerCounters = \App\Core\SecurityHeaders::injectScriptNonce((string) Setting::get('footer_counters', '')); ?>
                 <?php if (trim($footerCounters) !== ''): ?>
                     <div class="site-footer__counters">
                         <?= $footerCounters ?>
@@ -147,7 +147,7 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
                 <?php endif; ?>
             </div>
             <div class="site-footer__bottom-col site-footer__bottom-col--right">
-                <?php $footerCounters = Setting::get('footer_counters', ''); ?>
+                <?php $footerCounters = \App\Core\SecurityHeaders::injectScriptNonce((string) Setting::get('footer_counters', '')); ?>
                 <?php if (trim($footerCounters) !== ''): ?>
                     <div class="site-footer__counters">
                         <?= $footerCounters ?>

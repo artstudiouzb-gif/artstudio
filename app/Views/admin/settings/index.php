@@ -199,9 +199,9 @@ require __DIR__ . '/../layout/header.php';
                 <span class="form-hint">Выполняется в браузере посетителя. Вставляйте только доверенный код.</span>
             </div>
             <div class="form-field">
-                <label for="footer_counters">Счетчики и аналитика в подвале (HTML-код)</label>
-                <textarea id="footer_counters" name="footer_counters" rows="4" style="font-family:monospace;" placeholder='Например: <a href="https://mail.ru"><img src="..."></a>'><?= htmlspecialchars($settings['footer_counters'] ?? '', ENT_QUOTES) ?></textarea>
-                <span class="form-hint">Код счетчиков (Mail.ru, www.uz и др.). Выводится в самом низу подвала сайта.</span>
+                <label for="footer_counters">Счетчики в нижней строке подвала (HTML/JS-код)</label>
+                <textarea id="footer_counters" name="footer_counters" rows="6" style="font-family:monospace;" placeholder='Например: <a href="https://www.uz/"><img src="..."></a> или код Яндекс.Метрики'><?= htmlspecialchars($settings['footer_counters'] ?? '', ENT_QUOTES) ?></textarea>
+                <span class="form-hint">Код отображается справа в нижней строке подвала. Поддержаны HTML-счетчики www.uz и Mail.ru, а также скрипты Яндекс.Метрики и Mail.ru.</span>
             </div>
         </fieldset>
 
