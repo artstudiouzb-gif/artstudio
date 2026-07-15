@@ -73,7 +73,9 @@ php scripts/smoke.php http://127.0.0.1:8000 --admin admin:ПАРОЛЬ
   a11y-слой — `a11y.css`. JS фронта — `public/assets/js/frontend.js`.
 - **Шапка/подвал**: `App\Core\HeaderConfig` / `FooterConfig` (JSON в settings),
   вьюхи `app/Views/site/_header.php`, `_footer.php`. Логотипы — общий + светлый
-  (для тёмного фона) + по языкам (`logo_by_lang`, `logo_light_by_lang`).
+  (для тёмного фона) + по языкам (`logo_by_lang`, `logo_light_by_lang`). Поиск
+  рендерится только в выбранном варианте; код футер-счётчиков хранится в
+  `footer_counters` и получает CSP-nonce при выводе.
 - **Переиспользуемые компоненты форм**: `App\Core\ImageField::resolve()`
   (пустое присланное поле = очистка!), `AdminUi::imageField()`, `AdminUi::colorField()`.
 - **Миграции**: `database/migrations/*.sql`, применяет `database/migrate.php`
@@ -101,6 +103,8 @@ php scripts/smoke.php http://127.0.0.1:8000 --admin admin:ПАРОЛЬ
 - Telegram-публикация новостей, webpush, email-дайджест, формы, редиректы,
   открытые данные, календарь мероприятий, каталоги (`/catalog/{type}`),
   портал репозитория файлов (`/repo`), 2FA, аудит входов, CSP через nonce.
+- TinyMCE в админке: цитаты, верхний/нижний индекс и базовое форматирование.
+  Демо-контент запускается только из «Настройки сайта» после ввода `DEMO`.
 - Доступность: WCAG 2.1 AA (контраст, aria) — 0 нарушений axe на ключевых страницах.
 
 ## Грабли (уже наступали)
