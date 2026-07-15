@@ -830,6 +830,24 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .site-topbar--light .hdr-contact:hover { color: var(--gov-teal-text); }
 .site-topbar .site-lang-switcher__item { color: inherit; }
 .site-topbar .site-header__divider { background: currentColor; opacity: .3; }
+.site-topbar .site-search-toggle,
+.site-topbar .site-theme-toggle,
+.site-topbar .a11y-toggle {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 7px !important;
+    color: inherit !important;
+}
+.site-topbar .site-search-toggle svg,
+.site-topbar .site-theme-toggle svg,
+.site-topbar .a11y-toggle svg {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+}
 @media (max-width: 760px) { .site-topbar { display: none; } .site-topbar--mobile-on { display: block; } .site-topbar--mobile-on .site-topbar__zone--center { display: none; } }
 
 .hdr-contact { display: inline-flex; align-items: center; gap: 7px; font-weight: 600; white-space: nowrap; }

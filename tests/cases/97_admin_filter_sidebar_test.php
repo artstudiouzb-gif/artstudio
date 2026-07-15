@@ -58,6 +58,21 @@ test('installer buttons have consistent states and prevent duplicate submission'
     assert_contains("button.textContent = 'Подождите…'", $footer);
 });
 
+test('header and footer builders use the shared wide workspace', function (): void {
+    $root = dirname(__DIR__, 2);
+    $header = file_get_contents($root . '/app/Views/admin/header/index.php');
+    $footer = file_get_contents($root . '/app/Views/admin/footer/index.php');
+    $css = file_get_contents($root . '/public/assets/css/admin.css');
+
+    assert_true(is_string($header));
+    assert_true(is_string($footer));
+    assert_true(is_string($css));
+    assert_contains('class="admin-builder-workspace"', $header);
+    assert_contains('class="admin-builder-workspace"', $footer);
+    assert_contains('.admin-builder-workspace { width: 100%; }', $css);
+    assert_contains('grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));', $css);
+});
+
 test('repository source does not contain the retired external product name', function (): void {
     $root = dirname(__DIR__, 2);
     $iterator = new RecursiveIteratorIterator(

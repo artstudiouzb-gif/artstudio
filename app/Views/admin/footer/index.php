@@ -20,7 +20,7 @@ $widgetSelect = function (string $name, string $current) use ($widgets): string 
     return $out . '</select>';
 };
 ?>
-<div class="form-card">
+<div class="admin-builder-workspace">
     <form method="post" action="/admin/footer" class="form-grid">
         <?= Csrf::field() ?>
 

@@ -34,6 +34,14 @@ test('HeaderConfig Pro Max: элемент может повторяться в 
     assert_same(['language', 'search'], $cfg['elements']['right'], 'уникальность — в пределах секции');
 });
 
+test('Topbar: утилитарные иконки наследуют цвет и имеют единый размер', function () {
+    $css = (string) file_get_contents(APP_ROOT . '/public/assets/css/gov-theme.css');
+    assert_contains('.site-topbar .site-theme-toggle,', $css);
+    assert_contains('color: inherit !important;', $css);
+    assert_contains('width: 18px !important;', $css);
+    assert_contains('height: 18px !important;', $css);
+});
+
 test('HeaderConfig: sticky и transparent нормализуются в булевы', function () {
     $cfg = HeaderConfig::normalize(['sticky' => '1', 'transparent' => 'yes']);
     assert_true($cfg['sticky'] === true && $cfg['transparent'] === true);

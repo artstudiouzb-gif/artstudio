@@ -70,7 +70,7 @@ $heightSelect = function (string $name, string $current): string {
     return $out . '</select>';
 };
 ?>
-<div class="form-card">
+<div class="admin-builder-workspace">
     <form method="post" action="/admin/header" class="form-grid" enctype="multipart/form-data">
         <?= Csrf::field() ?>
 
