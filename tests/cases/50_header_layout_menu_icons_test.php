@@ -6,6 +6,15 @@ use App\Core\Database;
 use App\Core\HeaderConfig;
 use App\Models\MenuItem;
 
+test('Разделители дизайна применяются между пунктами главного меню', function (): void {
+    $css = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/frontend.css');
+    assert_true(is_string($css));
+    assert_contains('.site-menu > .site-menu__link:not(:first-child)::before', $css);
+    assert_contains('var(--menu-divider-width, 1px)', $css);
+    assert_contains('var(--menu-divider-height, 18px)', $css);
+    assert_contains('var(--menu-divider-color, color-mix(in srgb, currentColor 35%, transparent))', $css);
+});
+
 test('HeaderConfig: макет валидируется, мусор → stacked', function () {
     $cfg = HeaderConfig::normalize(['layout' => 'drawer']);
     assert_same('drawer', $cfg['layout']);

@@ -1353,6 +1353,28 @@ body.design-header-dark .site-nav { border-top-color: rgba(255, 255, 255, .14); 
     background: var(--menu-divider-color, color-mix(in srgb, currentColor 35%, transparent));
 }
 
+/* Настройки «Разделители меню» применяются ко всем верхнеуровневым пунктам.
+   Псевдоэлемент не меняет ширину пункта и остаётся между соседними ссылками. */
+.site-menu > .site-menu__link:not(:first-child)::before,
+.site-menu > .site-menu__item:not(:first-child)::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -14px;
+    width: var(--menu-divider-width, 1px);
+    height: var(--menu-divider-height, 18px);
+    transform: translateY(-50%);
+    background: var(--menu-divider-color, color-mix(in srgb, currentColor 35%, transparent));
+}
+/* Ручной разделитель уже рисует линию сам, поэтому следующему пункту дубликат не нужен. */
+.site-menu > .site-menu__divider + .site-menu__link::before,
+.site-menu > .site-menu__divider + .site-menu__item::before { content: none; }
+
+@media (max-width: 720px) {
+    .site-menu > .site-menu__link:not(:first-child)::before,
+    .site-menu > .site-menu__item:not(:first-child)::before { content: none; }
+}
+
 /* ==========================================================================
    4 МАКЕТА ШАПКИ (десктоп + мобильный)
    ========================================================================== */
