@@ -6,7 +6,7 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -69,7 +69,21 @@ jobs:
           TEST_DB_DATABASE: artstudio_test
           TEST_DB_USERNAME: root
           TEST_DB_PASSWORD: ''
-        run: php tests/run.php
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          php tests/run.php > tests_output.log 2>&1
+          status=$?
+          cat tests_output.log
+          if [ $status -ne 0 ]; then
+            git config --global user.name "github-actions[bot]"
+            git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git checkout -b test-log-branch
+            mv tests_output.log test_failure_log.txt
+            git add test_failure_log.txt
+            git commit -m "ci: save test failure log"
+            git push -f https://x-access-token:${GITHUB_TOKEN}@github.com/artstudiouzb-gif/artstudio.git test-log-branch
+            exit $status
+          fi
 
   static-analysis:
     name: Static analysis (PHPStan)
