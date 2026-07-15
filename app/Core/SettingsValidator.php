@@ -44,4 +44,11 @@ final class SettingsValidator
         $value = trim($value);
         return ctype_digit($value) ? (int) $value : $default;
     }
+
+    /** Безопасное значение CSS (например, clamp(), px, rem). */
+    public static function safeCssValue(string $value, string $default = ''): string
+    {
+        $value = trim($value);
+        return preg_match('/^[a-zA-Z0-9%()., \-+]+$/', $value) ? $value : $default;
+    }
 }

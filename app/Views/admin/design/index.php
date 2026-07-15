@@ -105,6 +105,7 @@ foreach ($options as $key => $opt) {
                 $primary = $customAppearance['color_primary'];
                 $accent = $customAppearance['color_accent'];
                 $semanticColors = \App\Core\DesignSettings::semanticColors();
+                $semanticSpacings = \App\Core\DesignSettings::semanticSpacings();
                 $defaultTheme = (string) \App\Models\Setting::get('default_theme', 'light');
                 if (!in_array($defaultTheme, ['light', 'dark', 'auto'], true)) { $defaultTheme = 'light'; }
                 $bodyFontChoice = \App\Core\DesignSettings::bodyFontChoice();
@@ -134,6 +135,16 @@ foreach ($options as $key => $opt) {
                             <div class="form-field">
                                 <label for="design_<?= htmlspecialchars($colorKey, ENT_QUOTES) ?>"><?= htmlspecialchars($colorLabel, ENT_QUOTES) ?></label>
                                 <input type="color" id="design_<?= htmlspecialchars($colorKey, ENT_QUOTES) ?>" name="<?= htmlspecialchars($colorKey, ENT_QUOTES) ?>" value="<?= htmlspecialchars($semanticColors[$colorKey], ENT_QUOTES) ?>" data-design-preview-field>
+                            </div>
+                        <?php endforeach; ?>
+                        <?php foreach ([
+                            'space_small' => 'Малый отступ (space-small)',
+                            'space_premium' => 'Премиальный отступ (space-premium)',
+                            'space_max' => 'Максимальный отступ (space-max)',
+                        ] as $spaceKey => $spaceLabel): ?>
+                            <div class="form-field">
+                                <label for="design_<?= htmlspecialchars($spaceKey, ENT_QUOTES) ?>"><?= htmlspecialchars($spaceLabel, ENT_QUOTES) ?></label>
+                                <input type="text" id="design_<?= htmlspecialchars($spaceKey, ENT_QUOTES) ?>" name="<?= htmlspecialchars($spaceKey, ENT_QUOTES) ?>" value="<?= htmlspecialchars($semanticSpacings[$spaceKey], ENT_QUOTES) ?>" data-design-preview-field placeholder="clamp(...) или px/rem">
                             </div>
                         <?php endforeach; ?>
                         <div class="form-field design-manual__wide">

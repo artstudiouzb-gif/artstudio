@@ -408,6 +408,25 @@ final class DesignSettings
         return $colors;
     }
 
+    /** @return array{space_small:string,space_premium:string,space_max:string} */
+    public static function semanticSpacings(): array
+    {
+        $defaults = [
+            'space_small' => 'clamp(14px, 2.5vw, 24px)',
+            'space_premium' => 'clamp(28px, 4vw, 56px)',
+            'space_max' => 'clamp(40px, 5vw, 76px)',
+        ];
+        $spacings = [];
+        foreach ($defaults as $key => $fallback) {
+            $spacings[$key] = SettingsValidator::safeCssValue(
+                (string) Setting::get('design_spacing_' . $key, $fallback),
+                $fallback
+            );
+        }
+
+        return $spacings;
+    }
+
     public static function save(array $input): void
     {
         // Новая форма присылает один выбор вместо двух конкурирующих полей.
@@ -467,6 +486,16 @@ final class DesignSettings
                 );
             }
         }
+        $spacings = self::semanticSpacings();
+        foreach ($spacings as $key => $current) {
+            if (array_key_exists($key, $input)) {
+                Setting::set(
+                    'design_spacing_' . $key,
+                    SettingsValidator::safeCssValue((string) $input[$key], $current)
+                );
+            }
+        }
+
         if (array_key_exists('font_family', $input)) {
             $family = mb_substr(trim((string) $input['font_family']), 0, 200);
             if ($family !== '') {

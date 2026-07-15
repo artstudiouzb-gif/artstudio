@@ -26,6 +26,7 @@ if ($logo === '') {
 $primaryColor = Setting::get('color_primary', '#173a63');
 $accentColor = Setting::get('color_accent', '#17999b');
 $semanticColors = \App\Core\DesignSettings::semanticColors();
+$semanticSpacings = \App\Core\DesignSettings::semanticSpacings();
 $font = Setting::get('font_family', "'PT Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif");
 $fontHeading = Setting::get('font_heading', "'PT Serif', Georgia, 'Times New Roman', serif");
 $extraHeadCss = $extraHeadCss ?? '';
@@ -463,6 +464,9 @@ if ($siteTemplate === 'modern_gov'): ?>
     --gov-ink: var(--text-main);
     --gov-muted: var(--text-muted);
     --gov-border: var(--border-color);
+    --space-small: <?= htmlspecialchars($semanticSpacings['space_small'], ENT_QUOTES) ?>;
+    --space-premium: <?= htmlspecialchars($semanticSpacings['space_premium'], ENT_QUOTES) ?>;
+    --space-max: <?= htmlspecialchars($semanticSpacings['space_max'], ENT_QUOTES) ?>;
     <?php // Внутри <style> HTML-экранирование ломает кавычки ('Inter' -> &#039;Inter&#039;).
           // Санитизация под CSS: только буквы/цифры/пробел/запятая/дефис/одинарные кавычки. ?>
     --font-family: <?= preg_replace("/[^a-zA-Z0-9 ,'\\-]/", '', (string) $font) ?: 'system-ui, sans-serif' ?>;

@@ -23,6 +23,9 @@ test('цвета и шрифты редактируются только в ра
     assert_contains('name="text_main"', $designView);
     assert_contains('name="text_muted"', $designView);
     assert_contains('name="border_color"', $designView);
+    assert_contains('name="space_small"', $designView);
+    assert_contains('name="space_premium"', $designView);
+    assert_contains('name="space_max"', $designView);
     assert_contains('name="font_family"', $designView);
     assert_contains('name="font_face_name"', $designView);
     assert_contains('name="font_url"', $designView);
@@ -44,6 +47,9 @@ test('ручное оформление сохраняется отдельно 
         'text_main' => '#202124',
         'text_muted' => '#62666d',
         'border_color' => '#d8dce2',
+        'space_small' => '15px',
+        'space_premium' => '30px',
+        'space_max' => '60px',
     ]);
     assert_same('#102030', \App\Models\Setting::get('color_primary'));
     assert_same('#40a0b0', \App\Models\Setting::get('color_accent'));
@@ -54,6 +60,9 @@ test('ручное оформление сохраняется отдельно 
     assert_same('#202124', DesignSettings::semanticColors()['text_main']);
     assert_same('#62666d', DesignSettings::semanticColors()['text_muted']);
     assert_same('#d8dce2', DesignSettings::semanticColors()['border_color']);
+    assert_same('15px', DesignSettings::semanticSpacings()['space_small']);
+    assert_same('30px', DesignSettings::semanticSpacings()['space_premium']);
+    assert_same('60px', DesignSettings::semanticSpacings()['space_max']);
 
     DesignSettings::save(['palette' => 'gov_blue', 'font_style' => 'system']);
     assert_same('#173a63', \App\Models\Setting::get('color_primary'));
@@ -68,6 +77,9 @@ test('ручное оформление сохраняется отдельно 
 test('семантические цвета выводятся как переменные общей и государственной темы', function (): void {
     $header = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Views/site/_header.php');
     foreach (['--bg-primary:', '--bg-surface:', '--text-main:', '--text-muted:', '--border-color:'] as $variable) {
+        assert_contains($variable, $header);
+    }
+    foreach (['--space-small:', '--space-premium:', '--space-max:'] as $variable) {
         assert_contains($variable, $header);
     }
     assert_contains('--gov-bg: var(--bg-primary)', $header);
