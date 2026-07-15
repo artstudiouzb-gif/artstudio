@@ -21,7 +21,7 @@ $fieldLabels = [
     'user_id' => 'IG User ID',
 ];
 ?>
-<div class="form-card">
+<div class="form-card admin-settings-card">
     <p class="form-hint">
         При публикации новости она автоматически ставится в очередь и
         отправляется в включённые сети CLI-воркером
@@ -57,14 +57,14 @@ $fieldLabels = [
                 <?php endforeach; ?>
             </fieldset>
         <?php endforeach; ?>
-        <div class="form-actions">
+        <div class="form-actions form-actions--sticky">
             <button type="submit" class="btn btn--primary">Сохранить</button>
         </div>
     </form>
 </div>
 
 <?php /** @var array $failedPosts */ $failedPosts = $failedPosts ?? []; ?>
-<div class="form-card" style="margin-top:24px;">
+<div class="form-card admin-settings-card" style="margin-top:24px;">
     <h2 style="margin-top:0;">Проблемные публикации (dead-letter)</h2>
     <p class="form-hint">Публикации, не отправленные после всех попыток. О переходе в этот статус приходит алерт в Telegram.</p>
     <table class="data-table">

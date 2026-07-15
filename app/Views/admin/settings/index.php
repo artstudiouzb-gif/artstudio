@@ -8,7 +8,7 @@ require __DIR__ . '/../layout/header.php';
 
 /** @var array $settings */
 ?>
-<div class="form-card">
+<div class="form-card admin-settings-card">
     <form method="post" action="/admin/settings" enctype="multipart/form-data" class="form-grid">
         <?= Csrf::field() ?>
 
@@ -211,7 +211,7 @@ require __DIR__ . '/../layout/header.php';
     </form>
 </div>
 
-<div class="form-card" style="margin-top:24px;">
+<div class="form-card admin-settings-card" style="margin-top:24px;">
     <h2 style="margin-top:0;">Демо-контент</h2>
     <p class="form-hint">Наполнить сайт примерами: оформленная главная (hero, счётчики, направления, проекты, новости, медиа) с демо-изображениями, новости, документы, вакансии, тендеры, руководство, типовые страницы и меню. Существующие записи не дублируются, отредактированную главную не трогает — повторная загрузка безопасна.</p>
     <form method="post" action="/admin/settings/demo-content" data-confirm="Загрузить демо-контент в разделы сайта?">
@@ -225,7 +225,7 @@ require __DIR__ . '/../layout/header.php';
     </form>
 </div>
 
-<div class="form-card" style="margin-top:24px;">
+<div class="form-card admin-settings-card" style="margin-top:24px;">
     <h2 style="margin-top:0;">Резервное копирование</h2>
     <p class="form-hint">Скачать полный бэкап (дамп базы данных + загруженные файлы) одним архивом.</p>
     <form method="post" action="/admin/backup">

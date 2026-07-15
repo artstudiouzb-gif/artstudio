@@ -38,7 +38,7 @@ test('long admin editors expose a fixed save bar without covering their content'
     assert_true(is_string($header));
     assert_true(is_string($block));
     assert_contains('.form-actions--sticky {', $css);
-    assert_contains('position: fixed; left: calc(var(--admin-sidebar-w) + 28px);', $css);
+    assert_contains('position: fixed; left: calc(var(--admin-sidebar-w) + 32px);', $css);
     assert_contains('padding-bottom: 108px', $css);
     assert_contains("document.body.classList.add('has-sticky-actions')", $layout);
     assert_contains("actions.classList.toggle('is-context-hidden', !inContext)", $layout);

@@ -18,6 +18,7 @@ foreach ($options as $key => $opt) {
     $grouped[$opt['group']][$key] = $opt;
 }
 ?>
+<div class="form-card admin-settings-card">
 <p class="form-hint">Готовые конфигурации применяют набор настроек одним кликом. Ниже — точная настройка: выберите вариант для каждого параметра. Изменения сразу применяются к сайту.</p>
 
 <section class="design-section">
@@ -275,10 +276,11 @@ foreach ($options as $key => $opt) {
         </div>
     </section>
 
-    <div class="design-actions">
+    <div class="form-actions form-actions--sticky">
         <button type="submit" class="btn btn--primary">Сохранить настройки дизайна</button>
     </div>
 </form>
+</div>
 
 <script nonce="<?= \App\Core\SecurityHeaders::nonce() ?>">
 (function () {

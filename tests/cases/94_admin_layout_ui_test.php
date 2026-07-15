@@ -22,11 +22,13 @@ test('admin stylesheet contains professional desktop and mobile states', functio
     $css = file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/admin.css');
 
     assert_true(is_string($css));
-    assert_contains('--admin-topbar-bg: #1d2327', $css);
+    assert_contains('--admin-topbar-bg: #18212b', $css);
     assert_contains('--admin-accent: #2271b1', $css);
     assert_contains('.admin-nav-collapsed', $css);
     assert_contains('body.sidebar-open .admin-sidebar-backdrop', $css);
     assert_contains('@media (prefers-reduced-motion: reduce)', $css);
     assert_contains('.data-table tbody tr:nth-child(even)', $css);
     assert_contains('.admin-welcome', $css);
+    assert_contains('--admin-radius: 6px', $css);
+    assert_contains('--admin-shadow-raised:', $css);
 });

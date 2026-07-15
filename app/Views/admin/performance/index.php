@@ -10,7 +10,7 @@ require __DIR__ . '/../layout/header.php';
 $val = fn (string $k, string $d = '') => htmlspecialchars($settings[$k] ?? $d, ENT_QUOTES);
 $on = fn (string $k, string $d = '0') => ($settings[$k] ?? $d) === '1';
 ?>
-<div class="form-card">
+<div class="form-card admin-settings-card">
     <form method="post" action="/admin/performance/clear-cache" style="margin-bottom:22px;">
         <?= Csrf::field() ?>
         <div class="header-builder__group" style="margin-bottom:0;">
@@ -105,7 +105,7 @@ $on = fn (string $k, string $d = '0') => ($settings[$k] ?? $d) === '1';
             </div>
         </div>
 
-        <div class="form-actions">
+        <div class="form-actions form-actions--sticky">
             <button type="submit" class="btn btn--primary">Сохранить</button>
         </div>
     </form>
