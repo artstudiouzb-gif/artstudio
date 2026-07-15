@@ -16,6 +16,9 @@ use PDO;
 
 final class InstallController
 {
+    private const DEFAULT_TIMEZONE = 'Asia/Tashkent';
+    private const DEFAULT_LANGUAGE = 'uz';
+
     public static function isInstalled(): bool
     {
         return defined('APP_INSTALLED') && APP_INSTALLED;
@@ -146,6 +149,8 @@ final class InstallController
             'error' => null,
             'languages' => Language::all(),
             'timezones' => \DateTimeZone::listIdentifiers(),
+            'selectedTimezone' => self::DEFAULT_TIMEZONE,
+            'selectedLanguage' => self::DEFAULT_LANGUAGE,
         ]);
     }
 
@@ -157,20 +162,22 @@ final class InstallController
 
         $siteName = trim((string) ($_POST['site_name'] ?? ''));
         $description = trim((string) ($_POST['site_description'] ?? ''));
-        $timezone = (string) ($_POST['timezone'] ?? 'UTC');
-        $defaultLang = (string) ($_POST['default_language'] ?? 'ru');
+        $timezone = (string) ($_POST['timezone'] ?? self::DEFAULT_TIMEZONE);
+        $defaultLang = (string) ($_POST['default_language'] ?? self::DEFAULT_LANGUAGE);
 
         if ($siteName === '') {
             View::render('install/step3', [
                 'error' => 'Укажите название сайта.',
                 'languages' => Language::all(),
                 'timezones' => \DateTimeZone::listIdentifiers(),
+                'selectedTimezone' => $timezone,
+                'selectedLanguage' => $defaultLang,
             ]);
             return;
         }
 
         if (!in_array($timezone, \DateTimeZone::listIdentifiers(), true)) {
-            $timezone = 'UTC';
+            $timezone = self::DEFAULT_TIMEZONE;
         }
 
         Setting::set('site_name', $siteName);
@@ -259,7 +266,7 @@ final class InstallController
             . "        'env' => getenv('APP_ENV') ?: 'production',\n"
             . "        'debug' => filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN),\n"
             . "        'url' => getenv('APP_URL') ?: " . var_export($appUrl, true) . ",\n"
-            . "        'timezone' => getenv('APP_TIMEZONE') ?: 'UTC',\n"
+            . "        'timezone' => getenv('APP_TIMEZONE') ?: '" . self::DEFAULT_TIMEZONE . "',\n"
             . "    ],\n"
             . "    'crypto' => [\n"
             . "        'encryption_key' => getenv('APP_ENCRYPTION_KEY') ?: " . var_export($encryptionKey, true) . ",\n"

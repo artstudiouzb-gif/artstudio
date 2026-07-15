@@ -5,6 +5,8 @@ use App\Core\Csrf;
 /** @var string|null $error */
 /** @var array $languages */
 /** @var array $timezones */
+/** @var string $selectedTimezone */
+/** @var string $selectedLanguage */
 $step = '3';
 require __DIR__ . '/_header.php';
 ?>
@@ -24,7 +26,7 @@ require __DIR__ . '/_header.php';
         <label for="timezone">Часовой пояс</label>
         <select id="timezone" name="timezone">
             <?php foreach ($timezones as $tz): ?>
-                <option value="<?= htmlspecialchars($tz, ENT_QUOTES) ?>" <?= $tz === 'Europe/Moscow' ? 'selected' : '' ?>><?= htmlspecialchars($tz, ENT_QUOTES) ?></option>
+                <option value="<?= htmlspecialchars($tz, ENT_QUOTES) ?>" <?= $tz === $selectedTimezone ? 'selected' : '' ?>><?= htmlspecialchars($tz, ENT_QUOTES) ?></option>
             <?php endforeach; ?>
         </select>
     </div>
@@ -32,7 +34,7 @@ require __DIR__ . '/_header.php';
         <label for="default_language">Язык по умолчанию</label>
         <select id="default_language" name="default_language">
             <?php foreach ($languages as $lang): ?>
-                <option value="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>" <?= $lang['is_default'] ? 'selected' : '' ?>>
+                <option value="<?= htmlspecialchars($lang['code'], ENT_QUOTES) ?>" <?= (string) $lang['code'] === $selectedLanguage ? 'selected' : '' ?>>
                     <?= htmlspecialchars($lang['name'], ENT_QUOTES) ?>
                 </option>
             <?php endforeach; ?>

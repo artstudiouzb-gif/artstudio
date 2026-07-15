@@ -42,7 +42,7 @@ final class Language
             $stmt = Database::pdo()->query('SELECT * FROM languages WHERE is_default = 1 LIMIT 1');
             $row = $stmt->fetch();
             if (!$row) {
-                $row = ['id' => 0, 'code' => 'ru', 'name' => 'Русский', 'is_default' => 1, 'is_active' => 1];
+                $row = ['id' => 0, 'code' => 'uz', 'name' => 'Oʻzbekcha', 'is_default' => 1, 'is_active' => 1];
             }
             self::$defaultCache = $row;
         }

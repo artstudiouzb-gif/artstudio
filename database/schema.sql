@@ -116,8 +116,8 @@ CREATE TABLE IF NOT EXISTS languages (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT INTO languages (code, name, is_default, is_active, sort_order) VALUES
-    ('ru', 'Русский', 1, 1, 0),
-    ('uz', 'Oʻzbekcha', 0, 1, 1)
+    ('uz', 'Oʻzbekcha', 1, 1, 0),
+    ('ru', 'Русский', 0, 1, 1)
 ON DUPLICATE KEY UPDATE code = code;
 
 -- ---------------------------------------------------------------------------
