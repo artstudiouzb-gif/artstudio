@@ -233,15 +233,15 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
 .block-hero--media .block-hero__title { color: var(--hero-text, #fff); font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.12; margin: 0 0 20px; }
 .block-hero--media .block-hero__subtitle { color: var(--hero-text, rgba(255,255,255,.85)); font-size: clamp(1.02rem, 1.5vw, 1.18rem); max-width: 520px; }
-.block-hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; margin-top: 30px; }
-.block-hero__button { display: inline-block; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; border-radius: var(--btn-radius, 8px); text-decoration: none; }
+.block-hero__actions { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 16px !important; margin-top: 30px; }
+.block-hero__button { display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 13px; letter-spacing: .06em; font-weight: 700; border-radius: var(--btn-radius, 8px); text-decoration: none; }
 .block-hero--media .block-hero__button { background: var(--hero-btn, #16406e); }
 .block-hero:not(.block-hero--media) .block-hero__button { background: var(--hero-btn, var(--gov-navy)); }
 .block-hero__button--ghost { background: transparent; border: 1px solid rgba(255,255,255,.5); }
 .block-hero__button--ghost:hover { background: rgba(255,255,255,.1); }
-.block-hero__play { display: inline-flex; align-items: center; gap: 12px; color: #fff; text-decoration: none; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
-.block-hero__play-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(2px); }
-.block-hero__play-icon svg { width: 20px; height: 20px; }
+.block-hero__play { display: inline-flex !important; align-items: center !important; gap: 12px; color: #fff; text-decoration: none; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
+.block-hero__play-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(2px); }
+.block-hero__play-icon svg { width: 18px; height: 18px; }
 .block-hero__play:hover .block-hero__play-icon { background: var(--gov-teal); }
 
 /* YouTube-фон: iframe масштабируется, чтобы всегда закрывать секцию (cover). */
