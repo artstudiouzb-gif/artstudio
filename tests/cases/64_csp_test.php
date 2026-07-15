@@ -64,6 +64,7 @@ test('injectScriptNonce: добавляет nonce только тегам без
     assert_contains('<script nonce="уже">var b=2;</script>', $out);
     // Замена нормализует регистр открывающего тега — важен сам nonce.
     assert_contains('<script nonce="abc" src="/x.js">', $out);
+    assert_contains('<script nonce="abc" src="/counter.js">', SecurityHeaders::injectScriptNonce('<SCRIPT src="/counter.js"></SCRIPT>', 'abc'));
     assert_same('<p>без скриптов</p>', SecurityHeaders::injectScriptNonce('<p>без скриптов</p>', 'abc'));
 });
 

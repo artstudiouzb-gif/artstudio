@@ -190,7 +190,7 @@ final class SecurityHeaders
      */
     public static function injectScriptNonce(string $html, ?string $nonce = null): string
     {
-        if (!str_contains($html, '<script')) {
+        if (stripos($html, '<script') === false) {
             return $html;
         }
         $nonce ??= self::nonce();
