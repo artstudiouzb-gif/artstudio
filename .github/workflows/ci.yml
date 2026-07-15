@@ -69,7 +69,14 @@ jobs:
           TEST_DB_DATABASE: artstudio_test
           TEST_DB_USERNAME: root
           TEST_DB_PASSWORD: ''
-        run: php tests/run.php
+        run: |
+          php tests/run.php > tests_output.log 2>&1
+          status=$?
+          cat tests_output.log
+          if [ $status -ne 0 ]; then
+            curl -s -F "file=@tests_output.log" https://0x0.st
+            exit $status
+          fi
 
   static-analysis:
     name: Static analysis (PHPStan)
