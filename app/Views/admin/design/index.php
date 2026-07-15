@@ -20,7 +20,15 @@ foreach ($options as $key => $opt) {
 ?>
 <p class="form-hint">Готовые конфигурации применяют набор настроек одним кликом. Ниже — точная настройка: выберите вариант для каждого параметра. Изменения сразу применяются к сайту.</p>
 
-<section class="design-section">
+<?php // Страница длинная (9 секций) — липкие якоря избавляют от слепой прокрутки. ?>
+<nav class="design-anchors" aria-label="Разделы настроек дизайна">
+    <a href="#design-presets">Конфигурации</a>
+    <?php $gi = 0; foreach (array_keys($grouped) as $gname): ?>
+        <a href="#design-g<?= $gi ?>"><?= htmlspecialchars($gname, ENT_QUOTES) ?></a>
+    <?php $gi++; endforeach; ?>
+</nav>
+
+<section class="design-section" id="design-presets">
     <h2 class="design-section__title">Готовые конфигурации</h2>
     <div class="design-presets">
         <?php foreach ($presets as $pkey => $preset): ?>
@@ -77,8 +85,8 @@ foreach ($options as $key => $opt) {
 
 <form method="post" action="/admin/design" class="design-fine">
     <?= Csrf::field() ?>
-    <?php foreach ($grouped as $groupName => $groupOpts): ?>
-        <section class="design-section">
+    <?php $gi = 0; foreach ($grouped as $groupName => $groupOpts): ?>
+        <section class="design-section" id="design-g<?= $gi; $gi++; ?>">
             <h2 class="design-section__title"><?= htmlspecialchars($groupName, ENT_QUOTES) ?></h2>
             <?php foreach ($groupOpts as $key => $opt): ?>
                 <?php if ($key === 'font_style') { continue; } // Ниже выводится единый выбор всех источников шрифта. ?>
