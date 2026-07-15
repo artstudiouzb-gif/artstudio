@@ -8,6 +8,7 @@ require __DIR__ . '/layout/header.php';
 /** @var array $counts */
 /** @var array<string, int> $chartData */
 /** @var array<int, array<string, mixed>> $recentLogs */
+/** @var array<int, array<string, mixed>> $recentItems */
 ?>
 <section class="admin-welcome" aria-labelledby="admin-welcome-title">
     <div>
@@ -51,6 +52,28 @@ require __DIR__ . '/layout/header.php';
         <span class="stat-card__label">Файлов</span>
     </a>
 </div>
+
+<?php if (!empty($recentItems)): ?>
+<div class="form-card continue-card">
+    <h3 style="margin-top:0;">Продолжить работу</h3>
+    <p class="form-hint">Последние материалы, которые редактировались.</p>
+    <div class="continue-list">
+        <?php foreach ($recentItems as $item): ?>
+            <?php
+            $isNews = ($item['kind'] ?? '') === 'news';
+            $editUrl = ($isNews ? '/admin/news/' : '/admin/pages/') . (int) $item['id'] . '/edit';
+            $isDraft = ($item['status'] ?? '') === 'draft';
+            ?>
+            <a href="<?= htmlspecialchars($editUrl, ENT_QUOTES) ?>" class="continue-item">
+                <span class="continue-item__kind"><?= $isNews ? 'Новость' : 'Страница' ?></span>
+                <span class="continue-item__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
+                <span class="badge <?= $isDraft ? 'badge--draft' : 'badge--published' ?>"><?= $isDraft ? 'Черновик' : 'Опубликовано' ?></span>
+                <span class="continue-item__time"><?= date('d.m.Y H:i', strtotime((string) $item['updated_at'])) ?></span>
+            </a>
+        <?php endforeach; ?>
+    </div>
+</div>
+<?php endif; ?>
 
 <?php
 $maxVal = max(1, ...array_values($chartData));

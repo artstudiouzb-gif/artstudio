@@ -21,7 +21,7 @@ require __DIR__ . '/../layout/header.php';
     </thead>
     <tbody>
         <?php if (empty($items)): ?>
-            <tr><td colspan="4" class="data-table__empty">Сотрудников пока нет.</td></tr>
+            <tr><td colspan="4" class="data-table__empty">Сотрудников пока нет.<br><a href="/admin/team/create" class="btn btn--small">+ Добавить первого сотрудника</a></td></tr>
         <?php endif; ?>
         <?php foreach ($items as $item): ?>
             <tr>

@@ -28,7 +28,15 @@ $contentPath = '/admin/content/' . rawurlencode((string) $type['slug']);
 <table class="data-table">
     <thead><tr><th>Заголовок</th><th>Статус</th><th>Обновлено</th><th></th></tr></thead>
     <tbody>
-        <?php if (empty($items)): ?><tr><td colspan="4" class="data-table__empty">Записей пока нет.</td></tr><?php endif; ?>
+        <?php if (empty($items)): ?>
+            <tr><td colspan="4" class="data-table__empty">
+                <?php if ($filters['q'] === '' && $filters['status'] === ''): ?>
+                    Записей пока нет.<br><a href="<?= htmlspecialchars($contentPath, ENT_QUOTES) ?>/create" class="btn btn--small">+ Добавить первую запись</a>
+                <?php else: ?>
+                    По заданным фильтрам ничего не найдено.
+                <?php endif; ?>
+            </td></tr>
+        <?php endif; ?>
         <?php foreach ($items as $e): ?>
             <tr>
                 <td><a class="data-table__primary" href="<?= htmlspecialchars($contentPath, ENT_QUOTES) ?>/<?= (int) $e['id'] ?>/edit"><?= htmlspecialchars((string) $e['title'], ENT_QUOTES) ?></a></td>

@@ -287,7 +287,22 @@ foreach ($blocks as $b) {
     <?php endforeach; ?>
     </div>
 
-    <?php $snippets = \App\Models\BlockSnippet::all(); ?>
+    <?php
+    // Библиотека шаблонов: если миграция block_snippets ещё не накатана,
+    // не роняем весь редактор страницы 500-й — скрываем секцию и подсказываем
+    // (тот же паттерн, что у ContentType::all() в layout/header.php).
+    try {
+        $snippets = \App\Models\BlockSnippet::all();
+    } catch (\Throwable $snippetError) {
+        $snippets = null;
+    }
+    ?>
+    <?php if ($snippets === null): ?>
+    <div class="form-card" style="margin-top:16px;">
+        <h3 style="margin-top:0;">Шаблоны страницы</h3>
+        <p class="form-hint">Раздел недоступен: не применена миграция базы данных. Выполните <code>php database/migrate.php</code> на сервере.</p>
+    </div>
+    <?php else: ?>
     <div class="form-card" style="margin-top:16px;">
         <h3 style="margin-top:0;">Шаблоны страницы</h3>
         <p class="form-hint">Шаблон сохраняет все блоки этого языка, включая содержимое колонок. Его можно применить к любой странице: добавить к текущим блокам или полностью заменить их.</p>
@@ -319,6 +334,7 @@ foreach ($blocks as $b) {
             <?php endif; ?>
         </div>
     </div>
+    <?php endif; ?>
 
     <div class="form-card" style="margin-top:20px;">
         <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/blocks/add" class="form-grid">

@@ -40,6 +40,7 @@
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 
 body {
     margin: 0;
@@ -364,6 +365,7 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .data-table tr:last-child td { border-bottom: none; }
 .data-table__actions { display: flex; gap: 8px; justify-content: flex-end; }
 .data-table__empty { padding: 32px; text-align: center; color: var(--admin-muted); }
+.data-table__empty .btn { margin-top: 12px; }
 
 .file-cell { display: flex; align-items: center; gap: 12px; }
 .file-thumbnail { width: 44px; height: 44px; border-radius: 6px; background: #f1f2f4; border: 1px solid var(--admin-border); overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -405,6 +407,24 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 body:has(.form-actions--sticky) .admin-main,
 body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 .form-actions--sticky .btn--primary { min-width: 132px; justify-content: center; }
+
+/* Сворачиваемая секция формы (details): второстепенные поля не шумят,
+   пока не понадобятся. Значения внутри закрытой секции отправляются как обычно. */
+.form-section { border: 1px solid var(--admin-border); border-radius: var(--admin-radius); background: var(--admin-surface-soft); }
+.form-section > summary {
+    display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+    cursor: pointer; font-weight: 600; font-size: 13px; list-style: none; user-select: none;
+}
+.form-section > summary::-webkit-details-marker { display: none; }
+.form-section > summary::before {
+    content: ''; flex-shrink: 0; width: 7px; height: 7px; margin-top: -3px;
+    border-right: 2px solid var(--admin-muted); border-bottom: 2px solid var(--admin-muted);
+    transform: rotate(-45deg); transition: transform .15s ease;
+}
+.form-section[open] > summary::before { transform: rotate(45deg); margin-top: -5px; }
+.form-section > summary:hover { color: var(--admin-accent); }
+.form-section__hint { font-weight: 400; font-size: 12px; color: var(--admin-muted); }
+.form-section__body { display: flex; flex-direction: column; gap: 18px; padding: 6px 16px 16px; }
 
 .settings-group { border: 1px solid var(--admin-border); border-radius: var(--admin-radius-lg); padding: 22px; margin: 20px 0; background: var(--admin-surface-soft); }
 .settings-group > legend { padding: 0 10px; font-size: 14px; font-weight: 700; color: var(--admin-text); }
@@ -627,7 +647,7 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .admin-sidebar, .admin-sidebar-backdrop, .admin-sidebar__collapse svg, .form-actions--sticky, .btn, .stat-card { transition: none; }
+    .admin-sidebar, .admin-sidebar-backdrop, .admin-sidebar__collapse svg, .form-actions--sticky, .btn, .stat-card, .form-section > summary::before { transition: none; }
     .stat-card:hover { transform: none; }
 }
 
@@ -671,7 +691,23 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 .block-list-item__badge { display: inline-block; margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: #eef0f3; color: #66707c; font-size: 11px; font-weight: 600; vertical-align: middle; }
 
 /* ===== Тема-билдер: управление дизайном ===== */
-.design-section { margin-bottom: 34px; }
+/* Липкие якоря разделов дизайна: страница из 9 секций листается без слепой прокрутки. */
+.design-anchors {
+    position: sticky; top: var(--admin-topbar-h); z-index: 60;
+    display: flex; gap: 6px; overflow-x: auto; scrollbar-width: thin;
+    margin: 0 0 20px; padding: 10px 2px;
+    background: color-mix(in srgb, var(--admin-bg) 92%, transparent);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.design-anchors a {
+    flex-shrink: 0; padding: 6px 12px; border: 1px solid var(--admin-border);
+    border-radius: 999px; background: var(--admin-surface);
+    color: var(--admin-text); font-size: 13px; font-weight: 600; text-decoration: none;
+    transition: border-color .15s ease, color .15s ease, background-color .15s ease;
+}
+.design-anchors a:hover { border-color: var(--admin-accent); color: var(--admin-accent-hover); text-decoration: none; }
+
+.design-section { margin-bottom: 34px; scroll-margin-top: calc(var(--admin-topbar-h) + 56px); }
 .design-section__title { font-size: 15px; text-transform: uppercase; letter-spacing: .05em; color: #66707c; margin: 0 0 16px; font-weight: 700; }
 
 .design-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
@@ -1172,6 +1208,24 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 /* --- Сетка дашборда и лог действий --- */
 .dashboard-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 24px; }
 @media (max-width: 960px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+/* «Продолжить работу»: последние редактированные материалы. */
+.continue-card { max-width: none; margin-top: 24px; }
+.continue-list { display: flex; flex-direction: column; margin-top: 12px; }
+.continue-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 0 -12px;
+    border-radius: var(--admin-radius-sm); color: var(--admin-text); text-decoration: none;
+}
+.continue-item:hover { background: var(--admin-accent-soft); text-decoration: none; }
+.continue-item + .continue-item { border-top: 1px solid var(--admin-border); }
+.continue-item__kind { flex-shrink: 0; min-width: 76px; font-size: 12px; color: var(--admin-muted); }
+.continue-item__title { flex: 1; min-width: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.continue-item:hover .continue-item__title { color: var(--admin-accent-hover); }
+.continue-item__time { flex-shrink: 0; font-size: 12px; color: var(--admin-muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+    .continue-item { flex-wrap: wrap; gap: 6px 10px; }
+    .continue-item__title { flex-basis: 100%; white-space: normal; }
+}
 
 .activity-feed { display: flex; flex-direction: column; gap: 14px; }
 .activity-item { padding: 10px 0; }

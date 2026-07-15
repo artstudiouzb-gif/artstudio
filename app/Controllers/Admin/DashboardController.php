@@ -27,6 +27,21 @@ final class DashboardController
         // Получаем последние 5 действий из журнала аудита
         $recentLogs = \App\Models\AuditLog::search([], 1, 5)['items'];
 
+        // «Продолжить работу»: последние редактированные новости и страницы
+        // (черновики и опубликованные, кроме корзины) — то, ради чего обычно
+        // и заходят в панель.
+        $recentItems = [];
+        try {
+            $recentItems = Database::pdo()->query(
+                "(SELECT 'news' AS kind, id, title, status, updated_at FROM news WHERE deleted_at IS NULL ORDER BY updated_at DESC LIMIT 6)
+                 UNION ALL
+                 (SELECT 'page' AS kind, id, title, status, updated_at FROM pages WHERE deleted_at IS NULL ORDER BY updated_at DESC LIMIT 6)
+                 ORDER BY updated_at DESC LIMIT 6"
+            )->fetchAll();
+        } catch (\Throwable $e) {
+            // Не критично для дашборда — секция просто не выводится.
+        }
+
         // Статистика заявок за последние 7 дней для графика
         $chartData = [];
         for ($i = 6; $i >= 0; $i--) {
@@ -48,6 +63,7 @@ final class DashboardController
             'user' => Auth::user(),
             'counts' => $counts,
             'recentLogs' => $recentLogs,
+            'recentItems' => $recentItems,
             'chartData' => $chartData
         ]);
     }

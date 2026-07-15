@@ -73,15 +73,20 @@ $navTools = [
     'trash' => ['/admin/trash', 'Корзина'],
 ];
 
-$navSettings = [];
+// «Настройки» из 12 пунктов подряд читались как хаос — разбиты на две группы:
+// «Внешний вид» (то, что видно на сайте) и «Система» (интеграции и служебное).
+$navAppearance = [];
+$navSystem = [];
 $navUsersGroup = [];
 if ($navIsSuper) {
-    $navSettings = [
+    $navAppearance = [
         'design' => ['/admin/design', 'Дизайн'],
         'menu' => ['/admin/menu', 'Меню'],
         'widgets' => ['/admin/widgets', 'Виджеты'],
         'header' => ['/admin/header', 'Шапка сайта'],
         'footer' => ['/admin/footer', 'Подвал сайта'],
+    ];
+    $navSystem = [
         'languages' => ['/admin/languages', 'Языки'],
         'content_types' => ['/admin/content-types', 'Типы контента'],
         'social' => ['/admin/social', 'Соцсети'],
@@ -101,9 +106,19 @@ if ($navIsSuper) {
 $navGroups = [
     'Контент' => $navContent,
     'Инструменты' => $navTools,
-    'Настройки' => $navSettings,
+    'Внешний вид' => $navAppearance,
+    'Система' => $navSystem,
     'Пользователи' => $navUsersGroup,
 ];
+
+// Крошка в топбаре: «Группа › Раздел» вместо дубля заголовка страницы (h1 ниже).
+$navCrumb = $pageTitle;
+foreach ($navGroups as $navGroupLabel => $navGroupItems) {
+    if (isset($navGroupItems[$activeNav])) {
+        $navCrumb = $navGroupLabel . ' › ' . $navGroupItems[$activeNav][1];
+        break;
+    }
+}
 
 $navInitials = mb_strtoupper(mb_substr((string) ($navUser['username'] ?? 'A'), 0, 1));
 ?>
@@ -133,7 +148,7 @@ try {
         <?= \App\Core\AdminBrand::badgeHtml() ?>
         <span class="admin-topbar__name"><?= htmlspecialchars(\App\Core\AdminBrand::name(), ENT_QUOTES) ?></span>
     </a>
-    <span class="admin-topbar__crumb"><?= htmlspecialchars($pageTitle, ENT_QUOTES) ?></span>
+    <span class="admin-topbar__crumb"><?= htmlspecialchars($navCrumb, ENT_QUOTES) ?></span>
     <div class="admin-topbar__spacer"></div>
     <div class="admin-search" data-search>
         <svg class="admin-search__icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
