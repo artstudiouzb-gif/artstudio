@@ -306,10 +306,13 @@ a:hover { color: color-mix(in srgb, var(--gov-teal) 80%, #000); }
     border-radius: 18px;
     padding: clamp(20px, 3vw, 32px);
     box-shadow: 0 6px 24px -10px rgba(15, 23, 42, 0.02);
+}
+.block-counters__grid {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
     gap: 16px;
+    width: 100%;
 }
 .counter { 
     border: 0 !important; 
