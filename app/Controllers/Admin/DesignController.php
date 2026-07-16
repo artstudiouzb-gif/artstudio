@@ -75,6 +75,20 @@ final class DesignController
                 DesignSettings::normalizeRadius((string) $preview['radius_custom'])
             );
         }
+        if (array_key_exists('line_height_custom', $preview)) {
+            Setting::overrideInMemory(
+                'design_line_height_custom',
+                DesignSettings::normalizeLineHeight((string) $preview['line_height_custom'])
+            );
+        }
+        foreach (array_keys(DesignSettings::TYPO_SIZES) as $fsKey) {
+            if (array_key_exists($fsKey, $preview)) {
+                Setting::overrideInMemory(
+                    'design_' . $fsKey,
+                    DesignSettings::normalizeFsSize((string) $preview[$fsKey])
+                );
+            }
+        }
 
         // Ручные значения превью берутся из той же формы, что и пресеты.
         // Они применяются только для соответствующих вариантов «Свои…».

@@ -27,6 +27,14 @@ test('точные размеры принимают только безопас
     assert_same('12.5px', DesignSettings::normalizeRadius('12.5'));
     assert_same('', DesignSettings::normalizeRadius('49'));
     assert_same('', DesignSettings::normalizeRadius('calc(1px)'));
+    assert_same('1.45', DesignSettings::normalizeLineHeight('1,45'));
+    assert_same('2', DesignSettings::normalizeLineHeight('2.0'));
+    assert_same('', DesignSettings::normalizeLineHeight('0.9'));
+    assert_same('', DesignSettings::normalizeLineHeight('2.6'));
+    assert_same('', DesignSettings::normalizeLineHeight('16px'));
+    assert_same('34px', DesignSettings::normalizeFsSize('34'));
+    assert_same('', DesignSettings::normalizeFsSize('7'));
+    assert_same('', DesignSettings::normalizeFsSize('97'));
 });
 
 test('форма дизайна объединяет источники шрифта и показывает точные размеры', function (): void {
@@ -36,6 +44,10 @@ test('форма дизайна объединяет источники шриф
     assert_contains('optgroup label="Google Fonts"', $view);
     assert_contains('data-custom-font-fields', $view);
     assert_contains('name="font_size_custom"', $view);
+    assert_contains('name="line_height_custom"', $view);
+    // Поля размеров по элементам рендерятся циклом из TYPO_SIZES.
+    assert_contains('DesignSettings::TYPO_SIZES as $fsKey', $view);
+    assert_true(isset(DesignSettings::TYPO_SIZES['fs_h1'], DesignSettings::TYPO_SIZES['fs_menu'], DesignSettings::TYPO_SIZES['fs_topbar']));
     assert_contains('name="radius_custom"', $view);
     assert_not_contains('<h2 class="design-section__title">Google-шрифты</h2>', $view);
 });
@@ -46,10 +58,20 @@ test('точные размеры сохраняются и переопреде
         'font_body_choice' => 'google:inter',
         'font_size_custom' => '17.5',
         'radius_custom' => '13',
+        'line_height_custom' => '1.35',
+        'fs_h1' => '34',
+        'fs_menu' => '15',
     ]);
 
     $css = DesignSettings::cssVariables(DesignSettings::current());
     assert_contains('--base-font-size:17.5px', $css);
+    assert_contains('--base-line-height:1.35', $css);
+    assert_contains('h1{font-size:34px !important;}', $css);
+    assert_contains('.site-menu__link{font-size:15px !important;}', $css);
+
+    // Сброс, чтобы прогон был идемпотентным и не влиял на другие тесты.
+    DesignSettings::save(['fs_h1' => '', 'fs_menu' => '']);
+    assert_not_contains('font-size:34px', DesignSettings::cssVariables(DesignSettings::current()));
     assert_contains('--radius:13px', $css);
     assert_contains('--btn-radius:13px', $css);
     assert_same('inter', (string) \App\Models\Setting::get('design_font_google_body', ''));

@@ -90,6 +90,7 @@ foreach ($options as $key => $opt) {
             <h2 class="design-section__title"><?= htmlspecialchars($groupName, ENT_QUOTES) ?></h2>
             <?php foreach ($groupOpts as $key => $opt): ?>
                 <?php if ($key === 'font_style') { continue; } // Ниже выводится единый выбор всех источников шрифта. ?>
+                <?php if ($key === 'font_size' || $key === 'line_height') { continue; } // Типографика управляется точными числами ниже. ?>
                 <div class="design-opt">
                     <div class="design-opt__label">
                         <span><?= htmlspecialchars($opt['label'], ENT_QUOTES) ?></span>
@@ -106,6 +107,57 @@ foreach ($options as $key => $opt) {
                     </div>
                 </div>
             <?php endforeach; ?>
+
+            <?php if ($groupName === 'Типографика'): ?>
+                <?php
+                // Пресетные значения остаются форматом хранения (и фолбэком при
+                // пустых полях), поэтому передаются скрытыми полями без карточек.
+                $fontSizePreset = ['sm' => '15', 'md' => '16', 'lg' => '17', 'xl' => '18'][$values['font_size'] ?? 'md'] ?? '16';
+                $lineHeightPreset = ['tight' => '1.45', 'normal' => '1.6', 'relaxed' => '1.8'][$values['line_height'] ?? 'normal'] ?? '1.6';
+                $fontSizeCustom = preg_replace('/px$/', '', \App\Core\DesignSettings::fontSizeCustom());
+                $lineHeightCustom = \App\Core\DesignSettings::lineHeightCustom();
+                ?>
+                <input type="hidden" name="font_size" value="<?= htmlspecialchars((string) ($values['font_size'] ?? 'md'), ENT_QUOTES) ?>">
+                <input type="hidden" name="line_height" value="<?= htmlspecialchars((string) ($values['line_height'] ?? 'normal'), ENT_QUOTES) ?>">
+                <div class="design-opt">
+                    <div class="design-opt__label">
+                        <span>Основной текст (p, span)</span>
+                        <small>Базовый размер текста сайта — абзацы и обычный текст наследуют его. От 12 до 24 px с шагом 0,5. Пусто — значение конфигурации (<?= htmlspecialchars($fontSizePreset, ENT_QUOTES) ?> px).</small>
+                    </div>
+                    <div class="design-opt__choices">
+                        <input type="number" name="font_size_custom" min="12" max="24" step="0.5" inputmode="decimal"
+                               value="<?= htmlspecialchars((string) $fontSizeCustom, ENT_QUOTES) ?>" placeholder="напр. <?= htmlspecialchars($fontSizePreset, ENT_QUOTES) ?>" style="max-width:220px;" data-design-preview-field>
+                    </div>
+                </div>
+                <div class="design-opt">
+                    <div class="design-opt__label">
+                        <span>Межстрочный интервал</span>
+                        <small>Высота строки основного текста, от 1 до 2,5 (множитель размера шрифта). Пусто — значение конфигурации (<?= htmlspecialchars($lineHeightPreset, ENT_QUOTES) ?>).</small>
+                    </div>
+                    <div class="design-opt__choices">
+                        <input type="number" name="line_height_custom" min="1" max="2.5" step="0.05" inputmode="decimal"
+                               value="<?= htmlspecialchars($lineHeightCustom, ENT_QUOTES) ?>" placeholder="напр. <?= htmlspecialchars($lineHeightPreset, ENT_QUOTES) ?>" style="max-width:220px;" data-design-preview-field>
+                    </div>
+                </div>
+                <?php $typoSizes = \App\Core\DesignSettings::typographySizes(); ?>
+                <div class="design-manual">
+                    <div class="design-manual__head">
+                        <strong>Размеры по элементам</strong>
+                        <span>Точный размер (px) для конкретных элементов сайта. Пустое поле — размер темы не меняется; в поле показан ориентировочный размер по умолчанию.</span>
+                    </div>
+                    <div class="design-manual__grid">
+                        <?php foreach (\App\Core\DesignSettings::TYPO_SIZES as $fsKey => $fsMeta): ?>
+                            <div class="form-field">
+                                <label for="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"><?= htmlspecialchars($fsMeta[0], ENT_QUOTES) ?>, px</label>
+                                <input type="number" id="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>" name="<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"
+                                       min="8" max="96" step="0.5" inputmode="decimal"
+                                       value="<?= htmlspecialchars(preg_replace('/px$/', '', $typoSizes[$fsKey]) ?? '', ENT_QUOTES) ?>"
+                                       placeholder="напр. <?= htmlspecialchars($fsMeta[2], ENT_QUOTES) ?>" data-design-preview-field>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
 
             <?php if ($groupName === 'Цвета и шрифт'): ?>
                 <?php
@@ -229,17 +281,6 @@ foreach ($options as $key => $opt) {
             </div>
             <div class="design-opt__choices">
                 <input type="text" name="container_custom" value="<?= htmlspecialchars((string) \App\Models\Setting::get('design_container_custom', ''), ENT_QUOTES) ?>" placeholder="напр. 1440px" style="max-width:220px;" data-design-preview-field>
-            </div>
-        </div>
-        <div class="design-opt">
-            <div class="design-opt__label">
-                <span>Базовый размер текста</span>
-                <small>От 12 до 24 px с шагом 0,5. Пусто — использовать выбранный вариант размера выше.</small>
-            </div>
-            <div class="design-opt__choices">
-                <?php $fontSizeCustom = preg_replace('/px$/', '', \App\Core\DesignSettings::fontSizeCustom()); ?>
-                <input type="number" name="font_size_custom" min="12" max="24" step="0.5" inputmode="decimal"
-                       value="<?= htmlspecialchars((string) $fontSizeCustom, ENT_QUOTES) ?>" placeholder="напр. 16.5" style="max-width:220px;" data-design-preview-field>
             </div>
         </div>
         <div class="design-opt">

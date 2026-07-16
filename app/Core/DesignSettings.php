@@ -346,6 +346,74 @@ final class DesignSettings
         return self::normalizePixelValue($raw, 0, 48);
     }
 
+    /**
+     * Размеры шрифта по элементам: ключ формы fs_* => [подпись, CSS-селектор,
+     * placeholder-значение темы]. Пустое значение — размер темы не трогаем.
+     * Правила выводятся с !important, чтобы предсказуемо перекрывать
+     * компонентные clamp()-размеры тем (панель a11y всё равно сильнее).
+     */
+    public const TYPO_SIZES = [
+        'fs_h1' => ['Заголовок H1', 'h1', '42'],
+        'fs_h2' => ['Заголовок H2', 'h2', '32'],
+        'fs_h3' => ['Заголовок H3', 'h3', '24'],
+        'fs_h4' => ['Заголовок H4', 'h4', '20'],
+        'fs_h5' => ['Заголовок H5', 'h5', '18'],
+        'fs_small' => ['Мелкий текст (small)', 'small', '13'],
+        'fs_btn' => ['Кнопки', '.block-cta__button, .btn-cta, .btn', '15'],
+        'fs_menu' => ['Главное меню', '.site-menu__link', '13'],
+        'fs_topbar' => ['Верхняя панель', '.site-topbar', '13'],
+    ];
+
+    /** Заданные размеры по элементам: ключ => '17px' или '' (не задан). @return array<string,string> */
+    public static function typographySizes(): array
+    {
+        $sizes = [];
+        foreach (self::TYPO_SIZES as $key => $_) {
+            $sizes[$key] = self::normalizeFsSize((string) Setting::get('design_' . $key, ''));
+        }
+
+        return $sizes;
+    }
+
+    /** Нормализует размер шрифта элемента (8–96px); '' — не задан/невалиден. */
+    public static function normalizeFsSize(string $raw): string
+    {
+        return self::normalizePixelValue($raw, 8, 96);
+    }
+
+    /** CSS-правила для заданных размеров по элементам ('' — ничего не задано). */
+    public static function typographyCss(): string
+    {
+        $rules = '';
+        foreach (self::typographySizes() as $key => $size) {
+            if ($size !== '') {
+                $rules .= self::TYPO_SIZES[$key][1] . '{font-size:' . $size . ' !important;}';
+            }
+        }
+
+        return $rules;
+    }
+
+    /** Точный межстрочный интервал, 1–2.5 (без единиц); пусто — значение пресета. */
+    public static function lineHeightCustom(): string
+    {
+        return self::normalizeLineHeight((string) Setting::get('design_line_height_custom', ''));
+    }
+
+    public static function normalizeLineHeight(string $raw): string
+    {
+        $raw = trim(str_replace(',', '.', $raw));
+        if ($raw === '' || !preg_match('/^\d(?:\.\d{1,2})?$/', $raw)) {
+            return '';
+        }
+        $value = (float) $raw;
+        if ($value < 1 || $value > 2.5) {
+            return '';
+        }
+
+        return rtrim(rtrim(number_format($value, 2, '.', ''), '0'), '.');
+    }
+
     private static function normalizePixelValue(string $raw, float $min, float $max): string
     {
         $raw = strtolower(trim(str_replace(',', '.', $raw)));
@@ -446,6 +514,14 @@ final class DesignSettings
         }
         if (array_key_exists('radius_custom', $input)) {
             Setting::set('design_radius_custom', self::normalizeRadius((string) $input['radius_custom']));
+        }
+        if (array_key_exists('line_height_custom', $input)) {
+            Setting::set('design_line_height_custom', self::normalizeLineHeight((string) $input['line_height_custom']));
+        }
+        foreach (array_keys(self::TYPO_SIZES) as $fsKey) {
+            if (array_key_exists($fsKey, $input)) {
+                Setting::set('design_' . $fsKey, self::normalizeFsSize((string) $input[$fsKey]));
+            }
         }
         if (array_key_exists('menu_divider_color', $input)) {
             Setting::set('design_menu_divider_color', SettingsValidator::hexColor((string) $input['menu_divider_color'], '#ffffff'));
@@ -602,7 +678,8 @@ final class DesignSettings
             'font_google_body' => '',
             'font_size_custom' => '',
             'radius_custom' => '',
-        ]));
+            'line_height_custom' => '',
+        ], array_fill_keys(array_keys(self::TYPO_SIZES), '')));
         Setting::set('design_preset', $preset);
 
         return true;
@@ -663,6 +740,11 @@ final class DesignSettings
                 'font_google_body' => Setting::get('design_font_google_body', ''),
                 'font_size_custom' => Setting::get('design_font_size_custom', ''),
                 'radius_custom' => Setting::get('design_radius_custom', ''),
+                'line_height_custom' => Setting::get('design_line_height_custom', ''),
+            ] + array_combine(
+                array_keys(self::TYPO_SIZES),
+                array_map(static fn (string $k): string => (string) Setting::get('design_' . $k, ''), array_keys(self::TYPO_SIZES))
+            ) + [
                 'bg_primary' => $semantic['bg_primary'],
                 'bg_surface' => $semantic['bg_surface'],
                 'text_main' => $semantic['text_main'],
@@ -712,12 +794,12 @@ final class DesignSettings
         }
         // Новые пресеты хранят весь единый блок оформления; colors остаётся
         // fallback для конфигураций, созданных до унификации.
-        $appearanceInput = array_intersect_key($appearance, array_flip([
+        $appearanceInput = array_intersect_key($appearance, array_flip(array_merge([
             'color_primary', 'color_accent', 'font_family', 'font_face_name',
             'font_url', 'default_theme', 'font_google_heading', 'font_google_body',
-            'font_size_custom', 'radius_custom',
+            'font_size_custom', 'radius_custom', 'line_height_custom',
             'bg_primary', 'bg_surface', 'text_main', 'text_muted', 'border_color',
-        ]));
+        ], array_keys(self::TYPO_SIZES))));
         // Старые пользовательские конфигурации не знали об этих полях: при
         // их применении сбрасываем текущие переопределения, а не наследуем их.
         $appearanceInput = array_merge([
@@ -725,7 +807,8 @@ final class DesignSettings
             'font_google_body' => '',
             'font_size_custom' => '',
             'radius_custom' => '',
-        ], $appearanceInput);
+            'line_height_custom' => '',
+        ], array_fill_keys(array_keys(self::TYPO_SIZES), ''), $appearanceInput);
         self::save(array_merge($values, $appearanceInput));
 
         Setting::set('design_preset', 'user:' . $slug);
@@ -762,6 +845,10 @@ final class DesignSettings
             $fontSize = $customFontSize;
         }
         $lineHeight = ['tight' => '1.45', 'normal' => '1.6', 'relaxed' => '1.8'][$v['line_height'] ?? 'normal'] ?? '1.6';
+        $customLineHeight = self::lineHeightCustom();
+        if ($customLineHeight !== '') {
+            $lineHeight = $customLineHeight;
+        }
         $shadow = [
             'flat' => 'none',
             'soft' => '0 1px 3px rgba(16,24,40,.06), 0 6px 18px rgba(16,24,40,.05)',
@@ -785,7 +872,9 @@ final class DesignSettings
             $divHeight = '18px';
         }
 
-        return sprintf(
+        // Точечные размеры по элементам (типографика) дописываются после :root —
+        // строка целиком выводится внутри <style> в шапке.
+        return self::typographyCss() . sprintf(
             ':root{--container-max:%s;--radius:%s;--radius-sm:calc(%s * .6);--card-gap:%s;--section-pad:%s;--btn-radius:%s;--base-font-size:%s;--base-line-height:%s;--card-shadow:%s;--menu-divider-color:%s;--menu-divider-width:%s;--menu-divider-height:%s;}',
             $container,
             $radius,
