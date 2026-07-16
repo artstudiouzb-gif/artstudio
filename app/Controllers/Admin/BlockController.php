@@ -677,7 +677,7 @@ final class BlockController
                 $source = 'manual';
                 if ($type === 'image_cards' && ($_POST['source'] ?? '') === 'projects') {
                     $source = 'projects';
-                } elseif ($type === 'media_gallery' && in_array($_POST['source'] ?? '', ['albums', 'videos'], true)) {
+                } elseif ($type === 'media_gallery' && in_array($_POST['source'] ?? '', ['albums', 'videos', 'media'], true)) {
                     $source = (string) $_POST['source'];
                 }
                 return [
