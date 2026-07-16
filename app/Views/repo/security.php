@@ -69,7 +69,7 @@ require __DIR__ . '/layout/top.php';
         <ol style="margin:10px 0 14px;padding-left:20px;line-height:1.7;">
             <li>
                 <?php if (!empty($telegramBotUsername)): ?>
-                    Откройте бота <a href="https://t.me/<?= htmlspecialchars((string) $telegramBotUsername, ENT_QUOTES) ?>?start=<?= htmlspecialchars((string) $telegramLinkCode, ENT_QUOTES) ?>" target="_blank" rel="noopener">@<?= htmlspecialchars((string) $telegramBotUsername, ENT_QUOTES) ?></a> и нажмите «Start».
+                    Откройте бота <a href="https://t.me/<?= htmlspecialchars((string) $telegramBotUsername, ENT_QUOTES) ?>?start=<?= htmlspecialchars((string) ($telegramLinkCode ?? ''), ENT_QUOTES) ?>" target="_blank" rel="noopener">@<?= htmlspecialchars((string) $telegramBotUsername, ENT_QUOTES) ?></a> и нажмите «Start».
                 <?php else: ?>
                     Откройте Telegram-бота сайта и отправьте ему сообщение.
                 <?php endif; ?>
