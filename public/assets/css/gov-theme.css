@@ -235,7 +235,7 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
     background: var(--hero-scrim, rgba(11, 26, 48, .55));
 }
 .block-hero--media .block-hero__inner { position: relative; width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 20px; }
-.block-hero--media .block-hero__text { max-width: 620px; }
+.block-hero--media .block-hero__text { max-width: var(--hero-text-width, 620px); }
 .block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
 .block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
 .block-hero--media .block-hero__title { color: var(--hero-text, #fff); font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.12; margin: 0 0 20px; }
@@ -302,7 +302,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
    Работает на любой странице, где блок счётчиков идёт сразу за hero. */
 .cms-block--hero:has(+ .cms-block--counters) { padding-bottom: 0; }
 /* Запас снизу внутри hero, чтобы карта наезжала на фон, а не на текст/кнопки. */
-.cms-block--hero:has(+ .cms-block--counters) .block-hero--media { padding-bottom: clamp(80px, 9vw, 130px); }
+/* +28px «воздуха»: карточка счётчиков наезжает ровно на clamp-высоту,
+   без добавки она прилипала вплотную к кнопкам hero. */
+.cms-block--hero:has(+ .cms-block--counters) .block-hero--media { padding-bottom: calc(clamp(80px, 9vw, 130px) + 28px); }
 .cms-block--hero + .cms-block--counters { padding-top: 0 !important; position: relative; z-index: 3; }
 .cms-block--hero + .cms-block--counters .block-counters { margin-top: clamp(-120px, -9vw, -80px); position: relative; z-index: 3; }
 .counter { flex-direction: row; align-items: center; gap: 16px; }
@@ -314,6 +316,9 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
     .cms-block--hero:has(+ .cms-block--counters) .block-hero--media { padding-bottom: 0; }
     .cms-block--hero + .cms-block--counters { padding-top: var(--space-premium) !important; }
     .cms-block--hero + .cms-block--counters .block-counters { margin-top: 0; }
+    /* Своя ширина текста (--hero-text-width) на телефонах игнорируется,
+       иначе 50vw и подобные значения сжимают текст в узкий столбик. */
+    .block-hero .block-hero__text { max-width: none; }
 }
 
 /* Заголовок секции: серифный + ссылка «Все …». */
@@ -940,6 +945,16 @@ body .site-header--nav-h-normal .site-menu__link { padding-block: 16px; }
 body .site-header--nav-h-tall .site-menu__link { padding-block: 24px; }
 
 /* --- Разделительные линии секций: full / container / none --- */
+/* Свои фоны секций шапки и тень (конструктор шапки, переменные с <header>).
+   !important + усиленный селектор перебивают правила тем (modern-gov-theme
+   красит шапку через background:...!important, включая тёмный режим). */
+:root[data-theme] .site-header.site-header--mid-bg,
+body .site-header--mid-bg { background: var(--header-mid-bg) !important; }
+:root[data-theme] .site-header.site-header--nav-bg .site-nav,
+body .site-header--nav-bg .site-nav { background: var(--header-nav-bg) !important; }
+:root[data-theme] .site-header.site-header--shadow,
+body .site-header--shadow { box-shadow: 0 6px var(--header-shadow-size, 14px) rgba(16, 24, 40, .10) !important; }
+
 body .site-header--borders-none, body .site-header--borders-none .site-nav { border-top: 0; border-bottom: 0; }
 body:has(.site-header--borders-none) .site-topbar--light { border-bottom: 0; }
 body .site-header--borders-container { border-bottom: 0; }

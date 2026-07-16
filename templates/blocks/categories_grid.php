@@ -19,7 +19,7 @@ $items = $data['items'] ?? [];
                     <?php if (!empty($item['icon_svg'])): ?>
                         <span class="cat-tile__icon" aria-hidden="true"><?= $item['icon_svg'] ?></span>
                     <?php endif; ?>
-                    <span class="cat-tile__label"><?= htmlspecialchars((string) $item['label'], ENT_QUOTES) ?></span>
+                    <span class="cat-tile__label"><?= htmlspecialchars((string) ($item['label'] ?? $item['title'] ?? ''), ENT_QUOTES) ?></span>
                 </<?= $tag ?>>
             <?php endforeach; ?>
         </div>

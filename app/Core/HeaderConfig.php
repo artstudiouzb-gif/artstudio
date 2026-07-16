@@ -96,13 +96,18 @@ final class HeaderConfig
             'height' => 'normal',             // из HEIGHTS
             'zones' => ['left' => [], 'center' => [], 'right' => []],
         ],
-        // Высота основной секции (логотип + утилиты).
-        'middlebar' => ['height' => 'normal'],
+        // Высота основной секции (логотип + утилиты) и свой цвет фона
+        // ('' — фон темы).
+        'middlebar' => ['height' => 'normal', 'bg' => ''],
         // Pro Max: нижняя полоса (bottom section) — элементы рядом с меню.
         'bottombar' => [
             'height' => 'normal',
+            'bg' => '',
             'zones' => ['left' => [], 'center' => [], 'right' => []],
         ],
+        // Тень под шапкой: вкл/выкл и размер (px, размытие). В прозрачном
+        // режиме шапки тень не рисуется (до прокрутки).
+        'shadow' => ['enabled' => false, 'size' => 14],
         // Разделительные линии между секциями.
         'borders' => 'full',
         // Значения для элементов «Телефон» и «E-mail».
@@ -275,13 +280,28 @@ final class HeaderConfig
                 ? self::normalizeZones($topbar['zones'])
                 : self::DEFAULTS['topbar']['zones'],
         ];
-        $result['middlebar'] = ['height' => $height(((array) ($config['middlebar'] ?? []))['height'] ?? '')];
+        // Свой цвет фона секции: #RRGGBB или '' (фон темы).
+        $hexOrEmpty = static fn (mixed $v): string => preg_match('/^#[0-9a-fA-F]{6}$/', (string) $v) ? strtolower((string) $v) : '';
+        $middlebar = (array) ($config['middlebar'] ?? []);
+        $result['middlebar'] = [
+            'height' => $height($middlebar['height'] ?? ''),
+            'bg' => $hexOrEmpty($middlebar['bg'] ?? ''),
+        ];
         $bottombar = (array) ($config['bottombar'] ?? []);
         $result['bottombar'] = [
             'height' => $height($bottombar['height'] ?? ''),
+            'bg' => $hexOrEmpty($bottombar['bg'] ?? ''),
             'zones' => isset($bottombar['zones']) && is_array($bottombar['zones'])
                 ? self::normalizeZones($bottombar['zones'])
                 : self::DEFAULTS['bottombar']['zones'],
+        ];
+        $shadow = (array) ($config['shadow'] ?? []);
+        $shadowSize = is_scalar($shadow['size'] ?? null) && preg_match('/^\d+$/', trim((string) $shadow['size']))
+            ? max(2, min(60, (int) $shadow['size']))
+            : self::DEFAULTS['shadow']['size'];
+        $result['shadow'] = [
+            'enabled' => !empty($shadow['enabled']),
+            'size' => $shadowSize,
         ];
         $result['borders'] = in_array($config['borders'] ?? '', self::BORDER_MODES, true)
             ? $config['borders'] : 'full';

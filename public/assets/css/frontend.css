@@ -460,7 +460,9 @@ body.is-preview { outline: 3px solid #b45309; outline-offset: -3px; }
 .faq-item__a { padding: 0 0 16px; color: var(--text-muted); }
 
 /* --- Каталог пользовательских типов контента (Документы/Вакансии/Тендеры) --- */
-.content-list { max-width: 900px; margin: 0 auto; padding: 24px 16px 56px; }
+/* Страницы фотоальбомов: ширина как у остальных списков сайта, а не
+   узкая статейная колонка — иначе сетка карточек выглядела обрезанной. */
+.content-list { max-width: var(--container-max, 1200px); margin: 0 auto; padding: 24px 20px 56px; }
 .content-list__head { margin-bottom: 24px; }
 .content-list__head h1 { margin: 0 0 8px; }
 .content-list__lead { color: var(--text-muted); font-size: 1.05rem; margin: 0; }
@@ -1544,11 +1546,14 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
 .block-hero__media { position: absolute; inset: 0 0 0 38%; background-size: cover; background-position: center; }
 .block-hero__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-primary) 6%, color-mix(in srgb, var(--bg-primary) 55%, transparent) 42%, transparent 66%); }
 .block-hero__inner { position: relative; width: 100%; }
-.block-hero__text { max-width: 560px; }
+.block-hero__text { max-width: var(--hero-text-width, 560px); }
 .block-hero__title { font-size: clamp(2rem, 5vw, 3.4rem); color: var(--color-primary, #223d79); margin: 0 0 16px; line-height: 1.1; text-wrap: balance; }
 .block-hero__subtitle { font-size: clamp(1.02rem, 1.6vw, 1.22rem); color: var(--text-muted); max-width: 480px; margin: 0; line-height: 1.6; }
 .block-hero__button {
-    display: inline-block; margin-top: 26px; padding: 13px 28px; border-radius: var(--btn-radius, 10px);
+    /* Без margin-top: кнопки всегда внутри .block-hero__actions (flex,
+       align-items:center) — собственный отступ ломал вертикальную центровку
+       кнопки «Смотреть видео» рядом. Отступ сверху задаёт сам контейнер. */
+    display: inline-block; padding: 13px 28px; border-radius: var(--btn-radius, 10px);
     background: var(--color-primary, #223d79); color: #fff; text-decoration: none; font-weight: 600;
     transition: transform .15s ease, box-shadow .15s ease;
 }

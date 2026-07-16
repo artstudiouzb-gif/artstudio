@@ -517,7 +517,20 @@ if ($siteTemplate === 'modern_gov'): ?>
     <a href="#" class="a11y-panel__off"><?= $et('Обычная версия') ?></a>
 </div>
 <?= $topbarHtml ?>
-<header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?><?= !empty($hcfg['sticky']) ? ' site-header--sticky' : '' ?><?= $transparentOn ? ' site-header--transparent' : '' ?> site-header--h-<?= htmlspecialchars(in_array($hcfg['middlebar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['middlebar']['height'] : 'normal', ENT_QUOTES) ?> site-header--nav-h-<?= htmlspecialchars(in_array($hcfg['bottombar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['bottombar']['height'] : 'normal', ENT_QUOTES) ?> site-header--borders-<?= htmlspecialchars(in_array($hcfg['borders'] ?? 'full', HeaderConfig::BORDER_MODES, true) ? $hcfg['borders'] : 'full', ENT_QUOTES) ?>" style="--header-logo-width:<?= (int) ($hcfg['logo_width'] ?? 240) ?>px;--header-logo-height:<?= (int) ($hcfg['logo_height'] ?? 48) ?>px"<?= (!empty($hcfg['sticky']) || $transparentOn) ? ' data-header-scroll' : '' ?>>
+<?php
+// Свои фоны секций и тень шапки (конструктор шапки). Цвета прошли hex-валидацию
+// в HeaderConfig; тень не включается в прозрачном режиме (пока шапка наложена).
+$midBg = (string) ($hcfg['middlebar']['bg'] ?? '');
+$navBg = (string) ($hcfg['bottombar']['bg'] ?? '');
+$shadowOn = !empty($hcfg['shadow']['enabled']) && !$transparentOn;
+$headerExtraClass = ($midBg !== '' ? ' site-header--mid-bg' : '')
+    . ($navBg !== '' ? ' site-header--nav-bg' : '')
+    . ($shadowOn ? ' site-header--shadow' : '');
+$headerExtraVars = ($midBg !== '' ? '--header-mid-bg:' . $midBg . ';' : '')
+    . ($navBg !== '' ? '--header-nav-bg:' . $navBg . ';' : '')
+    . ($shadowOn ? '--header-shadow-size:' . (int) ($hcfg['shadow']['size'] ?? 14) . 'px;' : '');
+?>
+<header class="site-header site-header--layout-<?= htmlspecialchars($layout, ENT_QUOTES) ?> site-header--logo-<?= htmlspecialchars($logoPos, ENT_QUOTES) ?><?= $navBarHtml !== '' ? ' site-header--has-nav' : '' ?><?= $drawerMenu !== '' ? ' site-header--has-drawer' : '' ?><?= !empty($hcfg['sticky']) ? ' site-header--sticky' : '' ?><?= $transparentOn ? ' site-header--transparent' : '' ?> site-header--h-<?= htmlspecialchars(in_array($hcfg['middlebar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['middlebar']['height'] : 'normal', ENT_QUOTES) ?> site-header--nav-h-<?= htmlspecialchars(in_array($hcfg['bottombar']['height'] ?? 'normal', HeaderConfig::HEIGHTS, true) ? $hcfg['bottombar']['height'] : 'normal', ENT_QUOTES) ?> site-header--borders-<?= htmlspecialchars(in_array($hcfg['borders'] ?? 'full', HeaderConfig::BORDER_MODES, true) ? $hcfg['borders'] : 'full', ENT_QUOTES) ?><?= $headerExtraClass ?>" style="--header-logo-width:<?= (int) ($hcfg['logo_width'] ?? 240) ?>px;--header-logo-height:<?= (int) ($hcfg['logo_height'] ?? 48) ?>px;<?= $headerExtraVars ?>"<?= (!empty($hcfg['sticky']) || $transparentOn) ? ' data-header-scroll' : '' ?>>
     <div class="site-header__inner">
         <div class="site-header__zone site-header__zone--left"><?= $zones['left'] ?></div>
         <div class="site-header__zone site-header__zone--center"><?= $zones['center'] ?></div>

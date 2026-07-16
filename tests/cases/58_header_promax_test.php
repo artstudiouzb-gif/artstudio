@@ -42,6 +42,23 @@ test('Topbar: утилитарные иконки наследуют цвет и
     assert_contains('height: 18px !important;', $css);
 });
 
+test('HeaderConfig: свои фоны секций и тень нормализуются', function () {
+    $cfg = HeaderConfig::normalize([
+        'middlebar' => ['height' => 'slim', 'bg' => '#AABBCC'],
+        'bottombar' => ['bg' => 'red;evil'],
+        'shadow' => ['enabled' => '1', 'size' => '999'],
+    ]);
+    assert_same('#aabbcc', $cfg['middlebar']['bg'], 'hex нормализуется в нижний регистр');
+    assert_same('', $cfg['bottombar']['bg'], 'не-hex отброшен');
+    assert_true($cfg['shadow']['enabled']);
+    assert_same(60, $cfg['shadow']['size'], 'размер тени ограничен лимитом');
+
+    $off = HeaderConfig::normalize([]);
+    assert_same('', $off['middlebar']['bg']);
+    assert_true($off['shadow']['enabled'] === false);
+    assert_same(14, $off['shadow']['size']);
+});
+
 test('HeaderConfig: sticky и transparent нормализуются в булевы', function () {
     $cfg = HeaderConfig::normalize(['sticky' => '1', 'transparent' => 'yes']);
     assert_true($cfg['sticky'] === true && $cfg['transparent'] === true);

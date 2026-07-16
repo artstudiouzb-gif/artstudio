@@ -156,6 +156,19 @@ $heightSelect = function (string $name, string $current): string {
                         </span>
                         <span class="hb-behavior-card__hint">Располагается поверх первого полноэкранного блока и становится сплошной при прокрутке.</span>
                     </label>
+                    <label class="hb-behavior-card">
+                        <span class="hb-switch">
+                            <input type="checkbox" name="header_shadow" value="1" <?= !empty($config['shadow']['enabled']) ? 'checked' : '' ?>>
+                            <span class="hb-switch__track"></span>
+                            <span class="hb-behavior-card__title">Тень под шапкой</span>
+                        </span>
+                        <span class="hb-behavior-card__hint">Лёгкая тень отделяет шапку от содержимого. В прозрачном режиме не рисуется (до прокрутки).</span>
+                        <span style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                            <label for="header_shadow_size" style="font-size:13px;">Размер, px</label>
+                            <input type="number" id="header_shadow_size" name="header_shadow_size" min="2" max="60" step="1"
+                                   value="<?= (int) ($config['shadow']['size'] ?? 14) ?>" style="width:90px;">
+                        </span>
+                    </label>
                 </div>
                 <p class="hb-behavior__note">Прозрачный режим лучше всего работает с первым блоком на основе фото или видео. Текст, элементы управления и эмблема без отдельного изображения автоматически становятся светлыми.</p>
                 <div class="hb-behavior__media">
@@ -235,6 +248,11 @@ $heightSelect = function (string $name, string $current): string {
                     <span class="hb-section__title">Основная секция (логотип + утилиты)</span>
                     <span class="hb-section__controls">
                         <?= $heightSelect('middlebar_height', $config['middlebar']['height'] ?? 'normal') ?>
+                        <label class="hb-switch" title="Иначе фон берётся из темы">
+                            <input type="checkbox" name="middlebar_bg_use" value="1" <?= ($config['middlebar']['bg'] ?? '') !== '' ? 'checked' : '' ?>>
+                            <span class="hb-switch__track"></span> Свой фон
+                        </label>
+                        <input type="color" name="middlebar_bg" value="<?= htmlspecialchars(($config['middlebar']['bg'] ?? '') !== '' ? $config['middlebar']['bg'] : '#ffffff', ENT_QUOTES) ?>" aria-label="Цвет фона основной секции" style="width:44px;height:30px;padding:2px;">
                         <span class="hb-tabs" data-hdr-tabs>
                             <button type="button" class="hb-tabs__tab hdr-tabs__tab is-active" data-hdr-tab="desktop">Десктоп</button>
                             <button type="button" class="hb-tabs__tab hdr-tabs__tab" data-hdr-tab="mobile">Мобильный</button>
@@ -257,6 +275,11 @@ $heightSelect = function (string $name, string $current): string {
                     <span class="hb-section__title">Нижняя полоса (меню + элементы)</span>
                     <span class="hb-section__controls">
                         <?= $heightSelect('bottombar_height', $config['bottombar']['height'] ?? 'normal') ?>
+                        <label class="hb-switch" title="Иначе фон берётся из темы">
+                            <input type="checkbox" name="bottombar_bg_use" value="1" <?= ($config['bottombar']['bg'] ?? '') !== '' ? 'checked' : '' ?>>
+                            <span class="hb-switch__track"></span> Свой фон
+                        </label>
+                        <input type="color" name="bottombar_bg" value="<?= htmlspecialchars(($config['bottombar']['bg'] ?? '') !== '' ? $config['bottombar']['bg'] : '#ffffff', ENT_QUOTES) ?>" aria-label="Цвет фона нижней полосы" style="width:44px;height:30px;padding:2px;">
                         <span class="hb-note">Меню занимает полосу автоматически; элементы встают рядом.</span>
                     </span>
                 </header>

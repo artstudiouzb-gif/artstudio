@@ -109,10 +109,20 @@ final class HeaderController
                 'height' => $_POST['topbar_height'] ?? 'normal',
                 'zones' => $parseZones('topbar_zones'),
             ],
-            'middlebar' => ['height' => $_POST['middlebar_height'] ?? 'normal'],
+            // Свой фон секции применяется только при включённом чекбоксе
+            // «Свой фон» (input type=color всегда присылает значение).
+            'middlebar' => [
+                'height' => $_POST['middlebar_height'] ?? 'normal',
+                'bg' => !empty($_POST['middlebar_bg_use']) ? (string) ($_POST['middlebar_bg'] ?? '') : '',
+            ],
             'bottombar' => [
                 'height' => $_POST['bottombar_height'] ?? 'normal',
+                'bg' => !empty($_POST['bottombar_bg_use']) ? (string) ($_POST['bottombar_bg'] ?? '') : '',
                 'zones' => $parseZones('bottombar_zones'),
+            ],
+            'shadow' => [
+                'enabled' => !empty($_POST['header_shadow']),
+                'size' => $_POST['header_shadow_size'] ?? HeaderConfig::DEFAULTS['shadow']['size'],
             ],
             'borders' => $_POST['borders'] ?? 'full',
             'contacts' => [
