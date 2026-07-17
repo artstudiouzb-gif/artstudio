@@ -281,6 +281,9 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 /* Hero как шапка страницы: убираем верхний отступ контента, чтобы hero стоял
    вплотную под шапкой сайта (без зазора). */
 .site-content:has(> .cms-block--page-hero) { padding-top: 0; }
+/* Премиум-hero новости — полноширинный тёмный экран; прижимаем к шапке,
+   убирая верхний отступ контента (иначе светлая полоса-зазор). */
+.site-content:has(> .newsdetail--premium) { padding-top: 0; }
 
 /* Хлебные крошки как часть hero (шапка-герой): поверх фона, вверху секции,
    вместо отдельной серой полосы над hero. */
