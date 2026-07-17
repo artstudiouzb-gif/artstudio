@@ -5,7 +5,7 @@ use App\Models\Language;
 
 $pageTitle = 'Команда';
 $activeNav = 'team';
-$pageActions = '<a href="/admin/team/create" class="btn btn--primary">+ Добавить сотрудника</a>';
+$pageActions = '<a href="/admin/team/create" class="btn btn--primary">' . \App\Core\AdminUi::icon('plus') . 'Добавить сотрудника</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -42,10 +42,10 @@ $langs = Language::active();
                     </span>
                 </td>
                 <td class="data-table__actions">
-                    <a class="btn btn--small" href="/admin/team/<?= (int) $item['id'] ?>/edit">Редактировать</a>
+                    <a class="btn btn--small" href="/admin/team/<?= (int) $item['id'] ?>/edit"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
                     <form method="post" action="/admin/team/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить сотрудника «<?= htmlspecialchars($item['name'], ENT_QUOTES) ?>»?">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

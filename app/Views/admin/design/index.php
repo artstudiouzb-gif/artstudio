@@ -69,7 +69,7 @@ foreach ($options as $key => $opt) {
                         <form method="post" action="/admin/design/preset/delete" style="margin:0;" data-confirm="Удалить конфигурацию «<?= htmlspecialchars((string) $upreset['label'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
                             <input type="hidden" name="slug" value="<?= htmlspecialchars($uslug, ENT_QUOTES) ?>">
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </div>
                 </div>

@@ -51,10 +51,10 @@ $langMap = \App\Models\Video::availableLangsForIds(array_map(static fn ($i): int
                     </td>
                     <td style="white-space:nowrap;"><?= htmlspecialchars((string) $item['created_at'], ENT_QUOTES) ?></td>
                     <td class="data-table__actions" style="white-space:nowrap;">
-                        <a href="/admin/videos/<?= (int) $item['id'] ?>/edit" class="btn btn--small">Редактировать</a>
+                        <a href="/admin/videos/<?= (int) $item['id'] ?>/edit" class="btn btn--small"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
                         <form method="post" action="/admin/videos/<?= (int) $item['id'] ?>/delete" style="display:inline;" data-confirm="Удалить видео «<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>

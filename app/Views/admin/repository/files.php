@@ -153,7 +153,7 @@ $categorySelect = static function (string $name, ?int $selected) use ($categorie
                         </details>
                         <form method="post" action="/admin/repository/<?= (int) $f['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars((string) $f['title'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>

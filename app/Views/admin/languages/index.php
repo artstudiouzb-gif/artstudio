@@ -34,7 +34,7 @@ require __DIR__ . '/../layout/header.php';
                     <?php if (!$item['is_default']): ?>
                     <form method="post" action="/admin/languages/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить язык «<?= htmlspecialchars($item['name'], ENT_QUOTES) ?>»? Переводы на этом языке будут удалены.">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                     <?php endif; ?>
                 </td>

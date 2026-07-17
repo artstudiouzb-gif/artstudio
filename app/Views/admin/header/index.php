@@ -340,7 +340,7 @@ $heightSelect = function (string $name, string $current): string {
                             <label>Ссылка</label>
                             <input type="text" name="social[<?= $i ?>][url]" value="<?= htmlspecialchars($btn['url'] ?? '', ENT_QUOTES) ?>">
                         </div>
-                        <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                        <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -357,7 +357,7 @@ $heightSelect = function (string $name, string $current): string {
                     <label>Ссылка</label>
                     <input type="text" name="social[__INDEX__][url]">
                 </div>
-                <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove>Удалить</button>
+                <button type="button" class="btn btn--small btn--danger repeater-row__remove" data-repeater-remove><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
             </template>
             <div class="repeater-actions">
                 <button type="button" class="btn btn--small" data-repeater-add="social">+ Добавить соцсеть</button>

@@ -5,7 +5,7 @@ use App\Models\Widget;
 
 $pageTitle = 'Виджеты сайдбара';
 $activeNav = 'widgets';
-$pageActions = '<a href="/admin/widgets/create" class="btn btn--primary">+ Добавить виджет</a>';
+$pageActions = '<a href="/admin/widgets/create" class="btn btn--primary">' . \App\Core\AdminUi::icon('plus') . 'Добавить виджет</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $left */

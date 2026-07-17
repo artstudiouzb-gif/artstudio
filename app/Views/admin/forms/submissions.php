@@ -37,7 +37,7 @@ require __DIR__ . '/../layout/header.php';
                 <td class="data-table__actions">
                     <form method="post" action="/admin/forms/submissions/<?= (int) $submission['id'] ?>/delete" data-confirm="Удалить заявку?">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

@@ -31,7 +31,7 @@ $row = static function (array $cat, bool $isChild): void {
             </details>
             <form method="post" action="/admin/repository/categories/<?= (int) $cat['id'] ?>/delete" data-confirm="Удалить категорию «<?= htmlspecialchars((string) $cat['name'], ENT_QUOTES) ?>»?<?= !$isChild ? ' Её подкатегории тоже удалятся.' : '' ?> Файлы останутся без категории.">
                 <?= Csrf::field() ?>
-                <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
             </form>
         </td>
     </tr>

@@ -4,7 +4,7 @@ use App\Core\Csrf;
 
 $pageTitle = 'Меню';
 $activeNav = 'menu';
-$pageActions = '<a href="#menu-add" class="btn btn--primary">+ Добавить пункт</a>';
+$pageActions = '<a href="#menu-add" class="btn btn--primary">' . \App\Core\AdminUi::icon('plus') . 'Добавить пункт</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $tree */
@@ -149,7 +149,7 @@ $renderNode = static function (array $item) use ($urlTypeLabels, $renderFields):
             <button type="button" class="btn btn--small" data-menu-edit-toggle aria-controls="<?= $editorId ?>" aria-expanded="false">Изменить</button>
             <form method="post" action="/admin/menu/<?= $id ?>/delete" data-confirm="Удалить пункт «<?= htmlspecialchars($title, ENT_QUOTES) ?>»<?= !empty($item['children']) ? ' вместе с вложенными пунктами' : '' ?>?">
                 <?= Csrf::field() ?>
-                <button type="submit" class="btn btn--small btn--danger" aria-label="Удалить <?= htmlspecialchars($title, ENT_QUOTES) ?>">Удалить</button>
+                <button type="submit" class="btn btn--small btn--danger" aria-label="Удалить <?= htmlspecialchars($title, ENT_QUOTES) ?>"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
             </form>
         </div>
     </div>

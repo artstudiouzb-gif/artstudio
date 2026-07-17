@@ -209,9 +209,9 @@ require __DIR__ . '/../layout/header.php';
         </select>
     </div>
     <div class="list-filters__actions">
-        <button type="submit" class="btn btn--primary">Применить</button>
+        <button type="submit" class="btn btn--primary"><?= \App\Core\AdminUi::icon('filter') ?>Применить</button>
         <?php if (!empty($_GET['q']) || !empty($_GET['type']) || !empty($_GET['sort'])): ?>
-            <a href="/admin/files" class="btn" style="text-decoration:none;">Сбросить</a>
+            <a href="/admin/files" class="btn" style="text-decoration:none;"><?= \App\Core\AdminUi::icon('reset') ?>Сбросить</a>
         <?php endif; ?>
     </div>
 
@@ -288,7 +288,7 @@ require __DIR__ . '/../layout/header.php';
                         <?php endif; ?>
                         <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?>»?" style="margin:0;">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>
@@ -338,7 +338,7 @@ require __DIR__ . '/../layout/header.php';
                         <?php endif; ?>
                         <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?>»?" style="margin:0;">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </div>
                 </div>

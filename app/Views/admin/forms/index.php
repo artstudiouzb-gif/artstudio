@@ -4,7 +4,7 @@ use App\Core\Csrf;
 
 $pageTitle = 'Формы';
 $activeNav = 'forms';
-$pageActions = '<a href="/admin/forms/create" class="btn btn--primary">+ Добавить форму</a>';
+$pageActions = '<a href="/admin/forms/create" class="btn btn--primary">' . \App\Core\AdminUi::icon('plus') . 'Добавить форму</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -33,10 +33,10 @@ require __DIR__ . '/../layout/header.php';
                     </a>
                 </td>
                 <td class="data-table__actions">
-                    <a class="btn btn--small" href="/admin/forms/<?= (int) $item['id'] ?>/edit">Редактировать</a>
+                    <a class="btn btn--small" href="/admin/forms/<?= (int) $item['id'] ?>/edit"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
                     <form method="post" action="/admin/forms/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить форму «<?= htmlspecialchars($item['name'], ENT_QUOTES) ?>» вместе со всеми заявками?">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

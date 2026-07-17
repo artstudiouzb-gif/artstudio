@@ -54,7 +54,7 @@ require __DIR__ . '/../layout/header.php';
                         </details>
                         <form method="post" action="/admin/repository/users/<?= (int) $u['id'] ?>/delete" data-confirm="Удалить пользователя «<?= htmlspecialchars((string) $u['username'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>

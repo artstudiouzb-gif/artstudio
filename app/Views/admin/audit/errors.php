@@ -51,8 +51,8 @@ $shortFile = static function (string $file): string {
             <input type="text" id="f_q" name="q" value="<?= htmlspecialchars($filters['q'], ENT_QUOTES) ?>" placeholder="например: SQLSTATE или /news">
         </div>
         <div class="form-actions" style="margin:0;">
-            <button type="submit" class="btn btn--primary">Фильтровать</button>
-            <a href="/admin/audit/errors" class="btn">Сбросить</a>
+            <button type="submit" class="btn btn--primary"><?= \App\Core\AdminUi::icon('filter') ?>Фильтровать</button>
+            <a href="/admin/audit/errors" class="btn"><?= \App\Core\AdminUi::icon('reset') ?>Сбросить</a>
         </div>
     </form>
     <?php if ($total > 0): ?>

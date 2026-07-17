@@ -52,10 +52,10 @@ $langMap = \App\Models\PhotoAlbum::availableLangsForIds(array_map(static fn ($i)
                     </td>
                     <td style="white-space:nowrap;"><?= htmlspecialchars((string) $item['created_at'], ENT_QUOTES) ?></td>
                     <td class="data-table__actions" style="white-space:nowrap;">
-                        <a href="/admin/albums/<?= (int) $item['id'] ?>/edit" class="btn btn--small">Редактировать</a>
+                        <a href="/admin/albums/<?= (int) $item['id'] ?>/edit" class="btn btn--small"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
                         <form method="post" action="/admin/albums/<?= (int) $item['id'] ?>/delete" style="display:inline;" data-confirm="Удалить альбом «<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>» вместе с составом?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>

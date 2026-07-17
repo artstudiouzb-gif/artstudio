@@ -5,7 +5,7 @@ use App\Models\Language;
 
 $pageTitle = 'Проекты';
 $activeNav = 'projects';
-$pageActions = '<a href="/admin/projects/create" class="btn btn--primary">+ Добавить проект</a>';
+$pageActions = '<a href="/admin/projects/create" class="btn btn--primary">' . \App\Core\AdminUi::icon('plus') . 'Добавить проект</a>';
 require __DIR__ . '/../layout/header.php';
 
 /** @var array $items */
@@ -21,7 +21,7 @@ $langs = Language::active();
     <div class="list-filter"><label for="projects_status">Статус</label><select id="projects_status" name="status"><option value="">Все статусы</option><option value="published" <?= $filters['status'] === 'published' ? 'selected' : '' ?>>Опубликованные</option><option value="draft" <?= $filters['status'] === 'draft' ? 'selected' : '' ?>>Черновики</option></select></div>
     <div class="list-filter"><label for="projects_sort">Сортировка</label><select id="projects_sort" name="sort"><option value="manual" <?= $filters['sort'] === 'manual' ? 'selected' : '' ?>>Заданный порядок</option><option value="newest" <?= $filters['sort'] === 'newest' ? 'selected' : '' ?>>Сначала новые</option><option value="oldest" <?= $filters['sort'] === 'oldest' ? 'selected' : '' ?>>Сначала старые</option><option value="title_asc" <?= $filters['sort'] === 'title_asc' ? 'selected' : '' ?>>Название А–Я</option><option value="title_desc" <?= $filters['sort'] === 'title_desc' ? 'selected' : '' ?>>Название Я–А</option></select></div>
     <div class="list-filter list-filter--compact"><label for="projects_per_page">На странице</label><select id="projects_per_page" name="per_page"><?php foreach ([20, 50, 100] as $size): ?><option value="<?= $size ?>" <?= $filters['per_page'] === $size ? 'selected' : '' ?>><?= $size ?></option><?php endforeach; ?></select></div>
-    <div class="list-filters__actions"><button type="submit" class="btn btn--primary">Применить</button><a href="/admin/projects" class="btn">Сбросить</a></div>
+    <div class="list-filters__actions"><button type="submit" class="btn btn--primary"><?= \App\Core\AdminUi::icon('filter') ?>Применить</button><a href="/admin/projects" class="btn"><?= \App\Core\AdminUi::icon('reset') ?>Сбросить</a></div>
 </form>
 
 <p class="list-results">Найдено: <strong><?= (int) $total ?></strong></p>
@@ -75,15 +75,15 @@ $langs = Language::active();
                 </td>
                 <td><?= (int) $item['sort_order'] ?></td>
                 <td class="data-table__actions">
-                    <a class="btn btn--small" href="/admin/projects/<?= (int) $item['id'] ?>/edit">Редактировать</a>
+                    <a class="btn btn--small" href="/admin/projects/<?= (int) $item['id'] ?>/edit"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
                     <form method="post" action="/admin/projects/<?= (int) $item['id'] ?>/duplicate">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small">Дублировать</button>
+                        <button type="submit" class="btn btn--small"><?= \App\Core\AdminUi::icon('copy') ?>Дублировать</button>
                     </form>
                     <form method="post" action="/admin/projects/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить проект «<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>»?">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

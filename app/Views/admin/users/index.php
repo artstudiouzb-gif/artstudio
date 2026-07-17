@@ -30,7 +30,7 @@ $roleLabels = ['admin' => 'Супер-администратор', 'super_admin'
                     <?php if ((int) $item['id'] !== Auth::id()): ?>
                         <form method="post" action="/admin/users/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить пользователя «<?= htmlspecialchars($item['username'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     <?php else: ?>
                         <span class="form-hint">это вы</span>

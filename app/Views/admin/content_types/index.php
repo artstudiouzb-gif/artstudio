@@ -58,7 +58,7 @@ require __DIR__ . '/../layout/header.php';
                     <a class="btn btn--small" href="/admin/content-types/<?= (int) $t['id'] ?>/fields">Поля</a>
                     <form method="post" action="/admin/content-types/<?= (int) $t['id'] ?>/delete" data-confirm="Удалить тип «<?= htmlspecialchars((string) $t['name'], ENT_QUOTES) ?>» и ВСЕ его записи?">
                         <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                     </form>
                 </td>
             </tr>

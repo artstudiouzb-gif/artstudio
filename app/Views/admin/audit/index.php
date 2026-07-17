@@ -90,8 +90,8 @@ $qs = static function (int $p) use ($filters): string {
         <input type="date" id="f_to" name="to" value="<?= htmlspecialchars($filters['to'], ENT_QUOTES) ?>">
     </div>
     <div class="form-actions" style="margin:0;">
-        <button type="submit" class="btn btn--primary">Фильтровать</button>
-        <a href="/admin/audit" class="btn">Сбросить</a>
+        <button type="submit" class="btn btn--primary"><?= \App\Core\AdminUi::icon('filter') ?>Фильтровать</button>
+        <a href="/admin/audit" class="btn"><?= \App\Core\AdminUi::icon('reset') ?>Сбросить</a>
     </div>
 </form>
 

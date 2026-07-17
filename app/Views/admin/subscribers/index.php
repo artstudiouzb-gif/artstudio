@@ -28,7 +28,7 @@ require __DIR__ . '/../layout/header.php';
                     <td class="data-table__actions">
                         <form method="post" action="/admin/subscribers/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить подписчика «<?= htmlspecialchars((string) $item['email'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>

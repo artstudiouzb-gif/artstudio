@@ -83,7 +83,7 @@ require __DIR__ . '/../layout/header.php';
                         </form>
                         <form method="post" action="/admin/redirects/<?= (int) $item['id'] ?>/delete" style="display:inline;" data-confirm="Удалить редирект «<?= htmlspecialchars((string) $item['from_path'], ENT_QUOTES) ?>»?">
                             <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger">Удалить</button>
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                         </form>
                     </td>
                 </tr>
