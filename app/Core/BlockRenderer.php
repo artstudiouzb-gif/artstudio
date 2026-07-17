@@ -265,7 +265,7 @@ final class BlockRenderer
         // Блоки-обёртки над существующими сущностями (группа 4): выводят
         // опубликованные записи команды/проектов, ограниченные limit (0 = все).
         if ($type === 'team_list') {
-            $items = \App\Models\TeamMember::published();
+            $items = \App\Models\TeamMember::published(Locale::current());
             $limit = (int) ($data['limit'] ?? 0);
             $data['members'] = $limit > 0 ? array_slice($items, 0, $limit) : $items;
         }
