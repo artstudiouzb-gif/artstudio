@@ -269,8 +269,9 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .admin-sidebar-backdrop { display: none; }
 
 /* Единая ширина контента во всех разделах: не на всю ширину экрана и не узкие
-   760px — максимум 1400px (на широких мониторах контент не растягивается). */
-.admin-main { flex: 1; min-width: 0; max-width: 1400px; padding: 24px 28px 40px; }
+   760px — максимум 1400px. На широких мониторах контент центрируется в области
+   справа от сайдбара (margin:auto), на узких — заполняет всё доступное. */
+.admin-main { flex: 1; min-width: 0; max-width: 1400px; margin-inline: auto; padding: 24px 28px 40px; }
 .admin-main__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; flex-wrap: wrap; }
 .admin-main__header h1 { margin: 0; font-size: 23px; font-weight: 500; }
 .admin-main__actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
