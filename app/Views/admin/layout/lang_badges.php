@@ -1,10 +1,9 @@
 <?php
-/**
- * Индикаторы языков контента для строки списка.
- *
- * @var array<int, string> $siteLangs Активные языки сайта (коды).
- * @var array<int, string> $has       Языки, на которых контент есть.
- */
+
+/** @var array<int, string> $siteLangs Активные языки сайта (коды). */
+/** @var array<int, string> $has Языки, на которых контент есть. */
+
+// Индикаторы языков контента для строки списка.
 foreach ($siteLangs as $code):
     $on = in_array($code, $has, true);
     ?>
