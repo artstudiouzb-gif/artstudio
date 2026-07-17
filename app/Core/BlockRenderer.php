@@ -376,7 +376,7 @@ final class BlockRenderer
             $limit = (int) ($data['limit'] ?? 8);
             $items = [];
             if ($mediaSource === 'videos' || $mediaSource === 'media') {
-                foreach (\App\Models\Video::forHome($limit) as $v) {
+                foreach (\App\Models\Video::forHome($limit, $lang) as $v) {
                     $items[] = [
                         'kind' => 'video',
                         'image' => (string) ($v['cover_url'] ?? ''),
@@ -387,7 +387,7 @@ final class BlockRenderer
                 }
             }
             if ($mediaSource === 'albums' || $mediaSource === 'media') {
-                foreach (\App\Models\PhotoAlbum::forHome($limit) as $a) {
+                foreach (\App\Models\PhotoAlbum::forHome($limit, $lang) as $a) {
                     $items[] = [
                         'kind' => 'photo',
                         'image' => \App\Models\PhotoAlbum::coverFor($a),
