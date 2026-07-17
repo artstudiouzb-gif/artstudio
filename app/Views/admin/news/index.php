@@ -57,19 +57,24 @@ $langs = Language::active();
             <th>Языки</th>
             <th>Статус</th>
             <th>Дата публикации</th>
+            <th>Соцсети</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         <?php if (empty($items)): ?>
-            <tr><td colspan="6" class="data-table__empty">Новостей не найдено.</td></tr>
+            <tr><td colspan="7" class="data-table__empty">Новостей не найдено.</td></tr>
         <?php endif; ?>
         <?php
         // Языки контента для всех строк одним запросом (без N+1) и список
         // активных языков сайта — чтобы показать и недостающие переводы.
-        $langMap = \App\Models\News::availableLangsForIds(array_map(static fn ($i): int => (int) $i['id'], $items));
+        $itemIds = array_map(static fn ($i): int => (int) $i['id'], $items);
+        $langMap = \App\Models\News::availableLangsForIds($itemIds);
         $siteLangs = array_map(static fn (array $l): string => (string) $l['code'], $langs);
         $socialReady = \App\Core\SocialSettings::readyNetworks() !== [];
+        // Статус публикации в соцсети по всем строкам одним запросом (без N+1).
+        $socialStatus = \App\Models\SocialPost::statusForNewsIds($itemIds);
+        $socialNetNames = ['telegram' => 'Telegram', 'facebook' => 'Facebook', 'linkedin' => 'LinkedIn', 'instagram' => 'Instagram'];
         ?>
         <?php foreach ($items as $item): ?>
             <tr>
@@ -82,18 +87,48 @@ $langs = Language::active();
                     </span>
                 </td>
                 <td><?= $item['published_at'] ? htmlspecialchars($item['published_at'], ENT_QUOTES) : '—' ?></td>
+                <?php
+                // Колонка «Соцсети»: статус прошлой публикации + кнопка отправки.
+                $ss = $socialStatus[(int) $item['id']] ?? null;
+                $sentNets = $ss ? array_values(array_unique(array_map(static fn (string $n): string => $socialNetNames[$n] ?? $n, $ss['networks']))) : [];
+                $alreadySent = $ss !== null && $ss['sent'] > 0;
+                $lastSent = $alreadySent && $ss['last_sent'] ? substr((string) $ss['last_sent'], 0, 16) : '';
+                ?>
+                <td class="news-social">
+                    <?php if ($item['status'] !== 'published'): ?>
+                        <span class="news-social__meta">—</span>
+                    <?php else: ?>
+                        <div class="news-social__state">
+                            <?php if ($alreadySent): ?>
+                                <span class="badge badge--success" title="<?= htmlspecialchars(implode(', ', $sentNets), ENT_QUOTES) ?>">✓ Опубликовано</span>
+                                <span class="news-social__meta"><?= htmlspecialchars(implode(', ', $sentNets), ENT_QUOTES) ?><?= $lastSent !== '' ? ' · ' . htmlspecialchars($lastSent, ENT_QUOTES) : '' ?></span>
+                            <?php elseif ($ss !== null && $ss['pending'] > 0): ?>
+                                <span class="badge badge--draft">В очереди</span>
+                            <?php elseif ($ss !== null && $ss['failed'] > 0): ?>
+                                <span class="badge badge--danger">Ошибка</span>
+                            <?php else: ?>
+                                <span class="news-social__meta">не публиковалось</span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($socialReady): ?>
+                            <?php $socialConfirm = $alreadySent
+                                ? 'Новость «' . $item['title'] . '» уже публиковалась в соцсети' . ($lastSent !== '' ? ' (' . $lastSent . ')' : '') . '. Отправить повторно?'
+                                : 'Опубликовать «' . $item['title'] . '» в соцсети?'; ?>
+                            <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/social"
+                                  data-confirm="<?= htmlspecialchars($socialConfirm, ENT_QUOTES) ?>">
+                                <?= Csrf::field() ?>
+                                <input type="hidden" name="from" value="list">
+                                <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
+                                <button type="submit" class="btn btn--small btn--social">
+                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                    <?= $alreadySent ? 'Опубликовать снова' : 'В соцсети' ?>
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </td>
                 <td class="data-table__actions">
                     <a class="btn btn--small" href="/admin/news/<?= (int) $item['id'] ?>/edit">Редактировать</a>
-                    <?php // В соцсети — только для опубликованных и когда сети настроены. ?>
-                    <?php if ($socialReady && $item['status'] === 'published'): ?>
-                        <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/social"
-                              data-confirm="Опубликовать «<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>» в соцсети?">
-                            <?= Csrf::field() ?>
-                            <input type="hidden" name="from" value="list">
-                            <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
-                            <button type="submit" class="btn btn--small">В соцсети</button>
-                        </form>
-                    <?php endif; ?>
                     <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/duplicate">
                         <?= Csrf::field() ?>
                         <button type="submit" class="btn btn--small">Дублировать</button>

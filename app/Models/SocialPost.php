@@ -103,6 +103,52 @@ final class SocialPost
     }
 
     /**
+     * Сводка статуса публикации в соцсети для списка новостей (без N+1).
+     * По каждому news_id: сколько ушло/в очереди/с ошибкой, когда последний
+     * раз публиковалось и в какие сети.
+     *
+     * @param array<int, int> $newsIds
+     * @return array<int, array{sent:int, pending:int, failed:int, last_sent:?string, networks:array<int,string>}>
+     */
+    public static function statusForNewsIds(array $newsIds): array
+    {
+        $ids = array_values(array_unique(array_filter(array_map('intval', $newsIds))));
+        if ($ids === []) {
+            return [];
+        }
+
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = Database::pdo()->prepare(
+            "SELECT news_id, network, status, sent_at FROM social_posts
+             WHERE news_id IN ($in)"
+        );
+        $stmt->execute($ids);
+
+        $out = [];
+        foreach ($stmt->fetchAll() as $row) {
+            $nid = (int) $row['news_id'];
+            if (!isset($out[$nid])) {
+                $out[$nid] = ['sent' => 0, 'pending' => 0, 'failed' => 0, 'last_sent' => null, 'networks' => []];
+            }
+            $status = (string) $row['status'];
+            if ($status === 'sent') {
+                $out[$nid]['sent']++;
+                $out[$nid]['networks'][] = (string) $row['network'];
+                $sentAt = $row['sent_at'] ?? null;
+                if ($sentAt !== null && ($out[$nid]['last_sent'] === null || $sentAt > $out[$nid]['last_sent'])) {
+                    $out[$nid]['last_sent'] = (string) $sentAt;
+                }
+            } elseif ($status === 'failed') {
+                $out[$nid]['failed']++;
+            } else {
+                $out[$nid]['pending']++;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Счётчики очереди по статусам (для сводки в шапке журнала).
      *
      * @return array{pending: int, sent: int, failed: int}
