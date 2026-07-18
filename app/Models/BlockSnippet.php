@@ -48,6 +48,48 @@ final class BlockSnippet
         Database::pdo()->prepare('DELETE FROM block_snippets WHERE id = :id')->execute([':id' => $id]);
     }
 
+    /** Префикс автокопий: по нему их видно в списке и чистится история. */
+    public const AUTO_PREFIX = 'Автокопия: ';
+
+    /** Сколько автокопий храним — дальше библиотека превращается в свалку. */
+    private const AUTO_KEEP = 5;
+
+    /**
+     * Снимок страницы перед разрушающей операцией («заменить все блоки»).
+     * История версий пишется при правке блока, а не при удалении, поэтому без
+     * такой копии заменённая страница не восстанавливалась бы никак.
+     *
+     * @return string|null название копии; null — копировать было нечего
+     */
+    public static function autoBackup(int $pageId, string $lang, string $pageTitle): ?string
+    {
+        $blocks = self::captureFromPage($pageId, $lang);
+        if ($blocks === []) {
+            return null;
+        }
+
+        $title = trim($pageTitle) !== '' ? trim($pageTitle) : ('страница #' . $pageId);
+        $name = self::AUTO_PREFIX . mb_substr($title, 0, 80) . ' (' . $lang . ') — ' . date('d.m.Y H:i');
+        self::create($name, $blocks);
+        self::pruneAuto();
+
+        return $name;
+    }
+
+    /** Оставляет только последние AUTO_KEEP автокопий. */
+    private static function pruneAuto(): void
+    {
+        $stmt = Database::pdo()->prepare(
+            'SELECT id FROM block_snippets WHERE name LIKE :prefix ORDER BY created_at DESC, id DESC'
+        );
+        $stmt->execute([':prefix' => self::AUTO_PREFIX . '%']);
+        $ids = $stmt->fetchAll(\PDO::FETCH_COLUMN);
+
+        foreach (array_slice($ids, self::AUTO_KEEP) as $id) {
+            self::delete((int) $id);
+        }
+    }
+
     /**
      * Снимок всех блоков страницы (языкового стека) как шаблон целой страницы:
      * верхний уровень + дочерние блоки колонок (children) + активность.

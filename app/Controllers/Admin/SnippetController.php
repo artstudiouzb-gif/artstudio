@@ -87,10 +87,15 @@ final class SnippetController
         }
 
         $replace = ($_POST['mode'] ?? 'append') === 'replace';
+        // Замена удаляет блоки безвозвратно — сначала снимаем автокопию.
+        $backup = $replace ? BlockSnippet::autoBackup($pageId, $lang, (string) ($page['title'] ?? '')) : null;
         $count = BlockSnippet::applyToPage($blocks, $pageId, $lang, $replace);
 
         Cache::forgetPrefix('page:' . $pageId);
         Flash::success(($replace ? 'Страница заменена шаблоном. ' : '') . 'Вставлено блоков: ' . $count . '.');
+        if ($backup !== null) {
+            Flash::success('Прежние блоки сохранены как шаблон «' . $backup . '» — применить его с режимом «Заменить», чтобы вернуть как было.');
+        }
         $this->back($pageId, $lang);
     }
 
@@ -120,15 +125,19 @@ final class SnippetController
         }
 
         $replace = ($_POST['mode'] ?? 'append') === 'replace';
+        // Замена удаляет блоки безвозвратно — сначала снимаем автокопию.
+        $backup = $replace ? BlockSnippet::autoBackup($pageId, $lang, (string) ($page['title'] ?? '')) : null;
         $count = BlockSnippet::applyToPage($preset['blocks'], $pageId, $lang, $replace);
 
         Cache::forgetPrefix('page:' . $pageId);
         Flash::success(sprintf(
-            '%sСборка «%s» применена: блоков — %d. Замените тексты-заготовки своим содержимым.',
-            $replace ? 'Прежние блоки удалены. ' : '',
+            'Сборка «%s» применена: блоков — %d. Замените тексты-заготовки своим содержимым.',
             $preset['name'],
             $count
         ));
+        if ($backup !== null) {
+            Flash::success('Прежние блоки сохранены как шаблон «' . $backup . '» — применить его с режимом «Заменить», чтобы вернуть как было.');
+        }
         $this->back($pageId, $lang);
     }
 
