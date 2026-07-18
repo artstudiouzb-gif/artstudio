@@ -94,6 +94,44 @@ final class SnippetController
         $this->back($pageId, $lang);
     }
 
+    /**
+     * Готовая сборка страницы (App\Core\PagePresets): те же блоки, что и у
+     * пользовательского шаблона, только описаны в коде и приходят с уже
+     * расставленными фонами и отступами.
+     */
+    public function applyPreset(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verifyRequest();
+
+        $pageId = (int) $params['id'];
+        $page = Page::findById($pageId);
+        if (!$page) {
+            http_response_code(404);
+            View::render('errors/404');
+            return;
+        }
+
+        $lang = $this->resolveLang();
+        $preset = \App\Core\PagePresets::find((string) ($_POST['preset'] ?? ''));
+        if ($preset === null) {
+            Flash::error('Сборка не найдена.');
+            $this->back($pageId, $lang);
+        }
+
+        $replace = ($_POST['mode'] ?? 'append') === 'replace';
+        $count = BlockSnippet::applyToPage($preset['blocks'], $pageId, $lang, $replace);
+
+        Cache::forgetPrefix('page:' . $pageId);
+        Flash::success(sprintf(
+            '%sСборка «%s» применена: блоков — %d. Замените тексты-заготовки своим содержимым.',
+            $replace ? 'Прежние блоки удалены. ' : '',
+            $preset['name'],
+            $count
+        ));
+        $this->back($pageId, $lang);
+    }
+
     public function destroy(array $params): void
     {
         Auth::requireLogin();

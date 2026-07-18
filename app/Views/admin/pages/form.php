@@ -296,6 +296,46 @@ foreach ($blocks as $b) {
     </div>
 
     <?php
+    // Готовые сборки: страница собирается одним нажатием, с уже расставленными
+    // фонами и отступами. Когда блоков ещё нет — это основной сценарий старта,
+    // поэтому карточки раскрыты; на заполненной странице секция свёрнута.
+    $presets = \App\Core\PagePresets::all();
+    ?>
+    <details class="form-card preset-picker" style="margin-top:16px;"<?= empty($blocks) ? ' open' : '' ?>>
+        <summary><strong>Собрать страницу из готовой сборки</strong>
+            <span class="form-hint">— <?= count($presets) ?> вариантов с готовой вёрсткой</span>
+        </summary>
+        <p class="form-hint" style="margin:10px 0 14px;">
+            Блоки добавятся с расставленными отступами, фонами и текстами-заготовками —
+            останется заменить содержимое своим. Оформление берётся из настроек дизайна сайта.
+        </p>
+        <div class="preset-grid">
+            <?php foreach ($presets as $presetId => $preset): ?>
+                <form method="post" action="/admin/pages/<?= (int) $page['id'] ?>/presets/apply" class="preset-card"
+                      data-confirm="Применить сборку «<?= htmlspecialchars($preset['name'], ENT_QUOTES) ?>» к этой странице?">
+                    <?= Csrf::field() ?>
+                    <input type="hidden" name="block_lang" value="<?= htmlspecialchars($blockLang, ENT_QUOTES) ?>">
+                    <input type="hidden" name="preset" value="<?= htmlspecialchars((string) $presetId, ENT_QUOTES) ?>">
+                    <h4 class="preset-card__title"><?= htmlspecialchars($preset['name'], ENT_QUOTES) ?></h4>
+                    <p class="preset-card__desc"><?= htmlspecialchars($preset['description'], ENT_QUOTES) ?></p>
+                    <ol class="preset-card__outline">
+                        <?php foreach ($preset['outline'] as $section): ?>
+                            <li><?= htmlspecialchars($section, ENT_QUOTES) ?></li>
+                        <?php endforeach; ?>
+                    </ol>
+                    <div class="preset-card__foot">
+                        <select name="mode" aria-label="Как применить сборку">
+                            <option value="append">Добавить к текущим</option>
+                            <option value="replace">Заменить всё</option>
+                        </select>
+                        <button type="submit" class="btn btn--small btn--primary">Применить</button>
+                    </div>
+                </form>
+            <?php endforeach; ?>
+        </div>
+    </details>
+
+    <?php
     // Библиотека шаблонов: если миграция block_snippets ещё не накатана,
     // не роняем весь редактор страницы 500-й — скрываем секцию и подсказываем
     // (тот же паттерн, что у ContentType::all() в layout/header.php).
