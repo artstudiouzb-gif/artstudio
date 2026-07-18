@@ -1460,3 +1460,36 @@ body.has-sticky-actions .admin-main { padding-bottom: 108px; }
 .preset-card__outline { margin: 0; padding-left: 18px; font-size: .8rem; color: var(--admin-muted); line-height: 1.7; }
 .preset-card__foot { display: flex; gap: 8px; align-items: center; margin-top: auto; padding-top: 6px; }
 .preset-card__foot select { flex: 1; min-width: 0; }
+
+/* --- Типографика: шкала и предпросмотр --- */
+.typo-scale { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.typo-scale__opt {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: baseline;
+    gap: 2px 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+}
+.typo-scale__opt:hover { border-color: var(--admin-accent); }
+.typo-scale__opt:has(input:checked) { border-color: var(--admin-accent); background: var(--admin-accent-soft); }
+.typo-scale__opt input { grid-row: 1; margin: 0; }
+.typo-scale__name { font-weight: 600; }
+.typo-scale__ratio { color: var(--admin-muted); font-variant-numeric: tabular-nums; }
+/* Пояснение занимает всю ширину карточки под названием. */
+.typo-scale__hint { grid-column: 1 / -1; font-size: .82rem; color: var(--admin-muted); line-height: 1.4; }
+
+.typo-preview { margin: 4px 0 8px; padding: 14px 16px; border: 1px solid var(--admin-border); border-radius: var(--admin-radius); background: #fff; }
+.typo-preview__head { font-size: .82rem; color: var(--admin-muted); margin-bottom: 10px; }
+.typo-preview__row { display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; }
+.typo-preview__item { display: flex; flex-direction: column; gap: 2px; }
+.typo-preview__sample { font-weight: 700; color: var(--admin-accent); }
+.typo-preview__size { font-size: .75rem; color: var(--admin-muted); font-variant-numeric: tabular-nums; }
+
+details.design-manual > summary { cursor: pointer; list-style: none; }
+details.design-manual > summary::-webkit-details-marker { display: none; }
+details.design-manual > summary::before { content: '▸'; display: inline-block; margin-right: 8px; color: var(--admin-muted); transition: transform .15s ease; }
+details.design-manual[open] > summary::before { transform: rotate(90deg); }

@@ -142,24 +142,72 @@ foreach ($options as $key => $opt) {
                                value="<?= htmlspecialchars($lineHeightCustom, ENT_QUOTES) ?>" placeholder="напр. <?= htmlspecialchars($lineHeightPreset, ENT_QUOTES) ?>" style="max-width:220px;" data-design-preview-field>
                     </div>
                 </div>
-                <?php $typoSizes = \App\Core\DesignSettings::typographySizes(); ?>
-                <div class="design-manual">
-                    <div class="design-manual__head">
-                        <strong>Размеры по элементам</strong>
-                        <span>Точный размер (px) для конкретных элементов сайта. Пустое поле — размер темы не меняется; в поле показан ориентировочный размер по умолчанию.</span>
+                <?php
+                // Шкала вместо девяти произвольных чисел: размеры заголовков
+                // считаются от базового, поэтому H2 физически не может стать
+                // мельче H3 — раньше такое собиралось руками за минуту.
+                $currentScale = \App\Core\DesignSettings::typoScale();
+                $scaleSizes = \App\Core\DesignSettings::scaleSizes();
+                $overrides = \App\Core\DesignSettings::typographyOverrides();
+                $hasOverrides = array_filter($overrides) !== [];
+                // При варианте «как в теме» шкала пуста — показываем размеры,
+                // заложенные в теме, иначе предпросмотр был бы одинаковым.
+                $previewSizes = $scaleSizes;
+                foreach (\App\Core\DesignSettings::TYPO_SIZES as $fsKey => $fsMeta) {
+                    if (($previewSizes[$fsKey] ?? '') === '') {
+                        $previewSizes[$fsKey] = $fsMeta[2] . 'px';
+                    }
+                }
+                ?>
+                <div class="design-opt">
+                    <div class="design-opt__label">
+                        <span>Шкала заголовков</span>
+                        <small>Размеры H1–H5 считаются от базового размера текста по выбранному коэффициенту. Так иерархия остаётся ровной при любом базовом размере.</small>
                     </div>
-                    <div class="design-manual__grid">
-                        <?php foreach (\App\Core\DesignSettings::TYPO_SIZES as $fsKey => $fsMeta): ?>
-                            <div class="form-field">
-                                <label for="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"><?= htmlspecialchars($fsMeta[0], ENT_QUOTES) ?>, px</label>
-                                <input type="number" id="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>" name="<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"
-                                       min="8" max="96" step="0.5" inputmode="decimal"
-                                       value="<?= htmlspecialchars(preg_replace('/px$/', '', $typoSizes[$fsKey]) ?? '', ENT_QUOTES) ?>"
-                                       placeholder="напр. <?= htmlspecialchars($fsMeta[2], ENT_QUOTES) ?>" data-design-preview-field>
+                    <div class="design-opt__choices typo-scale">
+                        <?php foreach (\App\Core\DesignSettings::TYPO_SCALES as $scaleKey => $scaleMeta): ?>
+                            <label class="typo-scale__opt<?= $currentScale === $scaleKey ? ' is-active' : '' ?>">
+                                <input type="radio" name="typo_scale" value="<?= htmlspecialchars($scaleKey, ENT_QUOTES) ?>"
+                                       <?= $currentScale === $scaleKey ? 'checked' : '' ?> data-design-preview-field>
+                                <span class="typo-scale__name"><?= htmlspecialchars($scaleMeta[0], ENT_QUOTES) ?></span>
+                                <span class="typo-scale__ratio">×<?= htmlspecialchars((string) $scaleMeta[1], ENT_QUOTES) ?></span>
+                                <span class="typo-scale__hint"><?= htmlspecialchars($scaleMeta[2], ENT_QUOTES) ?></span>
+                            </label>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <?php // Наглядно: что именно даст выбранная шкала. ?>
+                <div class="typo-preview">
+                    <div class="typo-preview__head">Как это выглядит</div>
+                    <div class="typo-preview__row">
+                        <?php foreach (['fs_h1' => 'H1', 'fs_h2' => 'H2', 'fs_h3' => 'H3', 'fs_h4' => 'H4', 'fs_h5' => 'H5'] as $k => $label): ?>
+                            <div class="typo-preview__item">
+                                <span class="typo-preview__sample" style="font-size:<?= htmlspecialchars($previewSizes[$k] ?? '16px', ENT_QUOTES) ?>;line-height:1.15;"><?= $label ?></span>
+                                <span class="typo-preview__size"><?= htmlspecialchars($previewSizes[$k] ?? '', ENT_QUOTES) ?><?= ($overrides[$k] ?? '') !== '' ? ' → ' . htmlspecialchars($overrides[$k], ENT_QUOTES) : '' ?></span>
                             </div>
                         <?php endforeach; ?>
                     </div>
                 </div>
+
+                <details class="design-manual"<?= $hasOverrides ? ' open' : '' ?>>
+                    <summary><strong>Точные размеры</strong> <span class="form-hint">— переопределяют шкалу, если нужно вручную</span></summary>
+                    <div class="design-manual__head" style="margin-top:10px;">
+                        <span>Пустое поле — размер берётся из шкалы (он показан в подсказке поля). Заполняйте, только если шкала не подходит для конкретного элемента.</span>
+                    </div>
+                    <div class="design-manual__grid">
+                        <?php foreach (\App\Core\DesignSettings::TYPO_SIZES as $fsKey => $fsMeta): ?>
+                            <?php $fromScale = $scaleSizes[$fsKey] ?? ''; ?>
+                            <div class="form-field">
+                                <label for="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"><?= htmlspecialchars($fsMeta[0], ENT_QUOTES) ?>, px</label>
+                                <input type="number" id="design_<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>" name="<?= htmlspecialchars($fsKey, ENT_QUOTES) ?>"
+                                       min="8" max="96" step="0.5" inputmode="decimal"
+                                       value="<?= htmlspecialchars(preg_replace('/px$/', '', $overrides[$fsKey]) ?? '', ENT_QUOTES) ?>"
+                                       placeholder="<?= $fromScale !== '' ? 'шкала: ' . htmlspecialchars(rtrim($fromScale, 'px'), ENT_QUOTES) : 'напр. ' . htmlspecialchars($fsMeta[2], ENT_QUOTES) ?>" data-design-preview-field>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </details>
             <?php endif; ?>
 
             <?php if ($groupName === 'Цвета и шрифт'): ?>
@@ -213,24 +261,33 @@ foreach ($options as $key => $opt) {
                         <div class="form-field design-manual__wide">
                             <label for="design_font_body_choice">Основной шрифт текста</label>
                             <select id="design_font_body_choice" name="font_body_choice" data-design-preview-field data-font-body-choice>
-                                <optgroup label="Базовые шрифты">
+                                <?php // Локальные показываем их же начертанием: они есть в системе,
+                                      // поэтому образец честный. Google-шрифты так показать нельзя —
+                                      // CSP панели не пускает внешние домены, и получилась бы подделка. ?>
+                                <optgroup label="Локальные — без внешних запросов">
                                     <?php foreach (\App\Core\DesignSettings::FONTS as $fontKey => $fontData): ?>
                                         <?php if ($fontKey === 'custom') { continue; } ?>
                                         <?php $choice = 'style:' . $fontKey; ?>
-                                        <option value="<?= htmlspecialchars($choice, ENT_QUOTES) ?>" <?= $bodyFontChoice === $choice ? 'selected' : '' ?>><?= htmlspecialchars($fontData[0], ENT_QUOTES) ?></option>
+                                        <option value="<?= htmlspecialchars($choice, ENT_QUOTES) ?>" style="font-family:<?= htmlspecialchars($fontData[1], ENT_QUOTES) ?>"
+                                                <?= $bodyFontChoice === $choice ? 'selected' : '' ?>><?= htmlspecialchars($fontData[0], ENT_QUOTES) ?></option>
                                     <?php endforeach; ?>
                                 </optgroup>
-                                <optgroup label="Google Fonts">
+                                <optgroup label="Google Fonts — грузятся с fonts.googleapis.com">
                                     <?php foreach (\App\Core\DesignSettings::GOOGLE_FONTS as $slug => $fontData): ?>
                                         <?php $choice = 'google:' . $slug; ?>
                                         <option value="<?= htmlspecialchars($choice, ENT_QUOTES) ?>" <?= $bodyFontChoice === $choice ? 'selected' : '' ?>><?= htmlspecialchars($fontData[0], ENT_QUOTES) ?></option>
                                     <?php endforeach; ?>
                                 </optgroup>
                                 <optgroup label="Собственный шрифт">
-                                    <option value="style:custom" <?= $bodyFontChoice === 'style:custom' ? 'selected' : '' ?>>Свой CSS-стек или файл</option>
+                                    <option value="style:custom" <?= $bodyFontChoice === 'style:custom' ? 'selected' : '' ?>>Свой CSS-стек или файл (.woff2)</option>
                                 </optgroup>
                             </select>
-                            <small class="form-hint">Внешние шрифты загружаются с fonts.googleapis.com; базовые и собственный шрифт не требуют такого подключения.</small>
+                            <small class="form-hint">
+                                Локальные шрифты и свой .woff2 отдаются с вашего домена. Google Fonts подгружаются
+                                со стороннего сервера: это внешний запрос от каждого посетителя (его адрес уходит Google)
+                                и лишние миллисекунды к загрузке. Для госсайта предпочтительны первые два варианта —
+                                нужный шрифт можно скачать и залить как свой .woff2.
+                            </small>
                         </div>
                         <div class="design-manual__custom-font design-manual__wide" data-custom-font-fields<?= $bodyFontChoice !== 'style:custom' ? ' hidden' : '' ?>>
                             <div class="form-field design-manual__wide">
@@ -255,11 +312,14 @@ foreach ($options as $key => $opt) {
                         <div class="form-field design-manual__wide">
                             <label for="design_font_heading">Шрифт заголовков</label>
                             <select id="design_font_heading" name="font_google_heading" data-design-preview-field>
-                                <option value="">Стандартный (PT Serif)</option>
-                                <?php foreach (\App\Core\DesignSettings::GOOGLE_FONTS as $slug => $fontData): ?>
-                                    <option value="<?= htmlspecialchars($slug, ENT_QUOTES) ?>" <?= $gHeading === $slug ? 'selected' : '' ?>><?= htmlspecialchars($fontData[0], ENT_QUOTES) ?></option>
-                                <?php endforeach; ?>
+                                <option value="">Как у основного текста (без отдельного шрифта)</option>
+                                <optgroup label="Google Fonts — грузятся с fonts.googleapis.com">
+                                    <?php foreach (\App\Core\DesignSettings::GOOGLE_FONTS as $slug => $fontData): ?>
+                                        <option value="<?= htmlspecialchars($slug, ENT_QUOTES) ?>" <?= $gHeading === $slug ? 'selected' : '' ?>><?= htmlspecialchars($fontData[0], ENT_QUOTES) ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
                             </select>
+                            <small class="form-hint">Отдельный шрифт заголовков — второй внешний запрос. Часто достаточно того же шрифта: контраст даёт шкала и насыщенность, а не второе семейство.</small>
                         </div>
                         <div class="form-field">
                             <label for="design_default_theme">Тема для посетителей</label>

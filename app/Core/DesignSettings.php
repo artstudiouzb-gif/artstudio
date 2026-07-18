@@ -378,8 +378,81 @@ final class DesignSettings
         'fs_topbar' => ['Верхняя панель', '.site-topbar', '13'],
     ];
 
-    /** Заданные размеры по элементам: ключ => '17px' или '' (не задан). @return array<string,string> */
+    /**
+     * Шкала типографики: коэффициент между соседними ступенями. Размеры
+     * заголовков считаются от базового размера текста, а не задаются каждый
+     * отдельно — иначе H2 легко оказывается мельче H3, что и случалось.
+     *
+     * ключ => [подпись, коэффициент, пояснение]
+     */
+    public const TYPO_SCALES = [
+        // Значение по умолчанию — «не вмешиваться»: на уже работающем сайте
+        // включение шкалы поменяло бы все заголовки разом, без спроса.
+        'theme' => ['Как в теме', 0.0, 'Размеры остаются такими, какие заданы в теме. Ничего не меняется.'],
+        'compact' => ['Компактная', 1.2, 'Плотный ритм: много текста на экране, заголовки не давят.'],
+        'classic' => ['Классическая', 1.25, 'Сбалансированная шкала для информационных сайтов.'],
+        'expressive' => ['Выразительная', 1.333, 'Крупные заголовки, сильный контраст с текстом.'],
+    ];
+
+    /** Ступени шкалы относительно базового размера: fs_h5 = базовый × k¹ и т.д. */
+    private const SCALE_STEPS = ['fs_h5' => 1, 'fs_h4' => 2, 'fs_h3' => 3, 'fs_h2' => 4, 'fs_h1' => 5];
+
+    public static function typoScale(): string
+    {
+        $scale = (string) Setting::get('design_typo_scale', 'theme');
+
+        return isset(self::TYPO_SCALES[$scale]) ? $scale : 'theme';
+    }
+
+    /**
+     * Размеры заголовков по выбранной шкале — то, что применится, если не
+     * задано точное значение вручную.
+     *
+     * @return array<string,string> ключ fs_* => '32px'
+     */
+    public static function scaleSizes(): array
+    {
+        $ratioSetting = self::TYPO_SCALES[self::typoScale()][1];
+        if ($ratioSetting <= 1.0) {
+            return []; // «Как в теме» — размеры не навязываем
+        }
+
+        $base = (float) (preg_replace('/[^0-9.]/', '', self::fontSizeCustom()) ?: 0);
+        if ($base <= 0) {
+            $base = (float) (['sm' => 15, 'md' => 16, 'lg' => 17, 'xl' => 18][self::current()['font_size'] ?? 'md'] ?? 16);
+        }
+        $ratio = $ratioSetting;
+
+        $sizes = [];
+        foreach (self::SCALE_STEPS as $key => $step) {
+            // Округляем до целого: дробные размеры вроде 13.12px и порождают
+            // ощущение, что шкалы нет.
+            $sizes[$key] = ((string) (int) round($base * ($ratio ** $step))) . 'px';
+        }
+
+        return $sizes;
+    }
+
+    /**
+     * Итоговые размеры по элементам: ручное значение важнее шкалы,
+     * при пустом поле для заголовков берётся шкала.
+     *
+     * @return array<string,string> ключ => '17px' или '' (не задан)
+     */
     public static function typographySizes(): array
+    {
+        $scale = self::scaleSizes();
+        $sizes = [];
+        foreach (self::TYPO_SIZES as $key => $_) {
+            $manual = self::normalizeFsSize((string) Setting::get('design_' . $key, ''));
+            $sizes[$key] = $manual !== '' ? $manual : ($scale[$key] ?? '');
+        }
+
+        return $sizes;
+    }
+
+    /** Только ручные переопределения — для формы в админке. @return array<string,string> */
+    public static function typographyOverrides(): array
     {
         $sizes = [];
         foreach (self::TYPO_SIZES as $key => $_) {
@@ -531,6 +604,10 @@ final class DesignSettings
         }
         if (array_key_exists('line_height_custom', $input)) {
             Setting::set('design_line_height_custom', self::normalizeLineHeight((string) $input['line_height_custom']));
+        }
+        if (array_key_exists('typo_scale', $input)) {
+            $scale = (string) $input['typo_scale'];
+            Setting::set('design_typo_scale', isset(self::TYPO_SCALES[$scale]) ? $scale : 'classic');
         }
         foreach (array_keys(self::TYPO_SIZES) as $fsKey) {
             if (array_key_exists($fsKey, $input)) {

@@ -41,7 +41,9 @@ test('форма дизайна объединяет источники шриф
     $view = file_get_contents(dirname(__DIR__, 2) . '/app/Views/admin/design/index.php');
     assert_true(is_string($view));
     assert_contains('name="font_body_choice"', $view);
-    assert_contains('optgroup label="Google Fonts"', $view);
+    // Подпись группы дополнена предупреждением о внешнем домене, поэтому
+    // проверяем начало, а не точный текст.
+    assert_contains('optgroup label="Google Fonts', $view);
     assert_contains('data-custom-font-fields', $view);
     assert_contains('name="font_size_custom"', $view);
     assert_contains('name="line_height_custom"', $view);

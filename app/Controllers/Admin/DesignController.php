@@ -81,6 +81,13 @@ final class DesignController
                 DesignSettings::normalizeLineHeight((string) $preview['line_height_custom'])
             );
         }
+        if (array_key_exists('typo_scale', $preview)) {
+            $scale = (string) $preview['typo_scale'];
+            Setting::overrideInMemory(
+                'design_typo_scale',
+                isset(DesignSettings::TYPO_SCALES[$scale]) ? $scale : 'classic'
+            );
+        }
         foreach (array_keys(DesignSettings::TYPO_SIZES) as $fsKey) {
             if (array_key_exists($fsKey, $preview)) {
                 Setting::overrideInMemory(
