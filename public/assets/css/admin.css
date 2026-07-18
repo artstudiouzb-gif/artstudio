@@ -1493,3 +1493,8 @@ details.design-manual > summary { cursor: pointer; list-style: none; }
 details.design-manual > summary::-webkit-details-marker { display: none; }
 details.design-manual > summary::before { content: '▸'; display: inline-block; margin-right: 8px; color: var(--admin-muted); transition: transform .15s ease; }
 details.design-manual[open] > summary::before { transform: rotate(90deg); }
+
+/* Поле картинки в строке повторителя: input + кнопка медиабиблиотеки. */
+.repeater-media { display: flex; gap: 8px; align-items: center; }
+.repeater-media input[type="text"] { flex: 1; min-width: 0; }
+.repeater-media .btn { white-space: nowrap; }

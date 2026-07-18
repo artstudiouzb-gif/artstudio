@@ -1106,3 +1106,54 @@
         } catch (e) {}
     });
 })();
+
+// --- Выбор картинки из медиабиблиотеки в строках повторителей ---
+// Поля логотипов, фото и изображений внутри повторяющихся строк были обычными
+// текстовыми input: путь приходилось вписывать руками. Кнопку добавляем
+// автоматически всем таким полям — включая строки, добавленные уже после
+// загрузки страницы (шаблон __INDEX__ клонируется скриптом повторителя).
+(function () {
+    var NAME_RE = /\[(image|logo|photo|cover|media)\]$/i;
+    var seq = 0;
+
+    function enhance(input) {
+        if (!input || input.dataset.mediaEnhanced === '1') { return; }
+        var name = input.getAttribute('name') || '';
+        if (input.type !== 'text' || !NAME_RE.test(name)) { return; }
+        // Поля, уже обёрнутые общим компонентом, трогать не нужно.
+        if (input.closest('[data-image-field]') || input.hasAttribute('data-image-input')) { return; }
+        input.dataset.mediaEnhanced = '1';
+
+        if (!input.id) { input.id = 'mediafld_' + (++seq); }
+        var pick = document.createElement('button');
+        pick.type = 'button';
+        pick.className = 'btn btn--small';
+        pick.textContent = 'Медиабиблиотека';
+        pick.setAttribute('data-media-pick', '');
+        pick.setAttribute('data-media-target', '#' + input.id);
+
+        var row = document.createElement('div');
+        row.className = 'repeater-media';
+        input.parentNode.insertBefore(row, input);
+        row.appendChild(input);
+        row.appendChild(pick);
+    }
+
+    function scan(root) {
+        (root || document).querySelectorAll('input[type="text"]').forEach(enhance);
+    }
+
+    scan(document);
+    // Новые строки повторителя появляются после клика «Добавить».
+    if (window.MutationObserver) {
+        new MutationObserver(function (records) {
+            records.forEach(function (r) {
+                Array.prototype.forEach.call(r.addedNodes, function (node) {
+                    if (node.nodeType !== 1) { return; }
+                    if (node.matches && node.matches('input[type="text"]')) { enhance(node); }
+                    scan(node);
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
+    }
+})();
