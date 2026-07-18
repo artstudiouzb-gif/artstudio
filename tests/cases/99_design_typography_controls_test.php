@@ -78,4 +78,14 @@ test('точные размеры сохраняются и переопреде
     assert_contains('--btn-radius:13px', $css);
     assert_same('inter', (string) \App\Models\Setting::get('design_font_google_body', ''));
     assert_contains('Inter', (string) \App\Models\Setting::get('font_family', ''));
+
+    // Убираем за собой всё, что писали в БД: иначе значения переживают прогон
+    // и следующий запуск валит соседние тесты чужим радиусом и шрифтом.
+    DesignSettings::save([
+        'font_body_choice' => 'style:pt',
+        'font_size_custom' => '',
+        'radius_custom' => '',
+        'line_height_custom' => '',
+    ]);
+    \App\Models\Setting::set('design_font_google_body', '');
 });

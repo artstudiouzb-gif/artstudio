@@ -116,3 +116,46 @@ function run_tests(): int
 
     return TestRunner::$failed === 0 ? 0 : 1;
 }
+
+/**
+ * Сбрасывает «ручные» настройки дизайна в памяти на время теста.
+ *
+ * Настройки дизайна живут в общей таблице settings, и тесты, которые их
+ * сохраняют, оставляли значения в тестовой БД до следующего прогона: соседние
+ * проверки потом падали на чужом радиусе 13px или шрифте Inter. Override
+ * только в памяти — БД не трогаем, порядок и содержимое прогонов не важны.
+ */
+function reset_design_state(): void
+{
+    $keys = [
+        'design_radius_custom', 'design_font_size_custom', 'design_line_height_custom',
+        'design_container_custom', 'design_font_google_body', 'design_font_google_heading',
+        'design_custom_color_primary', 'design_custom_color_accent', 'design_custom_font_family',
+        'design_typo_scale', 'design_font_style', 'design_preset',
+    ];
+    foreach (array_keys(\App\Core\DesignSettings::TYPO_SIZES) as $fsKey) {
+        $keys[] = 'design_' . $fsKey;
+    }
+
+    // На тестовой БД строки удаляем, а не обнуляем: для части настроек пустое
+    // значение и отсутствие ключа — разные вещи (design_custom_color_primary
+    // при отсутствии откатывается к color_primary, а при пустой строке — к
+    // цвету по умолчанию). Записать '' значило бы менять смысл проверок.
+    // Setting::set() к тому же сбрасывает кэш, поэтому переопределение в
+    // памяти не пережило бы первую же запись внутри теста.
+    // Без TEST_DB_* подключение ведёт к рабочей базе разработчика — там
+    // ограничиваемся памятью, чтобы не стереть его собственные настройки.
+    if ((string) (getenv('TEST_DB_DATABASE') ?: '') === '') {
+        foreach ($keys as $key) {
+            \App\Models\Setting::overrideInMemory($key, '');
+        }
+
+        return;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($keys), '?'));
+    \App\Core\Database::pdo()
+        ->prepare("DELETE FROM settings WHERE `key` IN ({$placeholders})")
+        ->execute($keys);
+    \App\Models\Setting::set('design_preset', ''); // заодно сбрасывает кэш настроек
+}
