@@ -194,6 +194,9 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 /* --- Hero: плоский, светлый; серифный титул --- */
 .block-hero { background: var(--gov-surface); border: 1px solid var(--gov-border); }
+/* Hero без фото и без своего цвета — заголовочная зона страницы, а не
+   карточка: убираем подложку и рамку, оставляя только отступы и типографику. */
+.block-hero--plain { background: transparent; border: 0; }
 .block-hero__title { color: var(--hero-text, var(--gov-title)); }
 .block-hero__subtitle { color: var(--hero-text, var(--gov-muted)); }
 

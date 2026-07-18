@@ -99,7 +99,9 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
 <?php elseif ($bgType === 'video' && $videoFile !== '' && $image !== ''): ?>
     <link rel="preload" as="image" href="<?= htmlspecialchars($image, ENT_QUOTES) ?>">
 <?php endif; ?>
-<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
+<?php // Без медиа и без своего фона hero — это просто шапка страницы:
+      // карточка с рамкой и подложкой в этой роли читается как чужой блок. ?>
+<div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= (!$hasMedia && $heroBg === '') ? ' block-hero--plain' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
     <?php if ($bgType === 'video' && $videoFile !== ''): ?>
         <video class="block-hero__video" autoplay muted loop playsinline preload="metadata"
                disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"

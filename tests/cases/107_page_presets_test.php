@@ -131,6 +131,69 @@ test('Демо-контент: оформление берётся из общи
     assert_contains('$blockData += $looks', $seeder);
 });
 
+test('Сборки страниц: разметка не протекает в поля, которые экранируются', function () {
+    // У части блоков текстовое поле выводится через htmlspecialchars, и <p> из
+    // заготовки показывался посетителю как текст. Проверяем итоговый HTML, а не
+    // список полей: так тест переживёт добавление новых блоков в сборки.
+    foreach (PagePresets::all() as $id => $preset) {
+        foreach ($preset['blocks'] as $index => $block) {
+            $rendered = BlockRenderer::render([
+                'id' => 900 + $index,
+                'type' => $block['type'],
+                'data' => json_encode($block['data']),
+                'custom_css' => '',
+            ]);
+            assert_false(
+                (bool) preg_match('/&lt;\/?[a-z]+[^&]{0,20}&gt;/', $rendered['html']),
+                "{$id}/{$block['type']}: HTML-теги выводятся как текст"
+            );
+        }
+    }
+});
+
+test('Сборки страниц: ни один блок не рендерится пустым', function () {
+    // Пустая секция на свежей странице читается как поломка вёрстки.
+    foreach (PagePresets::all() as $id => $preset) {
+        foreach ($preset['blocks'] as $index => $block) {
+            $rendered = BlockRenderer::render([
+                'id' => 900 + $index,
+                'type' => $block['type'],
+                'data' => json_encode($block['data']),
+                'custom_css' => '',
+            ]);
+            $text = trim((string) preg_replace('/\s+/u', ' ', strip_tags($rendered['html'])));
+            assert_true(
+                mb_strlen($text) >= 25,
+                "{$id}/{$block['type']}: секция пустая (" . mb_strlen($text) . " симв.)"
+            );
+        }
+    }
+});
+
+test('Обложка без фото — заголовочная зона, а не карточка', function () {
+    $plain = BlockRenderer::render([
+        'id' => 950, 'type' => 'hero', 'custom_css' => '',
+        'data' => json_encode(['title' => 'Заголовок', 'subtitle' => 'Подзаголовок']),
+    ]);
+    assert_contains('block-hero--plain', $plain['html']);
+    assert_not_contains('block-hero--media', $plain['html']);
+
+    // С фотографией и со своим цветом фона оформление прежнее.
+    $media = BlockRenderer::render([
+        'id' => 951, 'type' => 'hero', 'custom_css' => '',
+        'data' => json_encode(['title' => 'Заголовок', 'bg_type' => 'image', 'image' => '/uploads/public/x.jpg']),
+    ]);
+    assert_contains('block-hero--media', $media['html']);
+    assert_not_contains('block-hero--plain', $media['html']);
+
+    $colored = BlockRenderer::render([
+        'id' => 952, 'type' => 'hero', 'custom_css' => '',
+        'data' => json_encode(['title' => 'Заголовок', 'bg_color' => '#123456']),
+    ]);
+    assert_contains('block-hero--bgcolor', $colored['html']);
+    assert_not_contains('block-hero--plain', $colored['html']);
+});
+
 test('Сборки страниц: неизвестный идентификатор не находится', function () {
     assert_same(null, PagePresets::find('нет-такой'));
     assert_same(null, PagePresets::find(''));
