@@ -38,12 +38,12 @@ $renderFields = static function (?array $item) use ($languages, $pages, $parentC
                    placeholder="Например: О компании">
         </div>
 
+        <?php $selectedLang = $langCode !== '' ? $langCode : \App\Models\Language::defaultCode(); ?>
         <div class="form-field">
             <label for="<?= $prefix ?>_lang">Язык</label>
             <select id="<?= $prefix ?>_lang" name="lang" data-menu-lang-select>
-                <option value=""<?= $langCode === '' ? ' selected' : '' ?>>Все языки</option>
                 <?php foreach ($languages as $lang): ?>
-                    <option value="<?= htmlspecialchars((string) $lang['code'], ENT_QUOTES) ?>"<?= $langCode === (string) $lang['code'] ? ' selected' : '' ?>>
+                    <option value="<?= htmlspecialchars((string) $lang['code'], ENT_QUOTES) ?>"<?= $selectedLang === (string) $lang['code'] ? ' selected' : '' ?>>
                         <?= htmlspecialchars((string) $lang['name'], ENT_QUOTES) ?>
                     </option>
                 <?php endforeach; ?>
@@ -167,10 +167,11 @@ $renderNode = static function (array $item) use ($urlTypeLabels, $renderFields):
     return (string) ob_get_clean();
 };
 
-$groups = [['code' => '', 'name' => 'Все языки']];
+$groups = [];
 foreach ($languages as $language) {
     $groups[] = ['code' => (string) $language['code'], 'name' => (string) $language['name']];
 }
+$defaultLangCode = \App\Models\Language::defaultCode();
 ?>
 
 <p class="admin-hint">

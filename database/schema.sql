@@ -927,7 +927,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_17_project_translations.sql'),
     ('2026_07_17_team_translations.sql'),
     ('2026_07_17_album_translations.sql'),
-    ('2026_07_17_video_translations.sql')
+    ('2026_07_17_video_translations.sql'),
+    ('2026_07_18_menu_per_language.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;

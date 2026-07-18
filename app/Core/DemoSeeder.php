@@ -623,14 +623,22 @@ final class DemoSeeder
             ['Пресс-центр', '/press-centr'],
             ['Контакты', '/kontakty'],
         ];
+        // Меню привязано к конкретному языку (без «Все языки») — сеем свой набор
+        // для каждого активного языка.
+        $langs = $pdo->query('SELECT code FROM languages WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll(PDO::FETCH_COLUMN) ?: [];
+        if ($langs === []) {
+            return;
+        }
         $ins = $pdo->prepare(
             "INSERT INTO menu_items (lang, title, url_type, url_value, sort_order, is_active, created_at)
-             SELECT '', :t, 'custom', :u, :o, 1, NOW()
-             FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM menu_items WHERE url_value = :u2)"
+             SELECT :lang, :t, 'custom', :u, :o, 1, NOW()
+             FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM menu_items WHERE url_value = :u2 AND lang = :lang2)"
         );
-        foreach ($items as $i => $it) {
-            $ins->execute([':t' => $it[0], ':u' => $it[1], ':o' => $i, ':u2' => $it[1]]);
-            $c['menu'] += $ins->rowCount();
+        foreach ($langs as $lang) {
+            foreach ($items as $i => $it) {
+                $ins->execute([':lang' => (string) $lang, ':t' => $it[0], ':u' => $it[1], ':o' => $i, ':u2' => $it[1], ':lang2' => (string) $lang]);
+                $c['menu'] += $ins->rowCount();
+            }
         }
     }
 

@@ -149,9 +149,11 @@ final class MenuController
     private function collectInput(): array
     {
         $title = trim((string) ($_POST['title'] ?? ''));
+        // Меню теперь всегда привязано к конкретному языку (без «Все языки»):
+        // пустой/неактивный — на язык по умолчанию.
         $lang = (string) ($_POST['lang'] ?? '');
-        if ($lang !== '' && !Language::isActive($lang)) {
-            $lang = '';
+        if ($lang === '' || !Language::isActive($lang)) {
+            $lang = Language::defaultCode();
         }
         $isDivider = !empty($_POST['is_divider']);
         $iconSvg = (string) ($_POST['icon_svg'] ?? '');
