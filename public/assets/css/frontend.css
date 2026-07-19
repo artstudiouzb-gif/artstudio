@@ -260,10 +260,11 @@ summary:focus-visible {
     color: var(--color-accent, #2f6fed);
     margin-bottom: 16px;
     font-size: 28px;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
 .block-advantages__item:hover .block-advantages__icon {
-    background: color-mix(in srgb, var(--gov-teal) 15%, transparent);
+    background: var(--color-accent, #2f6fed);
+    color: #fff;
 }
 @keyframes advantages-icon-float {
     0%, 100% { transform: translateY(0) scale(1.08); }
