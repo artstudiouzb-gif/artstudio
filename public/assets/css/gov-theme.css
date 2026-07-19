@@ -518,7 +518,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 26px 22px;
+    padding: 22px !important;
     background: color-mix(in srgb, var(--gov-surface) 68%, transparent);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
@@ -526,11 +526,12 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
     border-radius: var(--radius);
     text-decoration: none;
     color: var(--gov-ink);
+    box-shadow: 0 1px 3px rgba(15, 27, 45, 0.01), 0 8px 24px -16px rgba(15, 27, 45, 0.06);
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease;
 }
 .feature-card:hover {
     background: color-mix(in srgb, var(--gov-surface) 88%, transparent);
-    box-shadow: 0 16px 36px rgba(19, 42, 92, 0.06);
+    box-shadow: 0 16px 36px rgba(19, 42, 92, 0.09);
     transform: translateY(-4px);
     border-color: var(--color-accent, var(--gov-teal));
 }
@@ -1956,10 +1957,19 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
 .block-banner[style*="--banner-btn"] .block-banner__button { background: var(--banner-btn); }
 
 /* Направления (cards_grid) */
-.block-cards[style*="--card-bg"] .feature-card { background: var(--card-bg); }
+.block-cards[style*="--card-bg"] .feature-card {
+    background: color-mix(in srgb, var(--card-bg) 68%, transparent) !important;
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid color-mix(in srgb, var(--gov-border) 45%, transparent) !important;
+}
+.block-cards[style*="--card-bg"] .feature-card:hover {
+    background: color-mix(in srgb, var(--card-bg) 88%, transparent) !important;
+}
 .block-cards[style*="--cards-text"] .feature-card__title { color: var(--cards-text); }
 .block-cards[style*="--cards-text"] .feature-card__text { color: var(--cards-text); opacity: .82; }
 .block-cards[style*="--cards-text"] .feature-card__icon { color: var(--cards-text); }
+.block-cards[style*="--cards-text"] .feature-card:hover .feature-card__title { color: var(--color-accent, var(--gov-teal)) !important; }
 
 /* CTA-полоса */
 .block-ctaband[style*="--ctaband-bg"] { background: var(--ctaband-bg); }
