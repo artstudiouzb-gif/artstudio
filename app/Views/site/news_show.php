@@ -357,7 +357,6 @@ if (!$isPremium) {
                         <?php endif; ?>
                         <?php if (!empty($item['published_at'])): ?><time class="relnews-card__date"><?= htmlspecialchars(DateFormatter::short((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                         <span class="relnews-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
-                        <span class="relnews-card__arrow">→</span>
                     </a>
                 <?php endforeach; ?>
             </div>
