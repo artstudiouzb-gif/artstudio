@@ -45,7 +45,7 @@ body {
 body, header, aside, section, div, footer, input, select, textarea, button, a, span {
     transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
-[data-carousel-track], [data-carousel-track] *, .newsdetail-gallery__slide, .newsdetail-gallery__thumb, .no-transition, .no-transition * {
+[data-carousel-track], .newsdetail-gallery__slide, .newsdetail-gallery__thumb, .no-transition, .no-transition * {
     transition: none !important;
 }
 
@@ -490,20 +490,22 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .imgcards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 @media (max-width: 1000px) { .imgcards-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .imgcards-grid { grid-template-columns: 1fr; } }
-.imgcard { position: relative; display: block; min-height: 240px; border-radius: var(--radius); overflow: hidden; text-decoration: none; color: #fff; }
-.imgcard__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #24425f center/cover no-repeat; transition: transform .4s ease; }
-.imgcard:hover .imgcard__media { transform: scale(1.05); }
-.imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); }
-.imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.imgcard { position: relative; display: block; min-height: 240px; border-radius: var(--radius); overflow: hidden; text-decoration: none; color: #fff; isolation: isolate; }
+.imgcard__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #24425f center/cover no-repeat; transform: scale(1.001); transition: transform .7s cubic-bezier(.22, 1, .36, 1); will-change: transform; }
+.imgcard:hover .imgcard__media { transform: scale(1.04); }
+.imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); transition: opacity .5s ease; }
+.imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; transform: translateY(2px); transition: transform .55s cubic-bezier(.22, 1, .36, 1); }
 .imgcard__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
-.imgcard__more { display: inline-flex; align-items: center; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,.9); transition: color .18s ease, transform .18s ease; }
+.imgcard__more { display: inline-flex; align-items: center; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,.9); transition: color .3s ease, transform .45s cubic-bezier(.22, 1, .36, 1); }
 /* Карточка целиком — ссылка, а «Подробнее» внутри неё был мёртвым текстом:
    при наведении не менялось ничего, кроме масштаба фото. Специфичность здесь
    выше правила-переопределения цвета ниже по файлу, поэтому порядок не важен. */
 @media (hover: hover) and (pointer: fine) {
+    .imgcard:hover .imgcard__body,
+    .imgcard:focus-visible .imgcard__body { transform: translateY(0); }
     .imgcard:hover .imgcard__more,
     .imgcard:focus-visible .imgcard__more {
-        color: #fff; text-decoration: underline; text-underline-offset: 3px; transform: translateX(3px);
+        color: #fff; text-decoration: underline; text-underline-offset: 3px; transform: translateX(4px);
     }
 }
 
