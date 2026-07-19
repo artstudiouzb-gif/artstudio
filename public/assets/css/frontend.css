@@ -237,6 +237,12 @@ summary:focus-visible {
     box-shadow: 0 16px 36px rgba(19,42,92,.08);
     border-color: var(--gov-teal);
 }
+.block-advantages__item h3 {
+    transition: color 0.3s ease;
+}
+.block-advantages__item:hover h3 {
+    color: var(--gov-teal-text);
+}
 .block-advantages__icon {
     display: inline-flex;
     align-items: center;
@@ -816,10 +822,37 @@ h1, h2 { letter-spacing: -.015em; }
 /* --- Блок «Партнёры» (логотипы) --- */
 .block-partners__title { text-align: center; margin: 0 0 28px; }
 .block-partners__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--card-gap, 24px); align-items: center; }
-.block-partners__item { display: flex; align-items: center; justify-content: center; padding: 18px; background: var(--surface, #fff); border: 1px solid var(--border-color); border-radius: var(--radius, 14px); min-height: 90px; transition: box-shadow .15s, transform .15s; }
-.block-partners__item:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.block-partners__logo { max-width: 100%; max-height: 56px; width: auto; height: auto; object-fit: contain; filter: grayscale(1); opacity: .75; transition: filter .2s, opacity .2s; }
-.block-partners__item:hover .block-partners__logo { filter: grayscale(0); opacity: 1; }
+.block-partners__item { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 18px; 
+    background: var(--surface, #fff); 
+    border: 1px solid var(--border-color); 
+    border-radius: var(--radius, 14px); 
+    min-height: 90px; 
+    transition: box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease; 
+}
+.block-partners__item:hover { 
+    box-shadow: 0 12px 28px rgba(19, 42, 92, 0.06); 
+    transform: translateY(-4px); 
+    border-color: var(--gov-teal); 
+}
+.block-partners__logo { 
+    max-width: 100%; 
+    max-height: 56px; 
+    width: auto; 
+    height: auto; 
+    object-fit: contain; 
+    filter: grayscale(1); 
+    opacity: .65; 
+    transition: filter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.3s ease; 
+}
+.block-partners__item:hover .block-partners__logo { 
+    filter: grayscale(0); 
+    opacity: 1; 
+    transform: scale(1.04); 
+}
 /* Партнёр без логотипа: название текстом вместо битой картинки. */
 .block-partners__name { font-weight: 600; font-size: .95rem; text-align: center; color: var(--text-main); }
 

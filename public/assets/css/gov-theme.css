@@ -187,14 +187,42 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 }
 
 /* --- Полоса статистики (counters): белая карта с плитками и кружком-иконкой --- */
-.block-counters { background: var(--counters-bg, var(--gov-surface)); border: 1px solid var(--gov-border); border-radius: 14px; padding: clamp(20px, 3vw, 34px); box-shadow: 0 10px 30px rgba(19,42,92,.06); }
+.block-counters { 
+    background: var(--counters-bg, rgba(255, 255, 255, 0.84)); 
+    border: 1px solid rgba(255, 255, 255, 0.45); 
+    border-radius: 16px; 
+    padding: clamp(20px, 3vw, 34px); 
+    box-shadow: 0 20px 45px rgba(19, 42, 92, 0.08); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+:root[data-theme="dark"] .block-counters {
+    background: var(--counters-bg, rgba(11, 26, 48, 0.72)); 
+    border-color: rgba(255, 255, 255, 0.08); 
+}
 .block-counters__title { color: var(--counters-text, var(--gov-title)); }
 .block-counters__grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0; }
-.counter { border: 0; border-right: 1px solid var(--gov-border); border-radius: 0; padding: 6px 26px; box-shadow: none; background: transparent; flex-direction: row; align-items: flex-start; gap: 14px; }
+.counter { 
+    border: 0; 
+    border-right: 1px solid var(--gov-border); 
+    border-radius: 0; 
+    padding: 6px 26px; 
+    box-shadow: none; 
+    background: transparent; 
+    flex-direction: row; 
+    align-items: flex-start; 
+    gap: 14px; 
+    transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.counter:hover {
+    transform: translateY(-2px);
+}
 .counter:last-child { border-right: 0; }
 .counter__value, .counter__suffix { color: var(--counters-text, var(--gov-title)); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: clamp(1.75rem, 3.2vw, 2.5rem); line-height: 1; }
 /* Плотный межстрочный: подпись из 2–3 слов не должна «рассыпаться». */
-.counter__label { color: var(--counters-text, var(--gov-muted)); font-size: .9rem; line-height: 1.35; margin: 4px 0 0; }
+.counter__label { color: var(--counters-text, var(--gov-muted)); font-size: .9rem; line-height: 1.35; margin: 4px 0 0; transition: color 0.3s ease; }
+.counter:hover .counter__label { color: var(--counters-text, var(--gov-title)); }
 .block-counters[style*="--counters-text"] .counter__label { opacity: .78; }
 @media (max-width: 720px) { .counter { border-right: 0; border-bottom: 1px solid var(--gov-border); padding: 14px 0; } .counter:last-child { border-bottom: 0; } }
 
@@ -241,6 +269,16 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
    ========================================================================== */
 /* Полноширинный герой с видео/фото и тёмным затемнением, текст слева поверх. */
 .cms-block--hero { padding-block: 0 !important; }
+@keyframes hero-media-zoom {
+    from { transform: scale(1.06); }
+    to { transform: scale(1); }
+}
+@keyframes hero-play-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(23, 153, 155, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(23, 153, 155, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(23, 153, 155, 0); }
+}
+
 .block-hero--media {
     position: relative; width: 100vw; margin-left: calc(50% - 50vw); overflow: hidden;
     border: 0; border-radius: 0; min-height: clamp(460px, 46vw, 640px);
@@ -249,8 +287,13 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero__video, .block-hero--media .block-hero__media {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     background-size: cover; background-position: center;
-    /* Скелетон: пока фото/видео грузится, под ним navy, а не светлый фон. */
     background-color: var(--gov-navy);
+    animation: hero-media-zoom 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+    .block-hero__video, .block-hero--media .block-hero__media {
+        animation: none;
+    }
 }
 /* Гасим светлый градиент старой темы (frontend.css красил левый край
    в --bg-primary) — в гос-теме читаемость текста обеспечивает navy-скрим. */
@@ -264,24 +307,72 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero__video::-webkit-media-controls-overlay-play-button { display: none !important; -webkit-appearance: none; opacity: 0; }
 .block-hero__scrim {
     position: absolute; inset: 0;
-    background: var(--hero-scrim, rgba(11, 26, 48, .55));
+    background: linear-gradient(90deg, rgba(11, 26, 48, 0.72) 0%, rgba(11, 26, 48, 0.48) 45%, rgba(11, 26, 48, 0.16) 100%);
+    z-index: 2;
 }
-.block-hero--media .block-hero__inner { position: relative; width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 20px; }
+.block-hero--pos-right .block-hero__scrim {
+    background: linear-gradient(270deg, rgba(11, 26, 48, 0.72) 0%, rgba(11, 26, 48, 0.48) 45%, rgba(11, 26, 48, 0.16) 100%);
+}
+.block-hero--pos-center .block-hero__scrim {
+    background: linear-gradient(0deg, rgba(11, 26, 48, 0.72) 0%, rgba(11, 26, 48, 0.48) 45%, rgba(11, 26, 48, 0.16) 100%);
+}
+.block-hero--media .block-hero__inner { position: relative; width: 100%; max-width: var(--container-max); margin: 0 auto; padding: 0 20px; z-index: 3; }
 .block-hero--media .block-hero__text { max-width: var(--hero-text-width, 620px); }
 .block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: 0.8125rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
 .block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
 .block-hero--media .block-hero__title { color: var(--hero-text, #fff); font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.15; margin: 0 0 20px; }
 .block-hero--media .block-hero__subtitle { color: var(--hero-text, rgba(255,255,255,.85)); font-size: 1.02rem; max-width: 520px; }
 .block-hero__actions { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 16px !important; margin-top: 30px; }
-.block-hero__button { display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 0.8125rem; letter-spacing: .06em; font-weight: 700; border-radius: var(--btn-radius, 8px); text-decoration: none; }
+.block-hero__button { 
+    display: inline-flex !important; 
+    align-items: center !important; 
+    justify-content: center !important; 
+    padding: 14px 26px; 
+    background: var(--gov-navy); 
+    color: #fff; 
+    text-transform: uppercase; 
+    font-size: 0.8125rem; 
+    letter-spacing: .06em; 
+    font-weight: 700; 
+    border-radius: var(--btn-radius, 8px); 
+    text-decoration: none; 
+    transition: background 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.3s ease;
+}
 .block-hero--media .block-hero__button { background: var(--hero-btn, #16406e); }
 .block-hero:not(.block-hero--media) .block-hero__button { background: var(--hero-btn, var(--gov-navy)); }
+.block-hero__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(22, 64, 110, 0.3);
+}
+.block-hero--media .block-hero__button:hover {
+    background: var(--gov-teal);
+    box-shadow: 0 8px 20px rgba(23, 153, 155, 0.35);
+}
 .block-hero__button--ghost { background: transparent; border: 1px solid rgba(255,255,255,.5); }
-.block-hero__button--ghost:hover { background: rgba(255,255,255,.1); }
+.block-hero__button--ghost:hover { 
+    background: rgba(255,255,255,.12) !important; 
+    border-color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 255, 255, 0.08);
+}
 .block-hero__play { display: inline-flex !important; align-items: center !important; gap: 12px; color: #fff; text-decoration: none; font-size: 0.8125rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 700; }
-.block-hero__play-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,.16); backdrop-filter: blur(2px); }
+.block-hero__play-icon { 
+    display: grid; 
+    place-items: center; 
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    background: rgba(255,255,255,.16); 
+    backdrop-filter: blur(2px);
+    transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    animation: hero-play-pulse 2s infinite;
+}
 .block-hero__play-icon svg { width: 18px; height: 18px; }
-.block-hero__play:hover .block-hero__play-icon { background: var(--gov-teal); }
+.block-hero__play:hover .block-hero__play-icon { 
+    background: var(--gov-teal); 
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--gov-teal);
+}
 
 /* YouTube-фон: iframe масштабируется, чтобы всегда закрывать секцию (cover). */
 .block-hero__yt { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
@@ -344,7 +435,23 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .cms-block--hero + .cms-block--counters .block-counters { margin-top: clamp(-120px, -9vw, -80px); position: relative; z-index: 3; }
 .counter { flex-direction: row; align-items: flex-start; gap: 14px; }
 /* Иконка выровнена к строке числа (компенсирует разницу высот 54px vs текст). */
-.counter__icon { display: grid; place-items: center; width: 50px; height: 50px; margin-top: 2px; border-radius: 50%; flex-shrink: 0; background: color-mix(in srgb, var(--counters-text, var(--gov-title)) 8%, transparent); color: var(--counters-text, var(--gov-title)); }
+.counter__icon { 
+    display: grid; 
+    place-items: center; 
+    width: 50px; 
+    height: 50px; 
+    margin-top: 2px; 
+    border-radius: 50%; 
+    flex-shrink: 0; 
+    background: color-mix(in srgb, var(--counters-text, var(--gov-title)) 8%, transparent); 
+    color: var(--counters-text, var(--gov-title)); 
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s ease, color 0.3s ease;
+}
+.counter:hover .counter__icon {
+    transform: scale(1.1) rotate(6deg);
+    background: var(--gov-teal);
+    color: #fff;
+}
 .counter__icon svg { width: 26px; height: 26px; }
 .counter__num { display: flex; align-items: baseline; gap: 4px; }
 .counter__body { display: flex; flex-direction: column; gap: 2px; }
