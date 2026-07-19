@@ -209,7 +209,7 @@ $a11yParts = explode(':', (string) ($_COOKIE['a11y'] ?? ''));
 $a11y = [
     'on' => in_array($a11yParts[0] ?? '', $a11ySchemes, true),
     'scheme' => in_array($a11yParts[0] ?? '', $a11ySchemes, true) ? $a11yParts[0] : 'cw',
-    'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'm',
+    'size' => in_array($a11yParts[1] ?? '', $a11ySizes, true) ? $a11yParts[1] : 'l',
     'images' => ($a11yParts[2] ?? '') === 'off' ? 'off' : 'on',
 ];
 $a11yToggle = '<button type="button" class="a11y-toggle" aria-label="' . $et('Версия для слабовидящих') . '" title="' . $et('Версия для слабовидящих') . '" aria-controls="a11y-panel" aria-expanded="' . ($a11y['on'] ? 'true' : 'false') . '">'

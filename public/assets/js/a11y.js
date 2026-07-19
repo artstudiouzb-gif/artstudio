@@ -24,7 +24,7 @@
         return {
             on: SCHEMES.indexOf(p[0]) !== -1,
             scheme: SCHEMES.indexOf(p[0]) !== -1 ? p[0] : 'cw',
-            size: SIZES.indexOf(p[1]) !== -1 ? p[1] : 'm',
+            size: SIZES.indexOf(p[1]) !== -1 ? p[1] : 'l',
             images: p[2] === 'off' ? 'off' : 'on'
         };
     }
