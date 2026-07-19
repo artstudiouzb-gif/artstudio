@@ -173,14 +173,14 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 
 /* --- Карточки: классические, с мягкими контурами и микро-тенями --- */
 .news-card, .content-card, .contact-card, .counter, .cat-tile, .site-search-results__item,
-.block-testimonials__item, .testimonial, .team-card, .project-card, .person-card {
+.block-testimonials__item, .testimonial, .team-card, .project-card, .person-card, .block-advantages__item {
     background: var(--gov-surface);
     border: 1px solid var(--gov-border);
     border-radius: var(--radius);
     box-shadow: 0 1px 3px rgba(15, 27, 45, 0.01), 0 8px 24px -16px rgba(15, 27, 45, 0.06);
     transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s ease, background-color 0.35s ease;
 }
-.news-card:hover, .content-card:hover, .contact-card:hover, .cat-tile:hover, .team-card:hover, .project-card:hover, .person-card:hover {
+.news-card:hover, .content-card:hover, .contact-card:hover, .cat-tile:hover, .team-card:hover, .project-card:hover, .person-card:hover, .block-advantages__item:hover {
     box-shadow: 0 16px 36px rgba(19,42,92,.09);
     transform: translateY(-6px);
     border-color: var(--gov-teal);
