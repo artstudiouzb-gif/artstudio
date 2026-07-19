@@ -407,7 +407,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }
 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
-.newsfeat-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 34px; }
+.newsfeat-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
 @media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
 .newsfeat-lead { display: flex; flex-direction: column; gap: 18px; min-width: 0; text-decoration: none; color: var(--gov-ink); }
 .newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); background: #24425f center/cover no-repeat; object-fit: cover; }
@@ -416,10 +416,10 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: var(--gov-title); line-height: 1.35; }
 .newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.5; font-size: .95rem; }
 .newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
-@media (min-width: 901px) { .newsfeat-side { border-left: 1px solid var(--gov-border); padding-left: 34px; } }
 .newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 @media (max-width: 560px) { .newsfeat-side__thumbs { grid-template-columns: 1fr; } }
-.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid var(--gov-border); padding-top: 20px; }
+/* Разделение колонок — отступом, без вертикальной линии: линий в блоке и так много. */
+.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid color-mix(in srgb, var(--gov-border) 55%, transparent); padding-top: 20px; }
 @media (max-width: 560px) { .newsfeat-side__texts { grid-template-columns: 1fr; } }
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
 .newsfeat__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; }
@@ -1515,7 +1515,6 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     }
 
     .newsfeat-grid, .block-newsdocs { gap: 24px; }
-    .newsfeat-side { border-left: 0; padding-left: 0; }
     .newsfeat-side__thumbs, .newsfeat-side__texts { gap: 18px; }
     .news-index__grid, .block-news__grid {
         grid-template-columns: minmax(0, 1fr);
