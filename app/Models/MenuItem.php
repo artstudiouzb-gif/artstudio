@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Core\Database;
+use App\Core\Locale;
 
 final class MenuItem
 {
@@ -441,8 +442,43 @@ final class MenuItem
         return match ($item['url_type']) {
             'news_index' => $prefix . '/news',
             'page' => self::pageUrl((string) $item['url_value'], $prefix),
-            default => (string) $item['url_value'],
+            default => self::customUrl((string) $item['url_value'], $lang),
         };
+    }
+
+    /**
+     * Внутренние произвольные ссылки должны оставаться в выбранной локали.
+     * Внешние URL, служебные схемы, якоря и query-only ссылки не меняем.
+     */
+    private static function customUrl(string $url, string $lang): string
+    {
+        $url = trim($url);
+        if ($url === ''
+            || str_starts_with($url, '#')
+            || str_starts_with($url, '?')
+            || str_starts_with($url, '//')
+            || preg_match('/^[a-z][a-z0-9+.-]*:/i', $url) === 1
+        ) {
+            return $url;
+        }
+
+        $suffixAt = strcspn($url, '?#');
+        $path = '/' . ltrim(substr($url, 0, $suffixAt), '/');
+        $suffix = substr($url, $suffixAt);
+
+        // Старые пункты меню могли хранить языковой префикс вручную.
+        // Снимаем известный префикс и добавляем текущий ровно один раз.
+        $languageCodes = array_values(array_unique(array_merge([$lang], Language::activeCodes())));
+        foreach ($languageCodes as $code) {
+            $languagePrefix = '/' . $code;
+            if ($path === $languagePrefix || str_starts_with($path, $languagePrefix . '/')) {
+                $path = substr($path, strlen($languagePrefix));
+                $path = $path === '' ? '/' : $path;
+                break;
+            }
+        }
+
+        return Locale::url($path, $lang) . $suffix;
     }
 
     /**
