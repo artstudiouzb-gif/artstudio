@@ -144,14 +144,16 @@ if (!empty($menuItems)) {
 }
 
 // --- Переключатель языков ---
-// Если контроллер сообщил языки с реальным контентом сущности — показываем
-// только их; на общих маршрутах (списки, поиск) — все активные языки.
+// Переключатель всегда показывает все активные языки. Наличие перевода не
+// должно лишать посетителя возможности явно сменить язык интерфейса.
 $langHtml = '';
 $activeLangs = Language::active();
+$hrefLangs = $activeLangs;
 $contentLangs = \App\Core\Locale::contentLangs();
 if ($contentLangs !== null) {
-    $activeLangs = array_values(array_filter(
-        $activeLangs,
+    // Для SEO по-прежнему объявляем только реально существующие переводы.
+    $hrefLangs = array_values(array_filter(
+        $hrefLangs,
         static fn (array $l): bool => in_array((string) $l['code'], $contentLangs, true)
     ));
 }
@@ -380,10 +382,10 @@ if ($inlineMenu !== '') {
 <?php endif; ?>
 <link rel="canonical" href="<?= htmlspecialchars($canonicalUrl, ENT_QUOTES) ?>">
 <?php // hreflang: текущий путь на языках, где контент реально существует
-      // ($activeLangs уже отфильтрован по Locale::contentLangs выше),
+      // ($hrefLangs отфильтрован по Locale::contentLangs выше),
       // + x-default (основной язык). Одинокий hreflang не выводим. ?>
-<?php if (count($activeLangs) > 1): ?>
-<?php foreach ($activeLangs as $hrefLang): ?>
+<?php if (count($hrefLangs) > 1): ?>
+<?php foreach ($hrefLangs as $hrefLang): ?>
 <link rel="alternate" hreflang="<?= htmlspecialchars((string) $hrefLang['code'], ENT_QUOTES) ?>" href="<?= htmlspecialchars($appUrl . Locale::url(Locale::path(), (string) $hrefLang['code']), ENT_QUOTES) ?>">
 <?php endforeach; ?>
 <link rel="alternate" hreflang="x-default" href="<?= htmlspecialchars($appUrl . Locale::url(Locale::path(), \App\Models\Language::defaultCode()), ENT_QUOTES) ?>">

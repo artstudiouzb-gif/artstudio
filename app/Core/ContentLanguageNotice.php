@@ -24,9 +24,9 @@ final class ContentLanguageNotice
             return false;
         }
 
-        // Текущий язык оставляем в переключателе, хотя контента на нём нет:
-        // уведомление и вся навигация должны остаться на выбранном языке.
-        Locale::setContentLangs(array_values(array_unique(array_merge([$current], $availableCodes))));
+        // Для hreflang оставляем только реальные переводы. Переключатель
+        // независимо от этого показывает все активные языки.
+        Locale::setContentLangs($availableCodes);
 
         $alternatives = [];
         foreach ($active as $language) {
