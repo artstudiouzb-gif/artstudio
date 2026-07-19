@@ -58,7 +58,7 @@ $langs = Language::active();
             <th>Статус</th>
             <th>Дата публикации</th>
             <th>Соцсети</th>
-            <th></th>
+            <th class="data-table__action-cell">Действия</th>
         </tr>
     </thead>
     <tbody>
@@ -134,17 +134,19 @@ $langs = Language::active();
                         <?php endif; ?>
                     <?php endif; ?>
                 </td>
-                <td class="data-table__actions">
-                    <a class="btn btn--small" href="/admin/news/<?= (int) $item['id'] ?>/edit"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
-                    <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/duplicate">
-                        <?= Csrf::field() ?>
-                        <button type="submit" class="btn btn--small"><?= \App\Core\AdminUi::icon('copy') ?>Дублировать</button>
-                    </form>
-                    <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить новость «<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>»?">
-                        <?= Csrf::field() ?>
-                        <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
-                        <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
-                    </form>
+                <td class="data-table__action-cell">
+                    <div class="data-table__actions">
+                        <a class="btn btn--small" href="/admin/news/<?= (int) $item['id'] ?>/edit"><?= \App\Core\AdminUi::icon('edit') ?>Редактировать</a>
+                        <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/duplicate">
+                            <?= Csrf::field() ?>
+                            <button type="submit" class="btn btn--small"><?= \App\Core\AdminUi::icon('copy') ?>Дублировать</button>
+                        </form>
+                        <form method="post" action="/admin/news/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить новость «<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>»?">
+                            <?= Csrf::field() ?>
+                            <input type="hidden" name="return_query" value="<?= htmlspecialchars(http_build_query($filterParams), ENT_QUOTES) ?>">
+                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
+                        </form>
+                    </div>
                 </td>
             </tr>
         <?php endforeach; ?>

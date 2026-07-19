@@ -236,7 +236,7 @@ require __DIR__ . '/../layout/header.php';
                 <th>Размер</th>
                 <th>Доступ</th>
                 <th>Ссылка</th>
-                <th></th>
+                <th class="data-table__action-cell">Действия</th>
             </tr>
         </thead>
         <tbody>
@@ -278,18 +278,20 @@ require __DIR__ . '/../layout/header.php';
                             <code>/download.php?file_id=<?= (int) $item['id'] ?>&amp;token=<?= htmlspecialchars($item['access_token'], ENT_QUOTES) ?></code>
                         <?php endif; ?>
                     </td>
-                    <td class="data-table__actions">
-                        <button type="button" class="btn btn--small" data-copy-link="<?= htmlspecialchars($item['access_type'] === 'public' ? FileEntry::publicUrl($item) : '/download.php?file_id=' . (int) $item['id'] . '&token=' . $item['access_token'], ENT_QUOTES) ?>">Ссылка</button>
-                        <?php if ($item['access_type'] === 'protected'): ?>
-                            <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/regenerate-token" style="margin:0;">
+                    <td class="data-table__action-cell">
+                        <div class="data-table__actions">
+                            <button type="button" class="btn btn--small" data-copy-link="<?= htmlspecialchars($item['access_type'] === 'public' ? FileEntry::publicUrl($item) : '/download.php?file_id=' . (int) $item['id'] . '&token=' . $item['access_token'], ENT_QUOTES) ?>">Ссылка</button>
+                            <?php if ($item['access_type'] === 'protected'): ?>
+                                <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/regenerate-token">
+                                    <?= Csrf::field() ?>
+                                    <button type="submit" class="btn btn--small">Токен</button>
+                                </form>
+                            <?php endif; ?>
+                            <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?>»?">
                                 <?= Csrf::field() ?>
-                                <button type="submit" class="btn btn--small">Токен</button>
+                                <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
                             </form>
-                        <?php endif; ?>
-                        <form method="post" action="/admin/files/<?= (int) $item['id'] ?>/delete" data-confirm="Удалить файл «<?= htmlspecialchars($item['original_name'], ENT_QUOTES) ?>»?" style="margin:0;">
-                            <?= Csrf::field() ?>
-                            <button type="submit" class="btn btn--small btn--danger"><?= \App\Core\AdminUi::icon('trash') ?>Удалить</button>
-                        </form>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>

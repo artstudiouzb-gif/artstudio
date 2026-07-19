@@ -398,7 +398,14 @@ select:focus-visible, textarea:focus-visible, summary:focus-visible, [tabindex]:
 .data-table tbody tr:nth-child(even) { background: #f9f9f9; }
 .data-table tbody tr:hover { background: #f0f6fc; }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table__actions { display: flex; gap: 8px; justify-content: flex-end; white-space: nowrap; }
+.data-table__action-cell { width: 1%; text-align: right !important; }
+.data-table__actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; align-items: center; }
+.data-table__actions form { margin: 0; }
+/* Старые списки используют класс прямо на td. Сохраняем ячейку частью
+   таблицы: display:flex на td ломает расчёт колонок и границы строк. */
+.data-table td.data-table__actions { display: table-cell; width: 1%; text-align: right; white-space: normal; }
+.data-table td.data-table__actions > form { display: inline-flex; margin: 2px 0 2px 8px; vertical-align: middle; }
+.data-table td.data-table__actions > .btn { margin: 2px 0 2px 8px; vertical-align: middle; }
 .data-table__empty { padding: 32px; text-align: center; color: var(--admin-muted); }
 .data-table__empty .btn { margin-top: 12px; }
 
