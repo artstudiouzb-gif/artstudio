@@ -8,6 +8,15 @@ use App\Core\Database;
 
 final class Language
 {
+    private const FALLBACK = [
+        'id' => 0,
+        'code' => 'ru',
+        'name' => 'Русский',
+        'is_default' => 1,
+        'is_active' => 1,
+        'sort_order' => 0,
+    ];
+
     private static ?array $activeCache = null;
     private static ?array $defaultCache = null;
 
@@ -16,6 +25,10 @@ final class Language
      */
     public static function all(): array
     {
+        if (!Database::isConnected()) {
+            return [self::FALLBACK];
+        }
+
         $stmt = Database::pdo()->query('SELECT * FROM languages ORDER BY sort_order ASC, id ASC');
 
         return $stmt->fetchAll();
@@ -26,6 +39,10 @@ final class Language
      */
     public static function active(): array
     {
+        if (!Database::isConnected()) {
+            return [self::FALLBACK];
+        }
+
         if (self::$activeCache === null) {
             $stmt = Database::pdo()->query(
                 'SELECT * FROM languages WHERE is_active = 1 ORDER BY sort_order ASC, id ASC'
@@ -38,11 +55,15 @@ final class Language
 
     public static function default(): array
     {
+        if (!Database::isConnected()) {
+            return self::FALLBACK;
+        }
+
         if (self::$defaultCache === null) {
             $stmt = Database::pdo()->query('SELECT * FROM languages WHERE is_default = 1 LIMIT 1');
             $row = $stmt->fetch();
             if (!$row) {
-                $row = ['id' => 0, 'code' => 'ru', 'name' => 'Русский', 'is_default' => 1, 'is_active' => 1];
+                $row = self::FALLBACK;
             }
             self::$defaultCache = $row;
         }
