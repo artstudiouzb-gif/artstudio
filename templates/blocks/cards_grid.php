@@ -28,7 +28,6 @@ $cardStyle = $cvar('card_bg', '--card-bg') . $cvar('text_color', '--cards-text')
                     <?php if (!empty($item['icon_svg'])): ?><span class="feature-card__icon" aria-hidden="true"><?= $item['icon_svg'] ?></span><?php endif; ?>
                     <span class="feature-card__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                     <?php if (!empty($item['text'])): ?><span class="feature-card__text"><?= htmlspecialchars((string) $item['text'], ENT_QUOTES) ?></span><?php endif; ?>
-                    <?php if ($url !== ''): ?><span class="feature-card__arrow" aria-hidden="true">→</span><?php endif; ?>
                 </<?= $tag ?>>
             <?php endforeach; ?>
         </div>

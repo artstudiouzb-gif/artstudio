@@ -29,7 +29,6 @@ $fmt = static fn (string $d): string => DateFormatter::short($d);
                             <?php if (!empty($item['published_at'])): ?><time class="newsdocs-item__date"><?= htmlspecialchars($fmt((string) $item['published_at']), ENT_QUOTES) ?></time><?php endif; ?>
                             <span class="newsdocs-item__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                         </span>
-                        <span class="newsdocs-item__arrow">→</span>
                     </a>
                 <?php endforeach; ?>
             </div>
