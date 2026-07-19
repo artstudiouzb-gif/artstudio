@@ -526,10 +526,6 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .mediacard { 
     text-decoration: none; color: var(--gov-ink); 
     display: block;
-    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-}
-.mediacard:hover {
-    transform: translateY(-2px);
 }
 .mediacard__media { 
     position: relative; display: grid; place-items: center; aspect-ratio: 16/10; 
@@ -1872,7 +1868,7 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
 @media (hover: hover) and (pointer: fine) {
     :where(
         .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
-        .newsdocs-item, .doc-card, .album-card, .cat-tile, .mediacard
+        .newsdocs-item, .doc-card, .album-card, .cat-tile
     ):hover {
         transform: translateY(-3px);
     }
