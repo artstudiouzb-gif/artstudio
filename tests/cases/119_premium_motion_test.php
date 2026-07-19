@@ -7,6 +7,8 @@ test('Главные CTA и преимущества используют дос
 
     assert_contains('@keyframes hero-button-sheen', $css);
     assert_contains('.block-hero__button:not(.block-hero__button--ghost)::after', $css);
+    assert_contains('animation: hero-button-sheen 6s ease-in-out infinite;', $css);
+    assert_false(str_contains($css, 'animation: hero-button-sheen 4.2s'));
     assert_contains('@keyframes advantages-icon-float', $css);
     assert_contains('.block-advantages__item:focus-within .block-advantages__icon', $css);
     assert_contains('@media (prefers-reduced-motion: reduce)', $css);

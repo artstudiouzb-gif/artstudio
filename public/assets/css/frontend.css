@@ -1908,7 +1908,7 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
         pointer-events: none;
         background: linear-gradient(90deg, transparent, rgba(255,255,255,.62), transparent);
         filter: blur(.3px);
-        animation: hero-button-sheen 4.2s ease-in-out infinite;
+        animation: hero-button-sheen 6s ease-in-out infinite;
     }
 }
 @media (prefers-reduced-motion: reduce) {
