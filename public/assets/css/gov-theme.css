@@ -352,7 +352,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* Заголовок секции: серифный + ссылка «Все …». */
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
 .section-head__title { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0; }
-.section-head__all { color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); text-transform: uppercase; font-size: 0.8125rem; letter-spacing: .06em; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.section-head__all { color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
 
 /* Приоритетные направления — карточки иконка+заголовок+текст+стрелка. */
 .cards-grid { display: grid; grid-template-columns: repeat(var(--cards-cols, 5), 1fr); gap: 20px; }
@@ -376,7 +376,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); }
 .imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .imgcard__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
-.imgcard__more { display: inline-flex; align-items: center; text-transform: uppercase; font-size: 0.75rem; letter-spacing: .06em; font-weight: 700; color: rgba(255,255,255,.9); transition: color .18s ease, transform .18s ease; }
+.imgcard__more { display: inline-flex; align-items: center; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,.9); transition: color .18s ease, transform .18s ease; }
 /* Карточка целиком — ссылка, а «Подробнее» внутри неё был мёртвым текстом:
    при наведении не менялось ничего, кроме масштаба фото. Специфичность здесь
    выше правила-переопределения цвета ниже по файлу, поэтому порядок не важен. */
@@ -457,7 +457,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
 /* Обязательно ПОСЛЕ базового правила: специфичность одинаковая, решает порядок. */
 .newsfeat__date--on-media { color: rgba(255,255,255,.88); }
-.newsfeat__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; }
+.newsfeat__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; }
 .newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
 .newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; object-fit: cover; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
@@ -537,7 +537,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .person-card__body { display: flex; flex-direction: column; gap: 6px; padding: 18px; text-align: center; flex: 1; }
 .person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-title); }
 .person-card__role { color: var(--gov-muted); font-size: .9rem; line-height: 1.35; flex: 1; }
-.person-card__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; text-decoration: none; margin-top: 8px; }
+.person-card__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-top: 8px; }
 .person-card--vacant .person-card__role { color: var(--gov-ink); font-weight: 700; }
 
 /* История — таймлайн + CTA-карточка с фоном. */
@@ -693,7 +693,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-head { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(28px, 4vw, 56px); align-items: start; margin-top: 8px; }
 @media (max-width: 1000px) { .newsdetail-head { grid-template-columns: 1fr; } }
 .newsdetail-head__info { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding-top: 6px; }
-.newsdetail__badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.7188rem; letter-spacing: .1em; font-weight: 700; }
+.newsdetail__badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-teal-text); font-size: 0.82rem; font-weight: 700; }
 .newsdetail__title { font-size: clamp(1.9rem, 3.4vw, 2.9rem); line-height: 1.15; margin: 0; letter-spacing: -.01em; }
 .newsdetail__lead { color: var(--gov-muted); font-size: 1.02rem; line-height: 1.6; margin: 0; max-width: 52ch; }
 .newsdetail__meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--gov-muted); font-size: .88rem; }
@@ -926,7 +926,7 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .cont
 .block-map__card { position: absolute; left: 24px; bottom: 24px; max-width: 300px; background: var(--gov-surface); border-radius: 12px; padding: 18px 20px; box-shadow: 0 14px 34px rgba(19,42,92,.16); display: flex; flex-direction: column; gap: 8px; }
 .block-map__card-title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; }
 .block-map__card-address { color: var(--gov-muted); font-size: .86rem; line-height: 1.5; }
-.block-map__card-link { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; text-decoration: none; }
+.block-map__card-link { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; }
 
 /* --- Шапка Pro Max: верхняя утилитарная полоса + элементы нижней полосы --- */
 .site-topbar { font-size: 0.8125rem; }
