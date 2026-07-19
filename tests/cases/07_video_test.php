@@ -25,4 +25,7 @@ test('Video: обложка и embed используют id', function () {
     assert_contains('hqdefault', Video::youtubeThumbnail($id));
     assert_contains($id, Video::youtubeEmbed($id));
     assert_contains('nocookie', Video::youtubeEmbed($id));
+    assert_contains('rel=0', Video::youtubeEmbed($id));
+    assert_contains('controls=0', Video::youtubeEmbed($id));
+    assert_contains('enablejsapi=1', Video::youtubeEmbed($id));
 });

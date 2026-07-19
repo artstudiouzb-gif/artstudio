@@ -17,6 +17,7 @@ return [
     'Все новости' => 'All news',
     'Все материалы' => 'All materials',
     'Смотреть видео' => 'Watch video',
+    'Посмотреть ещё раз' => 'Watch again',
     'Смотреть все' => 'View all',
     'Найти' => 'Search',
     'Сбросить' => 'Reset',

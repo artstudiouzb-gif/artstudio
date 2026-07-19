@@ -94,7 +94,9 @@ final class SecurityHeaders
      */
     public static function publicCsp(string $nonce, array $opts = []): string
     {
-        $script = ["'self'", "'nonce-{$nonce}'"];
+        // IFrame API загружается лениво только после клика по YouTube-видео.
+        // Он нужен, чтобы заменить экран рекомендаций собственной обложкой.
+        $script = ["'self'", "'nonce-{$nonce}'", 'https://www.youtube.com'];
         $connect = ["'self'"];
         $style = ["'self'", "'unsafe-inline'"];
         $font = ["'self'", 'data:'];

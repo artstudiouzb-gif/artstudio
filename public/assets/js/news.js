@@ -42,22 +42,96 @@
     });
 
     // --- Ленивый YouTube: превью -> iframe только по клику ---
+    // Штатный end screen YouTube нельзя отключить параметром rel=0. После
+    // завершения IFrame API сразу закрывает его исходной обложкой новости.
+    var youtubeApiPromise = null;
+    function loadYoutubeApi() {
+        if (window.YT && typeof window.YT.Player === 'function') {
+            return Promise.resolve(window.YT);
+        }
+        if (youtubeApiPromise) { return youtubeApiPromise; }
+
+        youtubeApiPromise = new Promise(function (resolve, reject) {
+            var previousReady = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = function () {
+                if (typeof previousReady === 'function') { previousReady(); }
+                resolve(window.YT);
+            };
+
+            var script = document.createElement('script');
+            script.src = 'https://www.youtube.com/iframe_api';
+            script.async = true;
+            script.onerror = function () { reject(new Error('YouTube API unavailable')); };
+            document.head.appendChild(script);
+        });
+
+        return youtubeApiPromise;
+    }
+
     document.querySelectorAll('[data-youtube]').forEach(function (box) {
         var btn = box.querySelector('.news-video__play');
         var target = btn || box;
         target.addEventListener('click', function () {
+            if (box.classList.contains('is-playing')) { return; }
             var embed = box.getAttribute('data-embed');
             if (!embed) { return; }
+            var originalThumb = box.querySelector('.news-video__thumb');
+            var endThumb = originalThumb ? originalThumb.cloneNode(true) : null;
+            var replayLabel = box.getAttribute('data-replay-label') || 'Посмотреть ещё раз';
+
             var iframe = document.createElement('iframe');
-            iframe.setAttribute('src', embed);
+            var separator = embed.indexOf('?') === -1 ? '?' : '&';
+            iframe.setAttribute('src', embed + separator + 'origin=' + encodeURIComponent(window.location.origin));
             iframe.setAttribute('title', 'YouTube video');
             iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media');
+            iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
             iframe.className = 'news-video__iframe';
+
+            var endCard = document.createElement('div');
+            endCard.className = 'news-video__end';
+            endCard.hidden = true;
+            if (endThumb) {
+                endThumb.className = 'news-video__thumb news-video__end-thumb';
+                endCard.appendChild(endThumb);
+            }
+            var replay = document.createElement('button');
+            replay.type = 'button';
+            replay.className = 'news-video__replay';
+            replay.textContent = replayLabel;
+            endCard.appendChild(replay);
+
             box.innerHTML = '';
             box.classList.remove('skeleton');
+            box.classList.add('is-playing');
             box.appendChild(iframe);
+            box.appendChild(endCard);
+
+            loadYoutubeApi().then(function (YT) {
+                var player = new YT.Player(iframe, {
+                    events: {
+                        onStateChange: function (event) {
+                            if (event.data === YT.PlayerState.ENDED) {
+                                endCard.hidden = false;
+                                box.classList.add('is-ended');
+                            } else if (event.data === YT.PlayerState.PLAYING) {
+                                endCard.hidden = true;
+                                box.classList.remove('is-ended');
+                            }
+                        }
+                    }
+                });
+
+                replay.addEventListener('click', function () {
+                    endCard.hidden = true;
+                    box.classList.remove('is-ended');
+                    player.seekTo(0, true);
+                    player.playVideo();
+                });
+            }).catch(function () {
+                // Сам iframe остаётся рабочим; недоступен только свой end screen.
+                endCard.remove();
+            });
         });
     });
 })();

@@ -220,7 +220,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
             $embed = \App\Core\Video::youtubeEmbed($videoId) . '&autoplay=1';
             ?>
             <div class="newsdetail-media">
-                <div class="news-video newsdetail-video skeleton" data-youtube="<?= htmlspecialchars($videoId, ENT_QUOTES) ?>" data-embed="<?= htmlspecialchars($embed, ENT_QUOTES) ?>">
+                <div class="news-video newsdetail-video skeleton" data-youtube="<?= htmlspecialchars($videoId, ENT_QUOTES) ?>" data-embed="<?= htmlspecialchars($embed, ENT_QUOTES) ?>" data-replay-label="<?= htmlspecialchars(t('Посмотреть ещё раз'), ENT_QUOTES) ?>">
                     <img class="news-video__thumb" src="<?= htmlspecialchars($cover !== '' ? $cover : $thumb, ENT_QUOTES) ?>" data-fallback="<?= htmlspecialchars($fallback, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $news['title'], ENT_QUOTES) ?>" loading="eager" decoding="async">
                     <button type="button" class="news-video__play" aria-label="<?= htmlspecialchars(t('Смотреть видео'), ENT_QUOTES) ?>"></button>
                 </div>

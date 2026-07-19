@@ -17,6 +17,7 @@ return [
     'Все новости' => 'Barcha yangiliklar',
     'Все материалы' => 'Barcha materiallar',
     'Смотреть видео' => 'Videoni ko‘rish',
+    'Посмотреть ещё раз' => 'Yana ko‘rish',
     'Смотреть все' => 'Barchasini ko‘rish',
     'Найти' => 'Qidirish',
     'Сбросить' => 'Tozalash',

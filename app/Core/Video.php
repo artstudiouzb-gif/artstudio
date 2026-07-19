@@ -52,7 +52,10 @@ final class Video
 
     public static function youtubeEmbed(string $id): string
     {
-        // rel=0 и modestbranding для аккуратного плеера; autoplay включит JS по клику.
-        return 'https://www.youtube-nocookie.com/embed/' . $id . '?rel=0&modestbranding=1';
+        // YouTube больше не позволяет полностью выключить рекомендации через
+        // rel=0. Поэтому скрываем штатные контролы/кнопку «Другие видео», а
+        // enablejsapi позволяет сайту закрыть финальный экран своей обложкой.
+        return 'https://www.youtube-nocookie.com/embed/' . $id
+            . '?rel=0&controls=0&disablekb=1&fs=0&iv_load_policy=3&playsinline=1&enablejsapi=1';
     }
 }
