@@ -91,6 +91,7 @@ test('Блок bio_education: карьера, образование, доп. с
 });
 
 test('Блок news_docs: документы и заглушки; ссылка «Все» у документов', function () {
+    ensure_test_db();
     $out = BlockRenderer::render(['id' => 47, 'type' => 'news_docs', 'custom_css' => null, 'data' => json_encode([
         'news_title' => 'Актуальные новости', 'docs_title' => 'Документы',
         'docs_all_text' => 'Все документы', 'docs_all_url' => '/docs',

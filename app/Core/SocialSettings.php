@@ -149,6 +149,13 @@ final class SocialSettings
             if ($code === $default) {
                 $row = $news;
             } else {
+                // Черновая полезная нагрузка без id (например, предпросмотр
+                // или unit-тест) не имеет переводов в БД. Не обращаемся к
+                // NewsTranslation с фиктивным id=0 и оставляем только базовый
+                // языковой блок.
+                if (empty($news['id']) || !Database::isConnected()) {
+                    continue;
+                }
                 $translation = NewsTranslation::find((int) ($news['id'] ?? 0), $code);
                 if ($translation === null || trim((string) ($translation['title'] ?? '')) === '') {
                     continue; // перевода нет — язык пропускаем, дубля не будет

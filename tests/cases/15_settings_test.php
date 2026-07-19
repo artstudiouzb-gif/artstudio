@@ -3,7 +3,21 @@
 declare(strict_types=1);
 
 use App\Core\Analytics;
+use App\Core\Database;
 use App\Core\SettingsValidator;
+use App\Models\Setting;
+
+test('Setting: чтение до подключения БД возвращает значения по умолчанию', function () {
+    if (Database::isConnected()) {
+        // В полном интеграционном прогоне соединение уже поднято более ранним
+        // тестом; здесь достаточно убедиться, что обычное чтение сохранилось.
+        assert_true(is_array(Setting::all()));
+        return;
+    }
+
+    assert_true(is_array(Setting::all()));
+    assert_same('fallback', Setting::get('missing_key', 'fallback'));
+});
 
 test('SettingsValidator: GA ID только формата G-XXXX', function () {
     assert_same('G-ABCD1234', SettingsValidator::gaId('g-abcd1234'));
