@@ -3,7 +3,6 @@
 $title = $data['title'] ?? '';
 $news = $data['news'] ?? [];
 $allUrl = $data['all_url'] ?? '/news';
-$lang = \App\Core\Locale::current();
 ?>
 <div class="block-news">
     <?php if ($title !== ''): ?>
@@ -26,11 +25,11 @@ $lang = \App\Core\Locale::current();
                         <?php endif; ?>
                         <span class="news-card__body">
                             <?php if (!empty($item['published_at'])): ?>
-                                <time class="news-card__date" datetime="<?= htmlspecialchars(substr((string) $item['published_at'], 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars(\App\Core\DateFormatter::long((string) $item['published_at'], $lang), ENT_QUOTES) ?></time>
+                                <time class="news-card__date" datetime="<?= htmlspecialchars(substr((string) $item['published_at'], 0, 10), ENT_QUOTES) ?>"><?= htmlspecialchars(\App\Core\DateFormatter::short((string) $item['published_at']), ENT_QUOTES) ?></time>
                             <?php endif; ?>
                             <span class="news-card__title"><?= htmlspecialchars($item['title'], ENT_QUOTES) ?></span>
                             <?php if (!empty($item['excerpt'])): ?>
-                                <span class="news-card__excerpt"><?= htmlspecialchars(mb_substr(strip_tags((string) $item['excerpt']), 0, 140), ENT_QUOTES) ?></span>
+                                <span class="news-card__excerpt"><?= htmlspecialchars(excerpt((string) $item['excerpt'], 140), ENT_QUOTES) ?></span>
                             <?php endif; ?>
                         </span>
                     </a>

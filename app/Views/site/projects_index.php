@@ -34,7 +34,7 @@ require __DIR__ . '/_crumbs.php';
                     <span class="imgcard__body">
                         <span class="imgcard__title"><?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?></span>
                         <?php if (!empty($item['description'])): ?>
-                            <span class="imgcard__desc"><?= htmlspecialchars(mb_substr(strip_tags((string) $item['description']), 0, 120), ENT_QUOTES) ?></span>
+                            <span class="imgcard__desc"><?= htmlspecialchars(excerpt((string) $item['description'], 120), ENT_QUOTES) ?></span>
                         <?php endif; ?>
                         <span class="imgcard__more"><?= htmlspecialchars(t('Подробнее'), ENT_QUOTES) ?> →</span>
                     </span>

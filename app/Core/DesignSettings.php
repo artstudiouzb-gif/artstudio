@@ -546,8 +546,11 @@ final class DesignSettings
     public static function semanticColors(): array
     {
         $defaults = [
-            'bg_primary' => '#ffffff',
-            'bg_surface' => '#f4f5f7',
+            // Страница — чуть серая, карточки — белые: карточка «поднимается»
+            // над фоном без тени и рамки. Обратный порядок делал карточки
+            // серыми пятнами на белом.
+            'bg_primary' => '#f6f8fa',
+            'bg_surface' => '#ffffff',
             'text_main' => '#1a1a1a',
             'text_muted' => '#666666',
             'border_color' => '#e1e3e8',

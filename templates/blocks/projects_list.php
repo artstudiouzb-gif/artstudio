@@ -16,7 +16,7 @@ $projects = $data['projects'] ?? [];
                     <?php endif; ?>
                     <div class="project-card__title"><?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES) ?></div>
                     <?php if (!empty($p['description'])): ?>
-                        <p class="project-card__desc"><?= htmlspecialchars(mb_substr(strip_tags((string) $p['description']), 0, 160), ENT_QUOTES) ?></p>
+                        <p class="project-card__desc"><?= htmlspecialchars(excerpt((string) $p['description'], 160), ENT_QUOTES) ?></p>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

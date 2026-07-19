@@ -21,11 +21,22 @@ test('Хлебные крошки публичных шаблонов перев
     }
 });
 
-test('Ведущая новость на главной использует полноширинное вертикальное построение', function () {
+test('Ведущая новость на главной — цельная плитка с текстом на обложке', function () {
     $css = file_get_contents(APP_ROOT . '/public/assets/css/gov-theme.css');
     assert_true($css !== false, 'CSS гос-темы доступен');
-    assert_contains('.newsfeat-lead { display: flex; flex-direction: column;', (string) $css);
-    assert_contains('.newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10;', (string) $css);
+    // Текст лежит на обложке: рамка позиционирует затемняющую подложку.
+    assert_contains('.newsfeat-lead__frame { position: relative;', (string) $css);
+    assert_contains('.newsfeat-lead__over {', (string) $css);
+    // Плитка тянется на высоту правой колонки — колонки заканчиваются вровень.
+    assert_contains('.newsfeat-grid { align-items: stretch; }', (string) $css);
+});
+
+test('Рубрика на карточке новости выводится только когда заполнена', function () {
+    $tpl = (string) file_get_contents(APP_ROOT . '/templates/blocks/news_feature.php');
+    // Одинаковая метка у всех карточек — шум, а не рубрикация: фолбэка быть не должно.
+    assert_not_contains("t('Новость')", $tpl);
+    assert_contains("\$badge = static fn (array \$i): string => trim((string) (\$i['badge'] ?? ''));", $tpl);
+    assert_contains("if (\$badge(\$featured) !== ''):", $tpl);
 });
 
 test('Публичные календарь и альбомы не содержат непереведённых основных подписей', function () {

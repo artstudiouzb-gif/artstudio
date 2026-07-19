@@ -47,7 +47,8 @@ test('Тема отдаёт вычисленные варианты акцент
     $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
     // На тёмных подложках текстовый акцент переключается на светлый вариант.
     assert_contains('.cms-block--bg-navy, .block-hero--media, .site-footer { --gov-teal-text: var(--gov-teal-on-dark); }', $css);
-    // Мелкие ссылки-стрелки берут текстовый вариант, а не «графический» акцент.
+    // Мелкие ссылки берут текстовый вариант, а не «графический» акцент.
     assert_contains('.block-hero__eyebrow', $css);
-    assert_not_contains('.feature-card__arrow { color: var(--gov-teal);', $css);
+    assert_not_contains('.newsfeat__more { color: var(--gov-teal);', $css);
+    assert_not_contains('.person-card__more { color: var(--gov-teal);', $css);
 });

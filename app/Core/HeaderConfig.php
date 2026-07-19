@@ -55,7 +55,7 @@ final class HeaderConfig
         'logo_position' => 'left',            // left | center
         'logo_width' => 240,                  // px, 40..600
         'logo_height' => 48,                  // px, 20..200
-        'menu_position' => 'right',           // left | center | right
+        'menu_position' => 'center',          // left | center | right
         // Поведение шапки: липкая (следует за прокруткой) и прозрачная
         // (накладывается на первый экран, при прокрутке становится сплошной).
         'sticky' => false,

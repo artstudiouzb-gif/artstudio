@@ -62,7 +62,12 @@ h1, h2, h3, h4, h5, h6,
 :root[data-theme="dark"] h1, :root[data-theme="dark"] h2, :root[data-theme="dark"] h3 { color: var(--gov-ink); }
 a { color: var(--gov-teal); }
 
-.site-content { max-width: var(--container-max); }
+/* Вертикальные отступы контейнера сняты — страница начинается выше и
+   заканчивается плотнее. Боковые (20px) остаются: на узком экране без них
+   текст упрётся в край. */
+.site-content { max-width: var(--container-max); padding-block: 0; }
+/* Крошкам нужен собственный зазор, иначе они прилипают к шапке. */
+.crumbs, .content-crumbs { margin-top: 16px; }
 
 /* --- Шапка: белая, эмблема + название, uppercase-меню с teal-подчёркиванием --- */
 .site-header { background: var(--gov-surface); border-bottom: 1px solid var(--gov-border); box-shadow: none; }
@@ -198,7 +203,10 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
    карточка: убираем подложку и рамку, оставляя только отступы и типографику. */
 .block-hero--plain { background: transparent; border: 0; }
 .block-hero__title { color: var(--hero-text, var(--gov-title)); }
-.block-hero__subtitle { color: var(--hero-text, var(--gov-muted)); }
+/* Лид героя набирается тем же кеглем, что и лиды разделов
+   (.listing__lead, .newsdetail-phero__lead) — 1.02rem. Раньше он
+   дорастал до 1.18–1.22rem и выбивался из общей шкалы. */
+.block-hero__subtitle { color: var(--hero-text, var(--gov-muted)); font-size: 1.02rem; }
 
 /* --- Сетка категорий: активная плитка teal --- */
 .cat-tile.is-active { background: color-mix(in srgb, var(--gov-teal) 10%, var(--gov-surface)); border-color: var(--gov-teal); }
@@ -257,7 +265,7 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .block-hero__eyebrow { display: inline-flex; align-items: center; gap: 10px; color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); font-weight: 700; font-size: 0.8125rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 18px; }
 .block-hero__eyebrow::before { content: ''; width: 34px; height: 2px; background: var(--gov-teal); }
 .block-hero--media .block-hero__title { color: var(--hero-text, #fff); font-size: clamp(2.2rem, 4.6vw, 3.7rem); line-height: 1.15; margin: 0 0 20px; }
-.block-hero--media .block-hero__subtitle { color: var(--hero-text, rgba(255,255,255,.85)); font-size: clamp(1.02rem, 1.5vw, 1.18rem); max-width: 520px; }
+.block-hero--media .block-hero__subtitle { color: var(--hero-text, rgba(255,255,255,.85)); font-size: 1.02rem; max-width: 520px; }
 .block-hero__actions { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: 16px !important; margin-top: 30px; }
 .block-hero__button { display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 14px 26px; background: var(--gov-navy); color: #fff; text-transform: uppercase; font-size: 0.8125rem; letter-spacing: .06em; font-weight: 700; border-radius: var(--btn-radius, 8px); text-decoration: none; }
 .block-hero--media .block-hero__button { background: var(--hero-btn, #16406e); }
@@ -352,7 +360,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 /* Заголовок секции: серифный + ссылка «Все …». */
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
 .section-head__title { font-size: clamp(1.5rem, 2.6vw, 2rem); margin: 0; }
-.section-head__all { color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); text-transform: uppercase; font-size: 0.8125rem; letter-spacing: .06em; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.section-head__all { color: var(--gov-teal-text); font-family: var(--font-family, 'PT Sans', sans-serif); font-size: 0.9rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
 
 /* Приоритетные направления — карточки иконка+заголовок+текст+стрелка. */
 .cards-grid { display: grid; grid-template-columns: repeat(var(--cards-cols, 5), 1fr); gap: 20px; }
@@ -364,7 +372,6 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .feature-card__icon svg { width: 34px; height: 34px; }
 .feature-card__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.12rem; color: var(--gov-title); line-height: 1.25; }
 .feature-card__text { color: var(--gov-muted); font-size: .92rem; line-height: 1.5; flex: 1; }
-.feature-card__arrow { color: var(--gov-teal-text); font-size: 1.2rem; }
 
 /* Проекты — карточки с фото и тёмным градиентом. */
 .imgcards-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -376,7 +383,16 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .imgcard__overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,26,48,.1) 30%, rgba(11,26,48,.85) 100%); }
 .imgcard__body { position: absolute; left: 0; right: 0; bottom: 0; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
 .imgcard__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.1rem; line-height: 1.25; }
-.imgcard__more { text-transform: uppercase; font-size: 0.75rem; letter-spacing: .06em; font-weight: 700; color: rgba(255,255,255,.9); }
+.imgcard__more { display: inline-flex; align-items: center; font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,.9); transition: color .18s ease, transform .18s ease; }
+/* Карточка целиком — ссылка, а «Подробнее» внутри неё был мёртвым текстом:
+   при наведении не менялось ничего, кроме масштаба фото. Специфичность здесь
+   выше правила-переопределения цвета ниже по файлу, поэтому порядок не важен. */
+@media (hover: hover) and (pointer: fine) {
+    .imgcard:hover .imgcard__more,
+    .imgcard:focus-visible .imgcard__more {
+        color: #fff; text-decoration: underline; text-underline-offset: 3px; transform: translateX(3px);
+    }
+}
 
 /* Карусель проектов. */
 .section-head__tools { display: flex; align-items: center; gap: 16px; }
@@ -407,30 +423,75 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .mediacard__date { display: block; color: var(--gov-muted); font-size: .85rem; margin-top: 4px; }
 
 /* --- Блок «Новости и аналитика»: крупная + список (по эскизу) --- */
-.newsfeat-grid { display: grid; grid-template-columns: 1fr 1.15fr; gap: 34px; }
+.newsfeat-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 40px; }
 @media (max-width: 900px) { .newsfeat-grid { grid-template-columns: 1fr; } }
-.newsfeat-lead { display: flex; flex-direction: column; gap: 18px; min-width: 0; text-decoration: none; color: var(--gov-ink); }
-.newsfeat-lead__media { display: block; width: 100%; aspect-ratio: 16/10; border-radius: var(--radius); background: #24425f center/cover no-repeat; object-fit: cover; }
-.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
-.newsfeat-lead__body { display: flex; flex-direction: column; gap: 12px; }
-.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.3rem; color: var(--gov-title); line-height: 1.35; }
-.newsfeat-lead__excerpt { color: var(--gov-muted); line-height: 1.5; font-size: .95rem; }
+/* Лид — цельная плитка: рубрика, заголовок, лид и дата лежат на обложке.
+   Разорванной связи «картинка отдельно, текст отдельно» больше нет. */
+.newsfeat-lead { display: block; min-width: 0; text-decoration: none; color: var(--gov-ink); }
+.newsfeat-lead__frame { position: relative; display: block; height: 100%; border-radius: var(--radius); overflow: hidden; }
+.newsfeat-lead__media { display: block; width: 100%; height: 100%; min-height: 260px; background: #24425f center/cover no-repeat; object-fit: cover; }
+.newsfeat-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 22%, var(--gov-surface)), var(--gov-surface)); }
+/* Подложка под текстом — затемнение снизу, чтобы белый читался на любом фото. */
+.newsfeat-lead__over {
+    position: absolute; inset-inline: 0; bottom: 0; display: flex; flex-direction: column;
+    align-items: flex-start; gap: 10px; padding: 22px;
+    /* Плотность подобрана так, чтобы белый текст держал 4.5:1 даже
+       на самой светлой обложке, а не только 3:1 «как крупный текст». */
+    background: linear-gradient(to top,
+        color-mix(in srgb, var(--gov-navy) 96%, transparent),
+        color-mix(in srgb, var(--gov-navy) 82%, transparent) 58%,
+        transparent);
+}
+.newsfeat-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.35rem; color: #fff; line-height: 1.32; }
+.newsfeat-lead__excerpt {
+    color: rgba(255,255,255,.86); line-height: 1.5; font-size: .93rem;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+/* На широком экране плитка тянется ровно на высоту правой колонки — колонки
+   всегда заканчиваются вровень, независимо от длины заголовков. */
+@media (min-width: 901px) { .newsfeat-grid { align-items: stretch; } }
+/* В одну колонку высоту задаёт пропорция, а не растяжка по соседу.
+   На узком экране плитка вытянута вертикально: иначе подложка с текстом
+   занимает больше половины картинки. */
+@media (max-width: 900px) { .newsfeat-lead__media { height: auto; min-height: 0; aspect-ratio: 16/10; } }
+@media (max-width: 560px) { .newsfeat-lead__media { aspect-ratio: 4/5; } }
 .newsfeat-side { display: flex; flex-direction: column; gap: 24px; }
-@media (min-width: 901px) { .newsfeat-side { border-left: 1px solid var(--gov-border); padding-left: 34px; } }
 .newsfeat-side__thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
 @media (max-width: 560px) { .newsfeat-side__thumbs { grid-template-columns: 1fr; } }
-.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid var(--gov-border); padding-top: 20px; }
+/* Разделение колонок — отступом, без вертикальной линии: линий в блоке и так много. */
+.newsfeat-side__texts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; border-top: 1px solid color-mix(in srgb, var(--gov-border) 55%, transparent); padding-top: 20px; }
 @media (max-width: 560px) { .newsfeat-side__texts { grid-template-columns: 1fr; } }
 .newsfeat__date { color: var(--gov-muted); font-size: .82rem; }
-.newsfeat__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; }
+/* Обязательно ПОСЛЕ базового правила: специфичность одинаковая, решает порядок. */
+.newsfeat__date--on-media { color: rgba(255,255,255,.88); }
+.newsfeat__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; }
 .newsfeat-mini { display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: var(--gov-ink); }
 .newsfeat-mini__media { display: block; width: 100%; aspect-ratio: 16/10; min-height: 150px; border-radius: 8px; background: #24425f center/cover no-repeat; object-fit: cover; }
 .newsfeat-mini__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsfeat-mini__body { display: flex; flex-direction: column; gap: 6px; }
 .newsfeat-mini__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
 .newsfeat-text { display: flex; flex-direction: column; gap: 6px; text-decoration: none; color: var(--gov-ink); }
+
+/* Рубрика карточки. На фото — плашка (нужен свой фон для читаемости),
+   без фото — просто набранная метка. */
+/* Рубрика — типографская метка с акцентной чертой, а не залитая плашка:
+   цветной прямоугольник в углу обложки — узнаваемый приём новостных
+   порталов. Метка стоит на одной строке с датой, поэтому не занимает
+   отдельную строку и не сдвигает соседей по ряду, у которых рубрики нет. */
+.news-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; min-width: 0; }
+.news-badge {
+    display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%;
+    color: var(--gov-teal-text); font-size: .8rem; font-weight: 700; line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.news-badge::before { content: ""; flex: none; width: 14px; height: 2px; background: currentColor; }
+/* На обложке акцентный цвет не держит контраст — метка становится белой. */
+.news-badge--on-media { color: #fff; }
 .newsfeat-text__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
-.newsfeat-lead:hover .newsfeat-lead__title, .newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
+.newsfeat-mini:hover .newsfeat-mini__title, .newsfeat-text:hover .newsfeat-text__title { color: var(--gov-teal); }
+/* Заголовок лида белый на фото — подсвечиваем подчёркиванием, не цветом. */
+.newsfeat-lead:hover .newsfeat-lead__title { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 560px) { .newsfeat-lead__over { padding: 14px; } .newsfeat-lead__title { font-size: 1.12rem; } }
 
 /* --- Медиа-галерея: переключатели --- */
 .media-tabs { display: inline-flex; gap: 22px; margin-right: auto; margin-left: 24px; }
@@ -483,7 +544,7 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .person-card__body { display: flex; flex-direction: column; gap: 6px; padding: 18px; text-align: center; flex: 1; }
 .person-card__name { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: 1.05rem; color: var(--gov-title); }
 .person-card__role { color: var(--gov-muted); font-size: .9rem; line-height: 1.35; flex: 1; }
-.person-card__more { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; text-decoration: none; margin-top: 8px; }
+.person-card__more { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; margin-top: 8px; }
 .person-card--vacant .person-card__role { color: var(--gov-ink); font-weight: 700; }
 
 /* История — таймлайн + CTA-карточка с фоном. */
@@ -512,14 +573,13 @@ body:has(.site-header--transparent) .block-hero .content-crumbs--on-hero { top: 
 .block-newsdocs { display: grid; grid-template-columns: 1.15fr 1fr; gap: 34px; align-items: start; }
 @media (max-width: 900px) { .block-newsdocs { grid-template-columns: 1fr; } }
 .newsdocs-news { display: flex; flex-direction: column; }
-.newsdocs-item { display: grid; grid-template-columns: 96px 1fr auto; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gov-border); text-decoration: none; color: var(--gov-ink); }
+.newsdocs-item { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gov-border); text-decoration: none; color: var(--gov-ink); }
 .newsdocs-item:first-child { padding-top: 0; }
 .newsdocs-item__media { display: block; aspect-ratio: 4/3; border-radius: 8px; background: #24425f center/cover no-repeat; width: 100%; object-fit: cover; }
 .newsdocs-item__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .newsdocs-item__body { display: flex; flex-direction: column; gap: 5px; }
 .newsdocs-item__date { color: var(--gov-muted); font-size: .82rem; }
 .newsdocs-item__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .95rem; }
-.newsdocs-item__arrow { color: var(--gov-teal-text); font-size: 1.15rem; }
 .newsdocs-item:hover .newsdocs-item__title { color: var(--gov-teal); }
 .newsdocs-docs { display: flex; flex-direction: column; gap: 14px; }
 .doc-card { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; padding: 18px 20px; background: var(--gov-surface); border: 1px solid var(--gov-border); border-radius: var(--radius); text-decoration: none; color: var(--gov-ink); transition: box-shadow .15s ease; }
@@ -639,7 +699,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .newsdetail-head { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: clamp(28px, 4vw, 56px); align-items: start; margin-top: 8px; }
 @media (max-width: 1000px) { .newsdetail-head { grid-template-columns: 1fr; } }
 .newsdetail-head__info { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; padding-top: 6px; }
-.newsdetail__badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.7188rem; letter-spacing: .1em; font-weight: 700; }
+.newsdetail__badge { display: inline-block; padding: 6px 14px; border-radius: 999px; background: color-mix(in srgb, var(--gov-teal) 12%, transparent); color: var(--gov-teal-text); font-size: 0.82rem; font-weight: 700; }
 .newsdetail__title { font-size: clamp(1.9rem, 3.4vw, 2.9rem); line-height: 1.15; margin: 0; letter-spacing: -.01em; }
 .newsdetail__lead { color: var(--gov-muted); font-size: 1.02rem; line-height: 1.6; margin: 0; max-width: 52ch; }
 .newsdetail__meta { display: flex; flex-wrap: wrap; gap: 8px 22px; color: var(--gov-muted); font-size: .88rem; }
@@ -725,8 +785,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .relnews-card__media { aspect-ratio: 16/10; border-radius: 12px; background-color: #24425f; background-position: center; background-size: cover; background-repeat: no-repeat; display: block; width: 100%; object-fit: cover; }
 .relnews-card__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
 .relnews-card__date { color: var(--gov-muted); font-size: .82rem; }
-.relnews-card__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .96rem; flex: 1; }
-.relnews-card__arrow { color: var(--gov-teal-text); }
+.relnews-card__title { font-weight: 700; color: var(--gov-title); line-height: 1.35; font-size: .96rem; }
+/* Лид прижат к низу карточки: у соседей по ряду заголовки разной длины,
+   и без этого нижние края текста гуляли. */
+.relnews-card__excerpt { margin-top: auto; }
 .relnews-card:hover .relnews-card__title { color: var(--gov-teal); }
 
 /* --- Предыдущая / следующая --- */
@@ -870,7 +932,7 @@ body:has(.site-header--transparent) .newsdetail--premium .newsdetail-phero .cont
 .block-map__card { position: absolute; left: 24px; bottom: 24px; max-width: 300px; background: var(--gov-surface); border-radius: 12px; padding: 18px 20px; box-shadow: 0 14px 34px rgba(19,42,92,.16); display: flex; flex-direction: column; gap: 8px; }
 .block-map__card-title { font-weight: 700; color: var(--gov-title); font-size: .95rem; line-height: 1.35; }
 .block-map__card-address { color: var(--gov-muted); font-size: .86rem; line-height: 1.5; }
-.block-map__card-link { color: var(--gov-teal-text); text-transform: uppercase; font-size: 0.75rem; letter-spacing: .05em; font-weight: 700; text-decoration: none; }
+.block-map__card-link { color: var(--gov-teal-text); font-size: 0.85rem; font-weight: 700; text-decoration: none; }
 
 /* --- Шапка Pro Max: верхняя утилитарная полоса + элементы нижней полосы --- */
 .site-topbar { font-size: 0.8125rem; }
@@ -1179,7 +1241,10 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 /* ==========================================================================
    Списочные страницы: «Все новости», «Все проекты».
    ========================================================================== */
-.listing { display: flex; flex-direction: column; gap: clamp(26px, 3.4vw, 44px); padding-block: clamp(16px, 2.4vw, 30px) clamp(40px, 5vw, 64px); }
+/* Сверху отступ не нужен — его уже дают крошки. Снизу оставлен небольшой:
+   контент, упирающийся в тёмный футер, выглядит так же сломанно, как
+   крошки, прилипшие к шапке. */
+.listing { display: flex; flex-direction: column; gap: clamp(26px, 3.4vw, 44px); padding-block: 0 28px; }
 .listing__title { font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0 0 10px; }
 .listing__lead { color: var(--gov-muted); font-size: 1.02rem; line-height: 1.6; max-width: 60ch; margin: 0; }
 
@@ -1194,13 +1259,18 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 @media (max-width: 900px) { .newslist-lead { grid-template-columns: 1fr; } }
 .newslist-lead__media { display: block; min-height: 300px; background-color: #24425f; background-position: center; background-size: cover; background-repeat: no-repeat; width: 100%; height: 100%; object-fit: cover; }
 .newslist-lead__media--empty { background: linear-gradient(120deg, color-mix(in srgb, var(--gov-navy) 14%, var(--gov-surface)), var(--gov-surface)); }
-.newslist-lead__body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: clamp(20px, 3vw, 36px); }
+/* Текст по центру высоты: он короче картинки, и прижатый к верху оставлял
+   под собой пустую половину блока. */
+.newslist-lead__body { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 12px; padding: clamp(20px, 3vw, 36px); }
 .newslist__date { color: var(--gov-muted); font-size: .85rem; }
 .newslist-lead__title { font-family: var(--font-heading, 'PT Serif', serif); font-weight: 700; font-size: clamp(1.3rem, 2.2vw, 1.7rem); color: var(--gov-title); line-height: 1.25; }
 .newslist-lead__excerpt { color: var(--gov-muted); line-height: 1.6; }
 .newslist-lead:hover .newslist-lead__title { color: var(--gov-teal); }
 
 /* Сетка новостей (переиспользует карточки relnews). */
+/* Крупная новость стыковалась с сеткой вплотную (0px). Отступ задаётся ей,
+   а не сетке: на страницах фильтра и со 2-й сетка идёт без крупной. */
+.newslist-lead { margin-bottom: clamp(22px, 3vw, 34px); }
 .newslist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
 @media (max-width: 1000px) { .newslist-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 560px) { .newslist-grid { grid-template-columns: 1fr; } }
@@ -1430,7 +1500,7 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     }
     :where(.news-card__link, .newsfeat-lead, .newsfeat-mini, .newsfeat-text,
         .newsdocs-item, .doc-card, .album-card, .cat-tile, .media-item,
-        .mediacard):hover :where(.newsfeat__more, .newsdocs-item__arrow,
+        .mediacard):hover :where(.newsfeat__more,
         .doc-card__dl, .media-item__action, .news-card__more) {
         transform: translateX(3px);
     }
@@ -1443,7 +1513,7 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     transform: translateY(0);
 }
 
-:where(.newsfeat__more, .newsdocs-item__arrow, .doc-card__dl,
+:where(.newsfeat__more, .doc-card__dl,
     .media-item__action, .news-card__more) {
     transition: transform .18s ease, color .18s ease;
 }
@@ -1515,7 +1585,6 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     }
 
     .newsfeat-grid, .block-newsdocs { gap: 24px; }
-    .newsfeat-side { border-left: 0; padding-left: 0; }
     .newsfeat-side__thumbs, .newsfeat-side__texts { gap: 18px; }
     .news-index__grid, .block-news__grid {
         grid-template-columns: minmax(0, 1fr);
@@ -1534,7 +1603,6 @@ button.catdetail__download { border: none; cursor: pointer; font-family: inherit
     .site-header__logo img { width: min(var(--header-logo-width, 240px), 42vw); }
     .site-header__logo span { max-width: 46vw; }
     .newsdocs-item { grid-template-columns: 68px minmax(0, 1fr); }
-    .newsdocs-item__arrow { grid-column: 2; }
     .ctaband__lead { align-items: flex-start; flex-direction: column; }
 }
 
@@ -1648,6 +1716,7 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
     .block-cta__button:hover, .site-footer__social-link:hover,
     .block-hero__button:hover, .btn-cta:hover, .btn:hover,
     .cms-columns__col .cms-block--cta .block-cta:hover,
+    .imgcard:hover .imgcard__more,
     .imgcard:hover .imgcard__media { transform: none; }
 }
 
@@ -1673,9 +1742,9 @@ body.design-type-static h2 { font-size: 1.95rem; }
 body.design-type-static h3 { font-size: 1.55rem; }
 body.design-type-static h4 { font-size: 1.25rem; }
 body.design-type-static .block-hero--media .block-hero__title { font-size: 3.7rem; }
-body.design-type-static .block-hero--media .block-hero__subtitle { font-size: 1.18rem; }
+body.design-type-static .block-hero--media .block-hero__subtitle { font-size: 1.02rem; }
 body.design-type-static .block-hero__title { font-size: 3.4rem; }
-body.design-type-static .block-hero__subtitle { font-size: 1.22rem; }
+body.design-type-static .block-hero__subtitle { font-size: 1.02rem; }
 body.design-type-static .section-head__title { font-size: 2rem; }
 body.design-type-static .timeline-cta__title { font-size: 1.7rem; }
 body.design-type-static .profile__name { font-size: 2.5rem; }
