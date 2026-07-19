@@ -12,6 +12,8 @@ test('accessibility controls stay above the header and reflow without overlap', 
     assert_true(is_string($js));
     assert_contains('z-index: 600', $css);
     assert_contains('position: sticky; top: 0;', $css);
+    assert_contains('left: 0; right: 0;', $css);
+    assert_contains('width: 100%; max-width: none; margin: 0;', $css);
     assert_contains('grid-template-columns: repeat(3, max-content)', $css);
     assert_contains('@media (max-width: 560px)', $css);
     assert_contains('id="a11y-panel"', $header);
