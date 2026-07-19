@@ -62,7 +62,12 @@ h1, h2, h3, h4, h5, h6,
 :root[data-theme="dark"] h1, :root[data-theme="dark"] h2, :root[data-theme="dark"] h3 { color: var(--gov-ink); }
 a { color: var(--gov-teal); }
 
-.site-content { max-width: var(--container-max); }
+/* Вертикальные отступы контейнера сняты — страница начинается выше и
+   заканчивается плотнее. Боковые (20px) остаются: на узком экране без них
+   текст упрётся в край. */
+.site-content { max-width: var(--container-max); padding-block: 0; }
+/* Крошкам нужен собственный зазор, иначе они прилипают к шапке. */
+.crumbs, .content-crumbs { margin-top: 16px; }
 
 /* --- Шапка: белая, эмблема + название, uppercase-меню с teal-подчёркиванием --- */
 .site-header { background: var(--gov-surface); border-bottom: 1px solid var(--gov-border); box-shadow: none; }
@@ -1233,7 +1238,10 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 /* ==========================================================================
    Списочные страницы: «Все новости», «Все проекты».
    ========================================================================== */
-.listing { display: flex; flex-direction: column; gap: clamp(26px, 3.4vw, 44px); padding-block: clamp(16px, 2.4vw, 30px) clamp(40px, 5vw, 64px); }
+/* Сверху отступ не нужен — его уже дают крошки. Снизу оставлен небольшой:
+   контент, упирающийся в тёмный футер, выглядит так же сломанно, как
+   крошки, прилипшие к шапке. */
+.listing { display: flex; flex-direction: column; gap: clamp(26px, 3.4vw, 44px); padding-block: 0 28px; }
 .listing__title { font-size: clamp(1.9rem, 3.4vw, 2.6rem); margin: 0 0 10px; }
 .listing__lead { color: var(--gov-muted); font-size: 1.02rem; line-height: 1.6; max-width: 60ch; margin: 0; }
 
