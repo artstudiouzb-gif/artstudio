@@ -1,7 +1,8 @@
 # ArtStudio CMS
 
 CMS на чистом PHP 8.2+ и MySQL/MariaDB — **без Composer, npm и внешних
-библиотек**. Всё, от TOTP и SMTP-клиента до Web Push (RFC 8291/8292) и
+библиотек во время выполнения**. Composer/PHPStan и npm/Playwright используются
+только для разработки и CI. Всё, от TOTP и SMTP-клиента до Web Push (RFC 8291/8292) и
 QR-генератора, реализовано на стандартных расширениях PHP. Дизайн страниц
 собирается из модульных блоков с изолированными (scoped) стилями; каждая
 секция сайта управляется из админки.
@@ -9,7 +10,7 @@ QR-генератора, реализовано на стандартных ра
 ## Возможности
 
 **Контент**
-- Конструктор страниц: 38 типов блоков (hero, слайдеры, галереи, FAQ,
+- Конструктор страниц: 37 типов блоков (hero, слайдеры, галереи, FAQ,
   таймлайны, счётчики, формы, колонки с вложенными блоками…), drag-and-drop
   сортировка, библиотека шаблонов блоков, история версий, предпросмотр
   черновиков.
@@ -106,7 +107,7 @@ artstudio/
 │   ├── Views/             # PHP-шаблоны (admin/*, site/*, errors/*)
 │   └── Console/           # cron-воркеры
 ├── templates/
-│   ├── blocks/            # шаблоны блоков конструктора (38 типов)
+│   ├── blocks/            # шаблоны блоков конструктора (37 типов)
 │   └── widgets/           # шаблоны сайдбар-виджетов
 ├── database/              # schema.sql, migrations/, migrate.php, restore.php
 ├── docs/                  # DEPLOY, RELEASE, ROADMAP, SECRETS, CDN, nginx
@@ -129,10 +130,11 @@ artstudio/
 php tests/run.php
 ```
 
-Нативный тест-раннер без PHPUnit; более 360 тестов. Без переменных окружения
-выполняются только unit-тесты; с `TEST_DB_HOST`, `TEST_DB_DATABASE`,
-`TEST_DB_USERNAME`, `TEST_DB_PASSWORD` — также тесты БД и консистентности
-миграций (schema.sql и миграции обязаны сходиться).
+Нативный тест-раннер без PHPUnit. Текущий прогон без БД: **378 тестов**;
+полный прогон CI с MariaDB: **478 тестов**. Без переменных окружения выполняются
+только unit-тесты; с `TEST_DB_HOST`, `TEST_DB_DATABASE`, `TEST_DB_USERNAME`,
+`TEST_DB_PASSWORD` — также тесты БД и консистентности миграций (`schema.sql`
+и миграции обязаны сходиться).
 
 ### Smoke-обход сайта (проверка после деплоя)
 
@@ -176,9 +178,11 @@ php scripts/release_check.php
 
 ### CI
 
-`.github/workflows/ci.yml` на каждый push/PR: `php -l` и полный прогон тестов
-на PHP 8.2–8.5 с MariaDB, обязательный PHPStan и `composer audit`, проверка
-JavaScript и browser smoke-тесты Chromium для десктопа и мобильного экрана.
+`.github/workflows/ci.yml` на каждый push/PR запускает четыре задачи: `php -l`
+и полный прогон тестов на PHP 8.2–8.5 с MariaDB; обязательный PHPStan и
+`composer audit`; проверку синтаксиса JavaScript на Node.js 24; browser smoke
+в Chromium для десктопа и мобильного экрана. При падении browser smoke отчёт,
+скриншоты и лог PHP-сервера сохраняются в artifact `browser-smoke-diagnostics`.
 
 Composer используется только для инструментов разработки и не участвует в
 работе CMS на production. Установка и локальный запуск анализа:
