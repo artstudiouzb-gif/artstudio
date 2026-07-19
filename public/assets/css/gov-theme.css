@@ -1669,7 +1669,7 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
 .projdetail-head--no-media { grid-template-columns: 1fr; }
 .projdetail__title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); line-height: 1.15; margin: 14px 0 0; }
 .projdetail__media { display: block; aspect-ratio: 16/9; border-radius: 14px; background: #24425f center/cover no-repeat; width: 100%; object-fit: cover; }
-.projdetail__content { max-width: 76ch; }
+.projdetail__content { width: 100%; max-width: none; }
 
 /* ===== Рубрикатор по бейджам (страница «Новости») ===== */
 .listing-filter { display: flex; flex-wrap: wrap; gap: 10px; margin-top: -8px; }
