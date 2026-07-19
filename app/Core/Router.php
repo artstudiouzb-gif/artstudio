@@ -62,7 +62,10 @@ final class Router
             }
         }
 
-        $path = $this->resolveLocale($path);
+        $path = $this->resolveLocale($path, $method, $uri);
+        if ($path === null) {
+            return;
+        }
 
         foreach ($this->routes as $route) {
             if ($route['method'] !== strtoupper($method)) {
@@ -86,7 +89,7 @@ final class Router
      * не-дефолтного языка (site.com/uz/...), язык устанавливается и префикс
      * отрезается. Админка (/admin) под языковой префикс не попадает.
      */
-    private function resolveLocale(string $path): string
+    private function resolveLocale(string $path, string $method, string $uri): ?string
     {
         // В режиме установки (или при недоступной БД) языков ещё нет.
         if (!Database::isConnected()) {
@@ -96,27 +99,89 @@ final class Router
             return $path;
         }
 
-        if (str_starts_with($path, '/admin')) {
+        if (!LocalePreference::managesPath($path)) {
             Locale::set(Language::defaultCode());
+            Locale::setPath($path);
 
             return $path;
         }
 
+        $activeCodes = Language::activeCodes();
+        $defaultCode = Language::defaultCode();
+        $requestedCode = LocalePreference::requestedCode($uri, $activeCodes);
+        if ($requestedCode !== null) {
+            LocalePreference::remember($requestedCode);
+            $contentPath = $this->withoutLanguagePrefix($path, $activeCodes);
+            $target = Locale::url($contentPath, $requestedCode) . LocalePreference::querySuffix($uri);
+            header('Cache-Control: private, no-store');
+            header('Location: ' . $target, true, 302);
+
+            return null;
+        }
+
+        $storedCode = LocalePreference::storedCode($_COOKIE, $activeCodes);
         if (preg_match('#^/([a-zA-Z]{2,8})(/.*|)$#', $path, $m)) {
             $code = strtolower($m[1]);
-            if ($code !== Language::defaultCode() && Language::isActive($code)) {
-                Locale::set($code);
+            if ($code !== $defaultCode && in_array($code, $activeCodes, true)) {
                 $rest = $m[2] === '' ? '/' : $m[2];
+                if ($storedCode !== null && $storedCode !== $code) {
+                    if (in_array(strtoupper($method), ['GET', 'HEAD'], true)) {
+                        $target = Locale::url($rest, $storedCode) . LocalePreference::querySuffix($uri);
+                        header('Cache-Control: private, no-store');
+                        header('Location: ' . $target, true, 302);
+
+                        return null;
+                    }
+
+                    Locale::set($storedCode);
+                    Locale::setPath($rest);
+
+                    return $rest;
+                }
+                if ($storedCode === null) {
+                    LocalePreference::remember($code);
+                }
+                Locale::set($code);
                 Locale::setPath($rest);
 
                 return $rest;
             }
         }
 
-        Locale::set(Language::defaultCode());
+        if ($storedCode !== null && $storedCode !== $defaultCode) {
+            if (in_array(strtoupper($method), ['GET', 'HEAD'], true)) {
+                $target = Locale::url($path, $storedCode) . LocalePreference::querySuffix($uri);
+                header('Cache-Control: private, no-store');
+                header('Location: ' . $target, true, 302);
+
+                return null;
+            }
+
+            Locale::set($storedCode);
+            Locale::setPath($path);
+
+            return $path;
+        }
+
+        Locale::set($defaultCode);
         Locale::setPath($path);
 
         return $path;
+    }
+
+    /** @param string[] $activeCodes */
+    private function withoutLanguagePrefix(string $path, array $activeCodes): string
+    {
+        if (!preg_match('#^/([a-zA-Z]{2,8})(/.*|)$#', $path, $matches)) {
+            return $path;
+        }
+
+        $code = strtolower($matches[1]);
+        if (!in_array($code, $activeCodes, true)) {
+            return $path;
+        }
+
+        return $matches[2] === '' ? '/' : $matches[2];
     }
 
     private function compile(string $pattern): string

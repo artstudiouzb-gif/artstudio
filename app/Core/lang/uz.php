@@ -164,4 +164,11 @@ return [
     // Подписи прокручиваемых полос — их читает экранный диктор.
     'Отзывы — прокрутка вбок' => 'Sharhlar — yon tomonga aylantirish',
     'Карточки — прокрутка вбок' => 'Kartochkalar — yon tomonga aylantirish',
+    'Перевод пока недоступен' => 'Tarjima hozircha mavjud emas',
+    'Доступен на другом языке' => 'Boshqa tilda mavjud',
+    'Этот материал ещё не переведён на выбранный язык.' => 'Ushbu material tanlangan tilga hali tarjima qilinmagan.',
+    'Этот материал ещё не переведён на выбранный язык. Вы можете открыть его на другом доступном языке.' => 'Ushbu material tanlangan tilga hali tarjima qilinmagan. Uni mavjud bo‘lgan boshqa tilda ochishingiz mumkin.',
+    'Доступные языки материала' => 'Material mavjud bo‘lgan tillar',
+    'Посмотреть на языке' => 'Ushbu tilda ko‘rish',
+    'Вернуться на главную' => 'Bosh sahifaga qaytish',
 ];

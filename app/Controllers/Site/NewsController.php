@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Site;
 
+use App\Core\ContentLanguageNotice;
 use App\Core\AppUrl;
 use App\Core\Config;
 use App\Core\Fragment;
@@ -156,9 +157,14 @@ final class NewsController
             return;
         }
 
+        $available = News::availableLangs((int) $news['id']);
+        if (ContentLanguageNotice::renderIfMissing($available, '/news/' . (string) $news['slug'])) {
+            return;
+        }
+
         News::incrementViews((int) $news['id']);
         // hreflang и переключатель — только языки с переводом этой новости.
-        Locale::setContentLangs(News::availableLangs((int) $news['id']));
+        Locale::setContentLangs($available);
         $adjacent = News::adjacent($news, $lang);
 
         $sidebarLayout = $news['sidebar_layout'] ?? 'right_sidebar';

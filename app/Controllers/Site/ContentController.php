@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers\Site;
 
+use App\Core\ContentLanguageNotice;
 use App\Core\Fragment;
 use App\Core\Locale;
 use App\Core\View;
@@ -98,6 +99,19 @@ final class ContentController
         }
 
         $lang = Locale::current();
+        if ((int) ($type['has_translations'] ?? 0) === 1) {
+            $translations = ContentEntry::translations((int) $entry['id']);
+            $available = [\App\Models\Language::defaultCode()];
+            foreach ($translations as $code => $translation) {
+                if (trim((string) ($translation['title'] ?? '')) !== '' || (array) ($translation['data'] ?? []) !== []) {
+                    $available[] = (string) $code;
+                }
+            }
+            $path = '/catalog/' . (string) $type['slug'] . '/' . (string) $entry['slug'];
+            if (ContentLanguageNotice::renderIfMissing($available, $path)) {
+                return;
+            }
+        }
         $entry = $this->localize($entry, $type, $lang);
 
         View::render('site/content_show', [

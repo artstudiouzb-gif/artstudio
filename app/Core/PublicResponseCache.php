@@ -31,6 +31,12 @@ final class PublicResponseCache
             return;
         }
 
+        // Ответ, устанавливающий языковое cookie, не должен попасть в общий CDN-кеш.
+        if (LocalePreference::changedThisRequest()) {
+            header('Cache-Control: private, no-store');
+            return;
+        }
+
         $path = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
         $status = http_response_code();
         $status = is_int($status) && $status > 0 ? $status : 200;
@@ -55,7 +61,10 @@ final class PublicResponseCache
             $browserTtl,
             $sharedTtl
         ));
-        header('Vary: Accept-Encoding', false);
+        // Один и тот же URL может быть запрошен с разным сохранённым языком.
+        // Без Vary браузер повторно показывает ранее закешированную языковую
+        // копию и запрос не доходит до редиректа в Router::resolveLocale().
+        header('Vary: Accept-Encoding, Cookie');
     }
 
     public static function isCacheableRequest(

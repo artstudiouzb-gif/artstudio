@@ -21,6 +21,21 @@ test('MenuItem::buildTree строит двухуровневое дерево (
     assert_same(0, count($tree[1]['children']), 'у «Контакты» детей нет');
 });
 
+test('MenuItem сохраняет выбранный язык во внутренних произвольных ссылках', function () {
+    $custom = static fn (string $url): array => ['url_type' => 'custom', 'url_value' => $url];
+
+    // Без тестовой БД язык по умолчанию — ru, поэтому uz моделирует
+    // неосновную локаль так же, как ru на сайте с основным языком uz.
+    assert_same('/uz/projects', MenuItem::resolveUrl($custom('/projects'), 'uz'));
+    assert_same('/uz/projects?view=grid#latest', MenuItem::resolveUrl($custom('/projects?view=grid#latest'), 'uz'));
+    assert_same('/uz/projects', MenuItem::resolveUrl($custom('/uz/projects'), 'uz'), 'префикс не дублируется');
+    assert_same('/uz/projects', MenuItem::resolveUrl($custom('/ru/projects'), 'uz'), 'старый языковой префикс заменяется');
+
+    assert_same('https://example.com/projects', MenuItem::resolveUrl($custom('https://example.com/projects'), 'uz'));
+    assert_same('mailto:info@example.com', MenuItem::resolveUrl($custom('mailto:info@example.com'), 'uz'));
+    assert_same('#contacts', MenuItem::resolveUrl($custom('#contacts'), 'uz'));
+});
+
 test('MenuItem: вложенность, ограничение глубины и reorder (БД, задача 3)', function () {
     ensure_test_db();
     $pdo = Database::pdo();

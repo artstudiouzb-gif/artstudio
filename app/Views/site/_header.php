@@ -167,7 +167,7 @@ if ($hcfg['language_switcher']['enabled'] && count($activeLangs) > 1) {
             'flag' => $flags[$code] ?? strtoupper($code),
             default => strtoupper($code),
         };
-        $href = Locale::url($path, $code);
+        $href = Locale::url($path, $code) . '?' . \App\Core\LocalePreference::QUERY . '=' . rawurlencode($code);
         $isActive = $code === $currentLang ? ' is-active' : '';
         $langHtml .= '<a class="site-lang-switcher__item' . $isActive . '" href="' . htmlspecialchars($href, ENT_QUOTES) . '">' . htmlspecialchars((string) $label, ENT_QUOTES) . '</a>';
     }

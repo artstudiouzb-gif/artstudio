@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Site;
 
 use App\Core\BlockRenderer;
+use App\Core\ContentLanguageNotice;
 use App\Core\Locale;
 use App\Core\View;
 use App\Models\Block;
@@ -24,6 +25,10 @@ final class PageController
             return;
         }
 
+        if (ContentLanguageNotice::renderIfMissing(Page::availableLangs((int) $page['id']), '/')) {
+            return;
+        }
+
         $this->renderPage($page, $lang);
     }
 
@@ -39,11 +44,16 @@ final class PageController
             return;
         }
 
+
         // Главная доступна по «/», а не «/{slug}» — со slug'ом это дубль
         // контента. Постоянный редирект на канонический корневой URL.
         if (!empty($page['is_home'])) {
             header('Location: ' . Locale::url('/'), true, 301);
             exit;
+        }
+
+        if (ContentLanguageNotice::renderIfMissing(Page::availableLangs((int) $page['id']), '/' . $slug)) {
+            return;
         }
 
         $this->renderPage($page, $lang);
