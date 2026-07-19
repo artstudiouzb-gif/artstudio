@@ -2,6 +2,7 @@
 
 use App\Core\UrlGuard;
 use App\Core\Video;
+use App\Core\Media;
 
 /** @var array $data */
 $title = $data['title'] ?? '';
@@ -91,14 +92,6 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
     $heroRootStyle .= '--hero-custom-height:' . $heightNumber . $heightUnit . ';';
 }
 ?>
-<?php if ($bgType === 'image' && $image !== ''): ?>
-    <?php /* Фон hero задан через CSS background-image — браузер узнаёт о нём
-             только после построения CSSOM, что затягивает LCP. Preload (валиден
-             в body) стартует загрузку сразу при парсинге; дубли браузер склеит. */ ?>
-    <link rel="preload" as="image" href="<?= htmlspecialchars($image, ENT_QUOTES) ?>" fetchpriority="high">
-<?php elseif ($bgType === 'video' && $videoFile !== '' && $image !== ''): ?>
-    <link rel="preload" as="image" href="<?= htmlspecialchars($image, ENT_QUOTES) ?>">
-<?php endif; ?>
 <?php // Без медиа и без своего фона hero — это просто шапка страницы:
       // карточка с рамкой и подложкой в этой роли читается как чужой блок. ?>
 <div class="block-hero<?= $hasMedia ? ' block-hero--media' : '' ?><?= (!$hasMedia && $heroBg === '') ? ' block-hero--plain' : '' ?><?= $heroBg !== '' ? ' block-hero--bgcolor' : '' ?><?= ($bgType === 'video' || $bgType === 'youtube') ? ' block-hero--video' : '' ?> block-hero--w-<?= $heroWidth ?> block-hero--h-<?= $heroHeight ?> block-hero--pos-<?= $textPos ?>"<?= $heroRootStyle !== '' ? ' style="' . $heroRootStyle . '"' : '' ?>>
@@ -113,7 +106,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
             <iframe src="https://www.youtube-nocookie.com/embed/<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>?autoplay=1&mute=1&loop=1&playlist=<?= htmlspecialchars($youtubeId, ENT_QUOTES) ?>&controls=0&showinfo=0&modestbranding=1&rel=0&playsinline=1&disablekb=1&fs=0&iv_load_policy=3" title="" tabindex="-1" frameborder="0" loading="lazy" allow="autoplay; encrypted-media" allowfullscreen></iframe>
         </div>
     <?php elseif ($bgType === 'image' && $image !== ''): ?>
-        <div class="block-hero__media" style="background-image:url('<?= htmlspecialchars($image, ENT_QUOTES) ?>')" aria-hidden="true"></div>
+        <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
     <?php endif; ?>
     <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="--hero-scrim: rgba(<?= $hex2rgb($ovColor) ?>, <?= $ovOpacity ?>);"></div><?php endif; ?>
     <div class="block-hero__inner">

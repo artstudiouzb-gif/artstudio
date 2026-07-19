@@ -123,7 +123,7 @@ final class BlockRenderer
 
     /**
      * @param array<string, mixed> $block
-     * @return array{html: string, css: string}
+     * @return array{html: string, css: string, hidden?: bool, preload_image?: string|null}
      */
     public static function render(array $block): array
     {
@@ -241,18 +241,33 @@ final class BlockRenderer
             $html
         );
 
-        return ['html' => $wrapped, 'css' => $scopedCss];
+        $preloadImage = null;
+        if ($type === 'hero') {
+            $heroImage = trim((string) ($data['image'] ?? ''));
+            $heroBgType = (string) ($data['bg_type'] ?? '');
+            if ($heroBgType === '') {
+                $heroBgType = Video::youtubeId((string) ($data['youtube_url'] ?? '')) !== null
+                    ? 'youtube'
+                    : (trim((string) ($data['video_url'] ?? '')) !== '' ? 'video' : ($heroImage !== '' ? 'image' : 'none'));
+            }
+            if ($heroBgType === 'image' && $heroImage !== '') {
+                $preloadImage = $heroImage;
+            }
+        }
+
+        return ['html' => $wrapped, 'css' => $scopedCss, 'preload_image' => $preloadImage];
     }
 
     /**
      * @param array<int, array<string, mixed>> $blocks
-     * @return array{html: string, css: string, assets: array<int, string>, expires_at: int|null}
+     * @return array{html: string, css: string, assets: array<int, string>, preload_images: array<int, string>, expires_at: int|null}
      */
     public static function renderPage(array $blocks): array
     {
         $htmlParts = [];
         $cssParts = [];
         $assets = [];
+        $preloadImages = [];
         self::$nextBoundary = null;
         self::$h1Used = false;
 
@@ -277,12 +292,18 @@ final class BlockRenderer
             }
             $type = preg_replace('/[^a-z0-9_]/', '', strtolower((string) $block['type'])) ?? '';
             $assets[$type] = true;
+            if (!empty($rendered['preload_image']) && $preloadImages === []) {
+                // Одного LCP-кандидата достаточно: дополнительные high-priority
+                // preload конкурировали бы с CSS и шрифтами первого экрана.
+                $preloadImages[] = (string) $rendered['preload_image'];
+            }
         }
 
         return [
             'html' => implode("\n", $htmlParts),
             'css' => implode("\n\n", $cssParts),
             'assets' => array_keys($assets),
+            'preload_images' => $preloadImages,
             'expires_at' => self::$nextBoundary,
         ];
     }

@@ -181,7 +181,14 @@ summary:focus-visible {
 .cms-block--space-small { padding: var(--space-small) 0; }
 .cms-block--space-premium { padding: var(--space-premium) 0; }
 .cms-block--space-max { padding: var(--space-max) 0; }
-
+/* Браузер откладывает layout/paint далёких секций длинной страницы, сохраняя
+   приблизительную высоту и не затрагивая первый экран/Hero. */
+@supports (content-visibility: auto) {
+    .cms-block:not(.cms-block--hero):not(.cms-block--empty-notice) {
+        content-visibility: auto;
+        contain-intrinsic-size: auto 560px;
+    }
+}
 /* Условия показа по устройству. Порог 768px совпадает с основным мобильным
    брейкпоинтом темы; ограничение решается стилями, потому что кэш страницы
    общий для всех посетителей. */
@@ -443,6 +450,7 @@ summary:focus-visible {
 /* --- Печатные стили (задача 63.2): чистый документ с логотипом и canonical --- */
 .print-only { display: none; }
 @media print {
+    .cms-block { content-visibility: visible !important; contain-intrinsic-size: none !important; }
     /* Скрываем всё «служебное»: шапку, сайдбары, футер, переключатель темы,
        соцкнопки, CTA, cookie-баннер, кнопки шеринга, слайдер-навигацию. */
     .site-header, .layout__sidebar, .site-footer, .site-theme-toggle,
@@ -1864,7 +1872,8 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
 /* Герой: текст слева на фоне, фото справа с плавным перетеканием в фон. */
 .block-hero { position: relative; overflow: hidden; border-radius: var(--radius, 16px); background: var(--bg-primary); }
 .block-hero--image { min-height: clamp(280px, 34vw, 440px); display: flex; align-items: center; }
-.block-hero__media { position: absolute; inset: 0 0 0 38%; background-size: cover; background-position: center; }
+.block-hero__media { position: absolute; inset: 0 0 0 38%; display: block; overflow: hidden; background-size: cover; background-position: center; }
+.block-hero__image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .block-hero__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-primary) 6%, color-mix(in srgb, var(--bg-primary) 55%, transparent) 42%, transparent 66%); }
 .block-hero__inner { position: relative; width: 100%; }
 .block-hero__text { max-width: var(--hero-text-width, 560px); }

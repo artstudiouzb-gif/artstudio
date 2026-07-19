@@ -21,7 +21,10 @@ final class Media
         ?int $focalX = null,
         ?int $focalY = null,
         string $imgClass = '',
-        bool $lazy = true
+        bool $lazy = true,
+        string $sizes = '(max-width: 800px) 100vw, 800px',
+        bool $highPriority = false,
+        string $pictureClass = ''
     ): string {
         $url = trim((string) $url);
         if ($url === '') {
@@ -40,7 +43,13 @@ final class Media
 
         $altAttr = htmlspecialchars($alt, ENT_QUOTES);
         $classAttr = $imgClass !== '' ? ' class="' . htmlspecialchars($imgClass, ENT_QUOTES) . '"' : '';
-        $loadingAttr = $lazy ? ' loading="lazy" decoding="async"' : '';
+        $loadingAttr = $lazy
+            ? ' loading="lazy" decoding="async"'
+            : ' loading="eager" decoding="async"';
+        $priorityAttr = $highPriority ? ' fetchpriority="high"' : '';
+        $pictureClassAttr = $pictureClass !== ''
+            ? ' class="' . htmlspecialchars($pictureClass, ENT_QUOTES) . '"'
+            : '';
         $styleAttr = '';
         if ($focalX !== null && $focalY !== null) {
             $fx = max(0, min(100, $focalX));
@@ -49,13 +58,55 @@ final class Media
         }
 
         $img = '<img src="' . htmlspecialchars($url, ENT_QUOTES) . '" alt="' . $altAttr . '"'
-            . $classAttr . $loadingAttr . $styleAttr . '>';
+            . $classAttr . $loadingAttr . $priorityAttr . $styleAttr . '>';
 
         $variants = self::webpVariants($url);
         if ($variants === null) {
-            return $img;
+            return $pictureClass !== '' ? '<picture' . $pictureClassAttr . '>' . $img . '</picture>' : $img;
         }
 
+        $srcset = self::webpSrcset($variants);
+        if ($srcset === []) {
+            return $pictureClass !== '' ? '<picture' . $pictureClassAttr . '>' . $img . '</picture>' : $img;
+        }
+
+        return '<picture' . $pictureClassAttr . '>'
+            . '<source type="image/webp" srcset="' . implode(', ', $srcset) . '" '
+            . 'sizes="' . htmlspecialchars($sizes, ENT_QUOTES) . '">'
+            . $img
+            . '</picture>';
+    }
+
+    /**
+     * Ранний preload использует тот же responsive WebP-набор, что и <picture>,
+     * поэтому браузер не скачивает полноразмерный JPEG параллельно с WebP.
+     */
+    public static function preloadLink(string $url, string $sizes = '100vw'): string
+    {
+        $url = trim($url);
+        if ($url === '') {
+            return '';
+        }
+
+        $href = $url;
+        $responsive = '';
+        $variants = self::webpVariants($url);
+        if ($variants !== null) {
+            $srcset = self::webpSrcset($variants);
+            if ($srcset !== []) {
+                $href = $variants['full'] ?? $variants['w1600'] ?? $variants['w800'] ?? $url;
+                $responsive = ' type="image/webp" imagesrcset="' . implode(', ', $srcset)
+                    . '" imagesizes="' . htmlspecialchars($sizes, ENT_QUOTES) . '"';
+            }
+        }
+
+        return '<link rel="preload" as="image" href="' . htmlspecialchars($href, ENT_QUOTES) . '"'
+            . $responsive . ' fetchpriority="high">';
+    }
+
+    /** @param array{full: ?string, w1600: ?string, w800: ?string} $variants */
+    private static function webpSrcset(array $variants): array
+    {
         $srcset = [];
         if ($variants['w800'] !== null) {
             $srcset[] = htmlspecialchars($variants['w800'], ENT_QUOTES) . ' 800w';
@@ -66,15 +117,8 @@ final class Media
         if ($variants['full'] !== null) {
             $srcset[] = htmlspecialchars($variants['full'], ENT_QUOTES) . ' 2000w';
         }
-        if ($srcset === []) {
-            return $img;
-        }
 
-        return '<picture>'
-            . '<source type="image/webp" srcset="' . implode(', ', $srcset) . '" '
-            . 'sizes="(max-width: 800px) 100vw, 800px">'
-            . $img
-            . '</picture>';
+        return $srcset;
     }
 
     /**

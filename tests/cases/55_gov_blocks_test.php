@@ -12,7 +12,9 @@ test('Блок hero: титул, подзаголовок, фон-фото, бе
     assert_contains('cms-block cms-block--hero', $out);
     assert_contains('block-hero--media', $out);
     assert_contains('Пресс-центр', $out);
-    assert_contains("url('/uploads/public/x.jpg')", $out);
+    assert_contains('<picture class="block-hero__media">', $out);
+    assert_contains('src="/uploads/public/x.jpg"', $out);
+    assert_contains('fetchpriority="high"', $out);
     assert_contains('href="/news"', $out);
 
     // Небезопасная ссылка кнопки не выводится.

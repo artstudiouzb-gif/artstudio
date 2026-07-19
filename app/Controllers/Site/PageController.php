@@ -120,6 +120,7 @@ final class PageController
             'page' => $page,
             'content' => $rendered['html'],
             'blockCss' => $rendered['css'],
+            'preloadImages' => $rendered['preload_images'] ?? [],
             'layoutType' => $layoutType,
             'sidebar' => $sidebar,
         ]);

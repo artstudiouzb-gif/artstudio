@@ -12,6 +12,7 @@ use App\Models\Setting;
 /** @var string $extraHeadCss */
 /** @var string $ogImage */
 /** @var string $ogType */
+/** @var array<int, string> $preloadImages */
 
 $siteName = Setting::get('site_name', 'ArtStudio');
 // Логотип: переопределение на текущий язык (Шапка → логотип для языка),
@@ -398,6 +399,24 @@ if ($inlineMenu !== '') {
 <?php if ($ogImageRaw !== ''): ?>
 <meta property="og:image" content="<?= htmlspecialchars($ogImageRaw, ENT_QUOTES) ?>">
 <meta name="twitter:card" content="summary_large_image">
+<?php endif; ?>
+<?php // Первый Hero уже отрендерен/закэширован до header, поэтому его LCP-кандидат
+      // можно начать загружать до блокирующих stylesheet. ?>
+<?php foreach (array_slice(array_values(array_unique($preloadImages ?? [])), 0, 1) as $preloadImage): ?>
+<?= \App\Core\Media::preloadLink((string) $preloadImage, '100vw') ?>
+<?php endforeach; ?>
+<?php
+$cdnBase = \App\Core\Asset::cdnBase();
+$cdnParts = $cdnBase !== '' ? parse_url($cdnBase) : false;
+$cdnOrigin = '';
+if (is_array($cdnParts) && in_array($cdnParts['scheme'] ?? '', ['http', 'https'], true) && !empty($cdnParts['host'])) {
+    $cdnOrigin = $cdnParts['scheme'] . '://' . $cdnParts['host']
+        . (isset($cdnParts['port']) ? ':' . (int) $cdnParts['port'] : '');
+}
+?>
+<?php if ($cdnOrigin !== ''): ?>
+<link rel="preconnect" href="<?= htmlspecialchars($cdnOrigin, ENT_QUOTES) ?>" crossorigin>
+<link rel="dns-prefetch" href="//<?= htmlspecialchars((string) $cdnParts['host'], ENT_QUOTES) ?>">
 <?php endif; ?>
 <?php if ($fontUrl !== '' && $fontFaceName !== ''): ?>
 <link rel="preload" href="<?= htmlspecialchars($fontUrl, ENT_QUOTES) ?>" as="font" type="font/woff2" crossorigin>

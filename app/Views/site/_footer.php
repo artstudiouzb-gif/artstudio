@@ -165,7 +165,7 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
 </button>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/a11y.js'), ENT_QUOTES) ?>" defer></script>
-<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>"></script>
+<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>" defer></script>
 <script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/forms.js'), ENT_QUOTES) ?>" defer></script>
 <?php $cspNonce = \App\Core\SecurityHeaders::nonce(); ?>
 <?php if (\App\Core\WebPush::isEnabled()): ?>
@@ -181,7 +181,7 @@ $renderFooterWidget = function (array $col) use ($footerLogo, $siteName, $addres
       // перенося nonce с держателя на создаваемый <script> (CSP). ?>
 <script type="text/plain" id="analytics-init" nonce="<?= $cspNonce ?>"><?= $analyticsInit ?></script>
 <script nonce="<?= $cspNonce ?>">window.__consent = {required: <?= $consentRequired ? 'true' : 'false' ?>, privacyUrl: <?= json_encode($privacyUrl, JSON_UNESCAPED_SLASHES) ?>};</script>
-<script src="/assets/js/consent.js" defer></script>
+<script src="<?= htmlspecialchars(\App\Core\Asset::url('/assets/js/consent.js'), ENT_QUOTES) ?>" defer></script>
 <?php endif; ?>
 <?php // Schema.org: карточка организации — только на главной (JSON-LD валиден в body). ?>
 <?php if (\App\Core\Locale::path() === '/'): ?>
