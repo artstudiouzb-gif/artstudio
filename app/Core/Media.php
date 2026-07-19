@@ -63,14 +63,8 @@ final class Media
             $styleAttr = ' style="object-position:' . $fx . '% ' . $fy . '%"';
         }
 
-        $dimensionsAttr = '';
-        $dimensions = self::imageDimensions($url);
-        if ($dimensions !== null) {
-            $dimensionsAttr = ' width="' . $dimensions['width'] . '" height="' . $dimensions['height'] . '"';
-        }
-
         $img = '<img src="' . htmlspecialchars($url, ENT_QUOTES) . '" alt="' . $altAttr . '"'
-            . $classAttr . $loadingAttr . $priorityAttr . $dimensionsAttr . $styleAttr . '>';
+            . $classAttr . $loadingAttr . $priorityAttr . $styleAttr . '>';
 
         $variants = self::webpVariants($url);
         if ($variants === null) {

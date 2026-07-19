@@ -69,7 +69,7 @@ test('ImageBatchOptimizer создаёт full и responsive WebP', function (): 
     }
 });
 
-test('Media добавляет intrinsic-размеры и нейтральный picture wrapper', function (): void {
+test('Media добавляет нейтральный picture wrapper без навязанной высоты', function (): void {
     $name = 'media-size-' . bin2hex(random_bytes(4));
     $dir = APP_ROOT . '/public/uploads/public';
     $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=', true);
@@ -79,7 +79,8 @@ test('Media добавляет intrinsic-размеры и нейтральны�
     try {
         $html = Media::picture('/uploads/public/' . $name . '.png', 'Тест');
         assert_contains('<picture class="media-picture">', $html);
-        assert_contains('width="1" height="1"', $html);
+        assert_true(!str_contains($html, 'width="1"'), 'Исходная ширина не должна менять размер CSS-компонента');
+        assert_true(!str_contains($html, 'height="1"'), 'Исходная высота не должна растягивать карточку');
     } finally {
         @unlink($dir . '/' . $name . '.png');
         @unlink($dir . '/' . $name . '.webp');

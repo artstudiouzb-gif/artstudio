@@ -9,6 +9,7 @@ test('Hero отдаёт responsive picture и LCP preload для head', function
     $name = 'perf-hero-' . bin2hex(random_bytes(4));
     $disk = APP_ROOT . '/public/uploads/public/' . $name;
     $url = '/uploads/public/' . $name . '.jpg';
+    file_put_contents($disk . '.jpg', base64_decode('R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==', true));
     foreach (['.webp', '-800.webp', '-1600.webp'] as $suffix) {
         file_put_contents($disk . $suffix, 'test');
     }
@@ -27,25 +28,26 @@ test('Hero отдаёт responsive picture и LCP preload для head', function
         assert_contains('loading="eager"', (string) $rendered['html']);
         assert_contains('fetchpriority="high"', (string) $rendered['html']);
         assert_contains('srcset="/uploads/public/' . $name . '-800.webp 800w', (string) $rendered['html']);
+        assert_true(!str_contains((string) $rendered['html'], ' width="1" height="1"'), 'Размеры файла не переопределяют высоту CSS-компонента');
 
         $preload = Media::preloadLink($url, '100vw');
         assert_contains('rel="preload"', $preload);
         assert_contains('imagesrcset=', $preload);
         assert_contains('fetchpriority="high"', $preload);
     } finally {
+        @unlink($disk . '.jpg');
         foreach (['.webp', '-800.webp', '-1600.webp'] as $suffix) {
             @unlink($disk . $suffix);
         }
     }
 });
 
-test('Первый экран не блокируется второстепенной отрисовкой и JS', function (): void {
+test('Первый экран не блокируется второстепенным JS и заранее загружает LCP', function (): void {
     $css = (string) file_get_contents(APP_ROOT . '/public/assets/css/frontend.css');
     $footer = (string) file_get_contents(APP_ROOT . '/app/Views/site/_footer.php');
     $header = (string) file_get_contents(APP_ROOT . '/app/Views/site/_header.php');
 
-    assert_contains('content-visibility: auto', $css);
-    assert_contains('contain-intrinsic-size: auto 560px', $css);
+    assert_true(!str_contains($css, 'content-visibility: auto'), 'Секции не пропускаются при полноэкранном снимке и отрицательных отступах');
     assert_contains("Asset::url('/assets/js/frontend.js'), ENT_QUOTES) ?>\" defer", $footer);
     assert_contains("Asset::url('/assets/js/consent.js')", $footer);
     assert_contains('Media::preloadLink', $header);

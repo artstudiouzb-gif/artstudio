@@ -181,14 +181,6 @@ summary:focus-visible {
 .cms-block--space-small { padding: var(--space-small) 0; }
 .cms-block--space-premium { padding: var(--space-premium) 0; }
 .cms-block--space-max { padding: var(--space-max) 0; }
-/* Браузер откладывает layout/paint далёких секций длинной страницы, сохраняя
-   приблизительную высоту и не затрагивая первый экран/Hero. */
-@supports (content-visibility: auto) {
-    .cms-block:not(.cms-block--hero):not(.cms-block--empty-notice) {
-        content-visibility: auto;
-        contain-intrinsic-size: auto 560px;
-    }
-}
 /* Условия показа по устройству. Порог 768px совпадает с основным мобильным
    брейкпоинтом темы; ограничение решается стилями, потому что кэш страницы
    общий для всех посетителей. */
@@ -450,7 +442,6 @@ summary:focus-visible {
 /* --- Печатные стили (задача 63.2): чистый документ с логотипом и canonical --- */
 .print-only { display: none; }
 @media print {
-    .cms-block { content-visibility: visible !important; contain-intrinsic-size: none !important; }
     /* Скрываем всё «служебное»: шапку, сайдбары, футер, переключатель темы,
        соцкнопки, CTA, cookie-баннер, кнопки шеринга, слайдер-навигацию. */
     .site-header, .layout__sidebar, .site-footer, .site-theme-toggle,
