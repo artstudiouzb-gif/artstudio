@@ -12,7 +12,7 @@ $items = $data['items'] ?? [];
         <?php foreach ($items as $item): ?>
             <figure class="testimonial">
                 <?php if (!empty($item['photo'])): ?>
-                    <img class="testimonial__photo" src="<?= htmlspecialchars($item['photo'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($item['name'] ?? '', ENT_QUOTES) ?>" loading="lazy">
+                    <?= \App\Core\Media::picture((string) $item['photo'], (string) ($item['name'] ?? ''), null, null, 'testimonial__photo', true, '72px') ?>
                 <?php endif; ?>
                 <blockquote class="testimonial__quote"><?= htmlspecialchars($item['quote'] ?? '', ENT_QUOTES) ?></blockquote>
                 <figcaption class="testimonial__author">

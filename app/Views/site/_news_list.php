@@ -35,7 +35,7 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
         <?php $fc = News::getCoverImage($featured); ?>
         <a class="newslist-lead" href="<?= htmlspecialchars(Locale::url('news/' . $featured['slug']), ENT_QUOTES) ?>">
             <?php if ($fc !== null): ?>
-                <img class="newslist-lead__media" src="<?= htmlspecialchars($fc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $featured['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                <?= \App\Core\Media::picture($fc, (string) $featured['title'], null, null, 'newslist-lead__media', false, '(max-width: 900px) 100vw, 55vw') ?>
             <?php else: ?>
                 <span class="newslist-lead__media newslist-lead__media--empty" aria-hidden="true"></span>
             <?php endif; ?>
@@ -55,7 +55,7 @@ $pageUrl = static fn (int $p): string => Locale::url('news')
             <?php $c = News::getCoverImage($item); ?>
             <a class="relnews-card" href="<?= htmlspecialchars(Locale::url('news/' . $item['slug']), ENT_QUOTES) ?>">
                 <?php if ($c !== null): ?>
-                    <img class="relnews-card__media" src="<?= htmlspecialchars($c, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                    <?= \App\Core\Media::picture($c, (string) $item['title'], null, null, 'relnews-card__media', true, '(max-width: 700px) 100vw, 33vw') ?>
                 <?php else: ?>
                     <span class="relnews-card__media relnews-card__media--empty" aria-hidden="true"></span>
                 <?php endif; ?>

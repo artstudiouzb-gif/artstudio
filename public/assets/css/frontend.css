@@ -1874,6 +1874,9 @@ body.mobile-menu-open .site-drawer__panel { transform: translateX(0); }
 .block-hero--image { min-height: clamp(280px, 34vw, 440px); display: flex; align-items: center; }
 .block-hero__media { position: absolute; inset: 0 0 0 38%; display: block; overflow: hidden; background-size: cover; background-position: center; }
 .block-hero__image { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+/* Responsive <picture> не создаёт дополнительный layout-box: существующие
+   grid/flex/absolute стили продолжают применяться к самому <img>. */
+.media-picture { display: contents; }
 .block-hero__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--bg-primary) 6%, color-mix(in srgb, var(--bg-primary) 55%, transparent) 42%, transparent 66%); }
 .block-hero__inner { position: relative; width: 100%; }
 .block-hero__text { max-width: var(--hero-text-width, 560px); }

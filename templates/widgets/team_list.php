@@ -6,7 +6,7 @@ $items = $data['items'] ?? [];
     <?php foreach ($items as $item): ?>
         <li>
             <?php if (!empty($item['photo'])): ?>
-                <img src="<?= htmlspecialchars($item['photo'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($item['name'], ENT_QUOTES) ?>" loading="lazy">
+                <?= \App\Core\Media::picture((string) $item['photo'], (string) $item['name'], null, null, '', true, '80px') ?>
             <?php endif; ?>
             <div>
                 <strong><?= htmlspecialchars($item['name'], ENT_QUOTES) ?></strong>

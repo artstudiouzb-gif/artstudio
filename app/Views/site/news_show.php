@@ -229,7 +229,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
             <div class="newsdetail-gallery" data-ndgallery>
                 <div class="newsdetail-gallery__main">
                     <?php foreach ($heroSlides as $i => $s): ?>
-                        <img class="newsdetail-gallery__slide<?= $i === 0 ? ' is-active' : '' ?>" src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="<?= $i === 0 ? 'eager' : 'lazy' ?>">
+                        <?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, 'newsdetail-gallery__slide' . ($i === 0 ? ' is-active' : ''), $i !== 0, '(max-width: 900px) 100vw, 70vw') ?>
                     <?php endforeach; ?>
                     <?php if (count($heroSlides) > 1): ?>
                         <button type="button" class="newsdetail-gallery__nav newsdetail-gallery__nav--prev" data-ndg-prev aria-label="<?= htmlspecialchars(t('Предыдущее фото'), ENT_QUOTES) ?>">‹</button>
@@ -288,7 +288,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
                     <h2 class="newsdetail-card__title"><?= htmlspecialchars(t('Галерея'), ENT_QUOTES) ?></h2>
                     <div class="newsdetail-sidegallery">
                         <?php foreach (array_slice($slides, 0, 4) as $i => $s): ?>
-                            <a class="newsdetail-sidegallery__item<?= $i === 0 ? ' newsdetail-sidegallery__item--wide' : '' ?>" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><img src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="lazy" decoding="async"></a>
+                            <a class="newsdetail-sidegallery__item<?= $i === 0 ? ' newsdetail-sidegallery__item--wide' : '' ?>" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, '', true, '(max-width: 900px) 50vw, 280px') ?></a>
                         <?php endforeach; ?>
                     </div>
                     <a class="newsdetail__btn newsdetail__btn--ghost newsdetail-sidegallery__all" href="<?= htmlspecialchars(Locale::url('news/' . $news['slug'] . '/photos.zip', $lang), ENT_QUOTES) ?>"><?= htmlspecialchars(t('Скачать все фото'), ENT_QUOTES) ?> <?= $dlIcon ?></a>
@@ -357,7 +357,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
             </div>
             <div class="newsdetail-photos__grid">
                 <?php foreach (array_slice($slides, 0, 8) as $s): ?>
-                    <a class="newsdetail-photos__item" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><img src="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($s['alt'], ENT_QUOTES) ?>" loading="lazy" decoding="async"></a>
+                    <a class="newsdetail-photos__item" href="<?= htmlspecialchars($s['path'], ENT_QUOTES) ?>" target="_blank" rel="noopener" aria-label="<?= htmlspecialchars($s['alt'] !== '' ? $s['alt'] : 'Фото', ENT_QUOTES) ?>"><?= \App\Core\Media::picture((string) $s['path'], (string) $s['alt'], null, null, '', true, '(max-width: 560px) 100vw, (max-width: 1000px) 50vw, 25vw') ?></a>
                 <?php endforeach; ?>
             </div>
         </section>
@@ -374,7 +374,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
                     <?php $rc = News::getCoverImage($item); ?>
                     <a class="relnews-card" href="<?= htmlspecialchars(Locale::url('news/' . $item['slug'], $lang), ENT_QUOTES) ?>">
                         <?php if ($rc !== null): ?>
-                            <img class="relnews-card__media" src="<?= htmlspecialchars($rc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                            <?= \App\Core\Media::picture($rc, (string) $item['title'], null, null, 'relnews-card__media', true, '(max-width: 700px) 100vw, 33vw') ?>
                         <?php else: ?>
                             <span class="relnews-card__media relnews-card__media--empty" aria-hidden="true"></span>
                         <?php endif; ?>
@@ -403,7 +403,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
                 <a class="adjnews adjnews--prev" href="<?= htmlspecialchars(Locale::url('news/' . $prevNews['slug'], $lang), ENT_QUOTES) ?>">
                     <span class="adjnews__arrow">←</span>
                     <?php if ($pc !== null): ?>
-                        <img class="adjnews__media" src="<?= htmlspecialchars($pc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $prevNews['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?= \App\Core\Media::picture($pc, (string) $prevNews['title'], null, null, 'adjnews__media', true, '92px') ?>
                     <?php else: ?>
                         <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
                     <?php endif; ?>
@@ -418,7 +418,7 @@ $hasSidebar = $sidebar !== null && trim($sidebar['html']) !== '';
                 <?php $nc = News::getCoverImage($nextNews); ?>
                 <a class="adjnews adjnews--next" href="<?= htmlspecialchars(Locale::url('news/' . $nextNews['slug'], $lang), ENT_QUOTES) ?>">
                     <?php if ($nc !== null): ?>
-                        <img class="adjnews__media" src="<?= htmlspecialchars($nc, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $nextNews['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?= \App\Core\Media::picture($nc, (string) $nextNews['title'], null, null, 'adjnews__media', true, '92px') ?>
                     <?php else: ?>
                         <span class="adjnews__media adjnews__media--empty" aria-hidden="true"></span>
                     <?php endif; ?>

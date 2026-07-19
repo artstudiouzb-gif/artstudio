@@ -19,7 +19,7 @@ $allUrl = $data['all_url'] ?? '/news';
                 <article class="news-card">
                     <a class="news-card__link" href="<?= htmlspecialchars($item['url'], ENT_QUOTES) ?>">
                         <?php if (!empty($item['cover'])): ?>
-                            <span class="news-card__cover"><img src="<?= htmlspecialchars($item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($item['title'], ENT_QUOTES) ?>" loading="lazy"></span>
+                            <span class="news-card__cover"><?= \App\Core\Media::picture((string) $item['cover'], (string) $item['title'], null, null, '', true, '(max-width: 700px) 100vw, 33vw') ?></span>
                         <?php else: ?>
                             <span class="news-card__cover news-card__cover--empty" aria-hidden="true"></span>
                         <?php endif; ?>

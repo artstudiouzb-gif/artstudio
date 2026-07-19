@@ -2114,7 +2114,9 @@ a.orgstruct__head:hover .orgstruct__head-name { color: color-mix(in srgb, var(--
 /* Фото галерей новости — настоящие <img> внутри ссылок (alt, lazy, индексация).
    Заполняют контейнер и наследуют его скругление. */
 .newsdetail-sidegallery__item > img,
-.newsdetail-photos__item > img {
+.newsdetail-photos__item > img,
+.newsdetail-sidegallery__item > picture > img,
+.newsdetail-photos__item > picture > img {
     display: block; width: 100%; height: 100%;
     object-fit: cover; border-radius: inherit;
 }

@@ -9,8 +9,9 @@ $items = $data['items'] ?? [];
         <div class="block-partners__grid">
             <?php foreach ($items as $p): ?>
                 <?php
-                $logo = htmlspecialchars((string) ($p['logo'] ?? ''), ENT_QUOTES);
-                $name = htmlspecialchars((string) ($p['name'] ?? ''), ENT_QUOTES);
+                $logo = trim((string) ($p['logo'] ?? ''));
+                $nameRaw = (string) ($p['name'] ?? '');
+                $name = htmlspecialchars($nameRaw, ENT_QUOTES);
                 $url = (string) ($p['url'] ?? '');
                 if ($url !== '' && !\App\Core\UrlGuard::isSafeLink($url)) {
                     $url = '';
@@ -19,7 +20,7 @@ $items = $data['items'] ?? [];
                 // — это битая картинка, а имя партнёра было видно только во
                 // всплывающей подсказке.
                 $img = $logo !== ''
-                    ? '<img class="block-partners__logo" src="' . $logo . '" alt="' . $name . '" loading="lazy">'
+                    ? \App\Core\Media::picture($logo, $nameRaw, null, null, 'block-partners__logo', true, '180px')
                     : '<span class="block-partners__name">' . ($name !== '' ? $name : 'Партнёр') . '</span>';
                 ?>
                 <?php if ($url !== ''): ?>

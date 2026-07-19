@@ -8,7 +8,7 @@ $slides = $data['slides'] ?? [];
         <?php foreach ($slides as $index => $slide): ?>
             <div class="block-slider__slide<?= $index === 0 ? ' is-active' : '' ?>">
                 <?php if (!empty($slide['image'])): ?>
-                    <img src="<?= htmlspecialchars($slide['image'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($slide['alt'] ?? '', ENT_QUOTES) ?>" loading="lazy">
+                    <?= \App\Core\Media::picture((string) $slide['image'], (string) ($slide['alt'] ?? ''), null, null, '', $index !== 0, '100vw') ?>
                 <?php endif; ?>
                 <?php if (!empty($slide['caption'])): ?>
                     <div class="block-slider__caption"><?= htmlspecialchars($slide['caption'], ENT_QUOTES) ?></div>

@@ -21,6 +21,6 @@ $items = $data['items'] ?? [];
         <?php endif; ?>
     </div>
     <?php if ($image !== ''): ?>
-        <img class="textimage__media" src="<?= htmlspecialchars($image, ENT_QUOTES) ?>" alt="<?= htmlspecialchars($title !== '' ? $title : '', ENT_QUOTES) ?>" loading="lazy" decoding="async">
+        <?= \App\Core\Media::picture($image, $title, null, null, 'textimage__media', true, '(max-width: 800px) 100vw, 50vw') ?>
     <?php endif; ?>
 </div>

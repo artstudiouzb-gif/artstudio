@@ -15,6 +15,12 @@ namespace App\Core;
  */
 final class Media
 {
+    /** @var array<string, array{width: int, height: int}|null> */
+    private static array $dimensionCache = [];
+
+    /** @var array<string, array{full: ?string, w1600: ?string, w800: ?string}|null> */
+    private static array $variantCache = [];
+
     public static function picture(
         ?string $url,
         string $alt = '',
@@ -57,8 +63,14 @@ final class Media
             $styleAttr = ' style="object-position:' . $fx . '% ' . $fy . '%"';
         }
 
+        $dimensionsAttr = '';
+        $dimensions = self::imageDimensions($url);
+        if ($dimensions !== null) {
+            $dimensionsAttr = ' width="' . $dimensions['width'] . '" height="' . $dimensions['height'] . '"';
+        }
+
         $img = '<img src="' . htmlspecialchars($url, ENT_QUOTES) . '" alt="' . $altAttr . '"'
-            . $classAttr . $loadingAttr . $priorityAttr . $styleAttr . '>';
+            . $classAttr . $loadingAttr . $priorityAttr . $dimensionsAttr . $styleAttr . '>';
 
         $variants = self::webpVariants($url);
         if ($variants === null) {
@@ -68,6 +80,10 @@ final class Media
         $srcset = self::webpSrcset($variants);
         if ($srcset === []) {
             return $pictureClass !== '' ? '<picture' . $pictureClassAttr . '>' . $img . '</picture>' : $img;
+        }
+
+        if ($pictureClass === '') {
+            $pictureClassAttr = ' class="media-picture"';
         }
 
         return '<picture' . $pictureClassAttr . '>'
@@ -109,13 +125,16 @@ final class Media
     {
         $srcset = [];
         if ($variants['w800'] !== null) {
-            $srcset[] = htmlspecialchars($variants['w800'], ENT_QUOTES) . ' 800w';
+            $srcset[] = htmlspecialchars($variants['w800'], ENT_QUOTES) . ' '
+                . self::imageWidth($variants['w800'], 800) . 'w';
         }
         if ($variants['w1600'] !== null) {
-            $srcset[] = htmlspecialchars($variants['w1600'], ENT_QUOTES) . ' 1600w';
+            $srcset[] = htmlspecialchars($variants['w1600'], ENT_QUOTES) . ' '
+                . self::imageWidth($variants['w1600'], 1600) . 'w';
         }
         if ($variants['full'] !== null) {
-            $srcset[] = htmlspecialchars($variants['full'], ENT_QUOTES) . ' 2000w';
+            $srcset[] = htmlspecialchars($variants['full'], ENT_QUOTES) . ' '
+                . self::imageWidth($variants['full'], 2000) . 'w';
         }
 
         return $srcset;
@@ -129,10 +148,14 @@ final class Media
      */
     private static function webpVariants(string $url): ?array
     {
+        if (array_key_exists($url, self::$variantCache)) {
+            return self::$variantCache[$url];
+        }
+
         $urlPrefix = rtrim((string) Config::get('paths.public_uploads_url', '/uploads/public'), '/');
         $diskBase = rtrim((string) Config::get('paths.public_uploads', ''), '/');
         if ($diskBase === '' || !str_starts_with($url, $urlPrefix . '/')) {
-            return null;
+            return self::$variantCache[$url] = null;
         }
 
         // Отбрасываем querystring/anchor.
@@ -155,6 +178,51 @@ final class Media
             }
         }
 
-        return $found ? $result : null;
+        return self::$variantCache[$url] = ($found ? $result : null);
+    }
+
+    /** @return array{width: int, height: int}|null */
+    private static function imageDimensions(string $url): ?array
+    {
+        if (array_key_exists($url, self::$dimensionCache)) {
+            return self::$dimensionCache[$url];
+        }
+
+        $path = self::localUploadPath($url);
+        if ($path === null) {
+            return self::$dimensionCache[$url] = null;
+        }
+
+        $size = @getimagesize($path);
+        if ($size === false || (int) $size[0] < 1 || (int) $size[1] < 1) {
+            return self::$dimensionCache[$url] = null;
+        }
+
+        return self::$dimensionCache[$url] = ['width' => (int) $size[0], 'height' => (int) $size[1]];
+    }
+
+    private static function imageWidth(string $url, int $fallback): int
+    {
+        return self::imageDimensions($url)['width'] ?? $fallback;
+    }
+
+    private static function localUploadPath(string $url): ?string
+    {
+        $urlPrefix = rtrim((string) Config::get('paths.public_uploads_url', '/uploads/public'), '/');
+        $diskBase = rtrim((string) Config::get('paths.public_uploads', ''), '/');
+        $clean = preg_replace('/[?#].*$/', '', $url) ?? $url;
+
+        if ($diskBase === '' || !str_starts_with($clean, $urlPrefix . '/')) {
+            return null;
+        }
+
+        $relative = substr($clean, strlen($urlPrefix));
+        if ($relative === '' || str_contains(str_replace('\\', '/', $relative), '/../')) {
+            return null;
+        }
+
+        $path = $diskBase . $relative;
+
+        return is_file($path) ? $path : null;
     }
 }

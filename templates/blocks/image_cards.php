@@ -33,7 +33,7 @@ $items = $data['items'] ?? [];
                 ?>
                 <<?= $tag ?> class="imgcard"<?= $url !== '' ? ' href="' . htmlspecialchars($url, ENT_QUOTES) . '"' : '' ?>>
                     <?php if ($img !== ''): ?>
-                        <img class="imgcard__media" src="<?= htmlspecialchars($img, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                        <?= \App\Core\Media::picture($img, (string) $item['title'], null, null, 'imgcard__media', true, '(max-width: 700px) 100vw, 25vw') ?>
                     <?php else: ?>
                         <span class="imgcard__media" aria-hidden="true"></span>
                     <?php endif; ?>

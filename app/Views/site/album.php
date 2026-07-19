@@ -32,7 +32,7 @@ $crumbs = [
             <?php foreach ($images as $img): ?>
                 <figure class="album-photo">
                     <a href="<?= htmlspecialchars((string) $img['image_url'], ENT_QUOTES) ?>" target="_blank" rel="noopener">
-                        <img src="<?= htmlspecialchars((string) $img['image_url'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) ($img['caption'] ?: $album['title']), ENT_QUOTES) ?>" loading="lazy">
+                        <?= \App\Core\Media::picture((string) $img['image_url'], (string) ($img['caption'] ?: $album['title']), null, null, '', true, '(max-width: 700px) 100vw, 33vw') ?>
                     </a>
                     <?php if ($img['caption'] !== ''): ?>
                         <figcaption><?= htmlspecialchars((string) $img['caption'], ENT_QUOTES) ?></figcaption>

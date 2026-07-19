@@ -104,8 +104,15 @@ final class ContentFields
                 $ts = strtotime($scalar);
                 return $ts ? htmlspecialchars(date('d.m.Y', $ts), ENT_QUOTES) : htmlspecialchars($scalar, ENT_QUOTES);
             case 'image':
-                $src = htmlspecialchars($scalar, ENT_QUOTES);
-                return '<img src="' . $src . '" alt="' . htmlspecialchars((string) $field['label'], ENT_QUOTES) . '" loading="lazy">';
+                return Media::picture(
+                    $scalar,
+                    (string) $field['label'],
+                    null,
+                    null,
+                    '',
+                    true,
+                    '(max-width: 800px) 100vw, 800px'
+                );
             case 'file':
                 $href = htmlspecialchars($scalar, ENT_QUOTES);
                 return '<a href="' . $href . '" target="_blank" rel="noopener" download>' . htmlspecialchars((string) $field['label'], ENT_QUOTES) . '</a>';

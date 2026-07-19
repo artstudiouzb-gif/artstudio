@@ -9,7 +9,7 @@ $btnUrl = trim((string) ($data['button_url'] ?? ''));
 <div class="block-profile">
     <div class="profile__media">
         <?php if ($photo !== ''): ?>
-            <img class="profile__photo" src="<?= htmlspecialchars($photo, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) ($data['name'] ?? ''), ENT_QUOTES) ?>">
+            <?= \App\Core\Media::picture($photo, (string) ($data['name'] ?? ''), null, null, 'profile__photo', false, '(max-width: 700px) 100vw, 35vw') ?>
         <?php else: ?>
             <span class="profile__photo profile__photo--empty">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" width="64" height="64"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6 8-6s8 2 8 6"/></svg>

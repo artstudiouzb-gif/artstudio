@@ -26,7 +26,7 @@ $others = array_values(array_filter(Project::published(), fn (array $p) => (int)
             <h1 class="projdetail__title"><?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?></h1>
         </div>
         <?php if ($cover !== ''): ?>
-            <img class="projdetail__media" src="<?= htmlspecialchars($cover, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $project['title'], ENT_QUOTES) ?>" decoding="async">
+            <?= \App\Core\Media::picture($cover, (string) $project['title'], null, null, 'projdetail__media', false, '(max-width: 900px) 100vw, 55vw') ?>
         <?php endif; ?>
     </div>
     <div class="projdetail__content newsdetail-article__content rich-content"><?= $project['description'] ?></div>
@@ -42,7 +42,7 @@ $others = array_values(array_filter(Project::published(), fn (array $p) => (int)
                     <?php $c = trim((string) ($item['cover_image'] ?? '')); ?>
                     <a class="imgcard" href="<?= htmlspecialchars(Locale::url('projects/' . $item['slug']), ENT_QUOTES) ?>">
                         <?php if ($c !== ''): ?>
-                            <img class="imgcard__media" src="<?= htmlspecialchars($c, ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                            <?= \App\Core\Media::picture($c, (string) $item['title'], null, null, 'imgcard__media', true, '(max-width: 700px) 100vw, 25vw') ?>
                         <?php else: ?>
                             <span class="imgcard__media" aria-hidden="true"></span>
                         <?php endif; ?>

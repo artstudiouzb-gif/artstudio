@@ -278,7 +278,8 @@ final class Uploader
         return max(1200, min(4000, $w));
     }
 
-    public static function optimizeImage(string $path): void
+    /** $downscaleOriginal=false используется для безопасной миграции старых файлов. */
+    public static function optimizeImage(string $path, bool $downscaleOriginal = true): void
     {
         if (!extension_loaded('gd')) {
             return;
@@ -347,7 +348,7 @@ final class Uploader
             // уменьшённый оригинал экономит вес страниц и место на диске, при
             // этом работает и там, где картинка задаётся через CSS background.
             $maxW = self::originalMaxWidth();
-            if ($width > $maxW) {
+            if ($downscaleOriginal && $width > $maxW) {
                 $newH = (int) round($height * ($maxW / $width));
                 $down = imagecreatetruecolor($maxW, $newH);
                 if ($type === IMAGETYPE_PNG) {

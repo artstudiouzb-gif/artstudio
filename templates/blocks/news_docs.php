@@ -21,7 +21,7 @@ $fmt = static fn (string $d): string => DateFormatter::short($d);
                 <?php foreach ($news as $item): ?>
                     <a class="newsdocs-item" href="<?= htmlspecialchars((string) $item['url'], ENT_QUOTES) ?>">
                         <?php if (!empty($item['cover'])): ?>
-                            <img class="newsdocs-item__media" src="<?= htmlspecialchars((string) $item['cover'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars((string) $item['title'], ENT_QUOTES) ?>" loading="lazy" decoding="async">
+                            <?= \App\Core\Media::picture((string) $item['cover'], (string) $item['title'], null, null, 'newsdocs-item__media', true, '(max-width: 700px) 100vw, 25vw') ?>
                         <?php else: ?>
                             <span class="newsdocs-item__media newsdocs-item__media--empty" aria-hidden="true"></span>
                         <?php endif; ?>

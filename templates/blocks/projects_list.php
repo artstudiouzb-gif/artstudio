@@ -12,7 +12,7 @@ $projects = $data['projects'] ?? [];
             <?php foreach ($projects as $p): ?>
                 <div class="project-card">
                     <?php if (!empty($p['cover_image'])): ?>
-                        <img class="project-card__cover" src="<?= htmlspecialchars($p['cover_image'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES) ?>" loading="lazy">
+                        <?= \App\Core\Media::picture((string) $p['cover_image'], (string) ($p['title'] ?? ''), null, null, 'project-card__cover', true, '(max-width: 700px) 100vw, 33vw') ?>
                     <?php endif; ?>
                     <div class="project-card__title"><?= htmlspecialchars($p['title'] ?? '', ENT_QUOTES) ?></div>
                     <?php if (!empty($p['description'])): ?>

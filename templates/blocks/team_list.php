@@ -12,7 +12,7 @@ $members = $data['members'] ?? [];
             <?php foreach ($members as $m): ?>
                 <div class="team-card">
                     <?php if (!empty($m['photo'])): ?>
-                        <img class="team-card__photo" src="<?= htmlspecialchars($m['photo'], ENT_QUOTES) ?>" alt="<?= htmlspecialchars($m['name'] ?? '', ENT_QUOTES) ?>" loading="lazy">
+                        <?= \App\Core\Media::picture((string) $m['photo'], (string) ($m['name'] ?? ''), null, null, 'team-card__photo', true, '(max-width: 700px) 100vw, 25vw') ?>
                     <?php endif; ?>
                     <div class="team-card__name"><?= htmlspecialchars($m['name'] ?? '', ENT_QUOTES) ?></div>
                     <?php if (!empty($m['position'])): ?>
