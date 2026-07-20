@@ -31,6 +31,14 @@
                 video.currentTime = 0;
                 resume();
             });
+            // Опережающий перезапуск за 0.2 секунды до реального окончания видео,
+            // чтобы избежать черного экрана/вспышки и появления кнопок управления.
+            video.addEventListener('timeupdate', function () {
+                if (video.duration && video.currentTime >= video.duration - 0.2) {
+                    video.currentTime = 0;
+                    video.play().catch(function () {});
+                }
+            });
             video.addEventListener('pause', function () {
                 if (!document.hidden && !video.ended) { resume(); }
             });
@@ -67,6 +75,27 @@
             frame.addEventListener('load', resume);
             document.addEventListener('visibilitychange', function () {
                 if (!document.hidden) { resume(); }
+            });
+
+            // Слушаем сообщения об изменении состояния плеера YouTube,
+            // чтобы перехватить окончание (playerState = 0 / ENDED) и запустить его заново.
+            window.addEventListener('message', function (e) {
+                if (e.origin !== 'https://www.youtube-nocookie.com' && e.origin !== 'https://www.youtube.com') { return; }
+                try {
+                    var data = JSON.parse(e.data);
+                    var ended = false;
+                    if (data.event === 'infoDelivery' && data.info && data.info.playerState === 0) {
+                        ended = true;
+                    } else if (data.event === 'onStateChange' && (data.info === 0 || data.data === 0)) {
+                        ended = true;
+                    }
+                    if (ended) {
+                        resume();
+                        command('seekTo', [0, true]);
+                    }
+                } catch (err) {
+                    // Игнорируем невалидные сообщения
+                }
             });
         });
     })();
