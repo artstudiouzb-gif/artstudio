@@ -130,6 +130,7 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .site-search input {
     border: 0 !important;
     background: transparent !important;
+    background-image: none !important;
     border-radius: 0 !important;
     padding: 0 !important;
     width: 0;
