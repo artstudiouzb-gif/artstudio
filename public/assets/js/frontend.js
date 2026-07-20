@@ -303,27 +303,39 @@
                 if (e.isIntersecting) { animate(e.target); obs.unobserve(e.target); }
             });
         }, { threshold: 0.4 });
-        counters.forEach(function (el) { cio.observe(el); });
+        counters.forEach(function (el) {
+            el.textContent = '0'; // start from 0 to avoid jumping
+            cio.observe(el);
+        });
     })();
 
+    // Автоматический скролл-ревил для всех секций, кроме Hero
+    document.querySelectorAll('.cms-block:not(.cms-block--hero)').forEach(function (block) {
+        if (!block.hasAttribute('data-reveal')) {
+            block.setAttribute('data-reveal', '');
+            block.setAttribute('data-reveal-type', 'slide-up');
+        }
+    });
+
     // Микро-движок анимаций появления при скролле на Intersection Observer.
-    var reveals = document.querySelectorAll('[data-reveal]');
-    if (!reveals.length) {
-        return;
-    }
-    if (!('IntersectionObserver' in window)) {
-        reveals.forEach(function (el) { el.classList.add('is-visible'); });
-        return;
-    }
-    var io = new IntersectionObserver(function (entries, observer) {
-        entries.forEach(function (entry) {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
+    (function () {
+        var reveals = document.querySelectorAll('[data-reveal]');
+        if (reveals.length) {
+            if (!('IntersectionObserver' in window)) {
+                reveals.forEach(function (el) { el.classList.add('is-visible'); });
+            } else {
+                var io = new IntersectionObserver(function (entries, observer) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+                reveals.forEach(function (el) { io.observe(el); });
             }
-        });
-    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
-    reveals.forEach(function (el) { io.observe(el); });
+        }
+    })();
 })();
 
     // Медиа-галерея: переключатели «Видео / Фото».
