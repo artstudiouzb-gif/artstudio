@@ -113,7 +113,7 @@ body.design-header-accent .site-nav, body.design-header-dark .site-nav { border-
 .site-lang-switcher__item.is-active { color: var(--gov-teal); }
 .site-lang-switcher__item:not(.is-active):hover { color: var(--color-accent, var(--gov-teal)) !important; opacity: 0.85; }
 .a11y-toggle, .site-theme-toggle, .site-search, .site-search input, .site-search-toggle { color: var(--gov-title); }
-.site-search { border: 1px solid var(--gov-border); border-radius: 999px; background: var(--gov-surface); padding-inline: 14px 4px; }
+.site-search { border: 1px solid var(--gov-border); border-radius: 999px; background: var(--gov-surface); }
 .site-search input { border: 0 !important; background: transparent !important; border-radius: 0 !important; }
 .site-search button { border: 0 !important; background: transparent !important; }
 .site-burger { color: var(--gov-title); border-color: var(--gov-border); }
