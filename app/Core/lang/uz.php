@@ -41,6 +41,13 @@ return [
     'Введите не менее двух символов.' => 'Kamida ikkita belgi kiriting.',
     'Ваш e-mail' => 'Sizning e-pochtangiz',
 
+    // Меню (демо-набор)
+    'О нас' => 'Biz haqimizda',
+    'Направления' => 'Yo‘nalishlar',
+    'Аналитика' => 'Tahliliyot',
+    'Пресс-центр' => 'Matbuot markazi',
+    'Контакты' => 'Aloqa',
+
     // Хлебные крошки / разделы
     'Главная' => 'Bosh sahifa',
     'Новости' => 'Yangiliklar',

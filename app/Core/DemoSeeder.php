@@ -643,7 +643,7 @@ final class DemoSeeder
             ['Контакты', '/kontakty'],
         ];
         // Меню привязано к конкретному языку (без «Все языки») — сеем свой набор
-        // для каждого активного языка.
+        // для каждого активного языка; названия пропускаем через словарь Lang.
         $langs = $pdo->query('SELECT code FROM languages WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll(PDO::FETCH_COLUMN) ?: [];
         if ($langs === []) {
             return;
@@ -655,7 +655,7 @@ final class DemoSeeder
         );
         foreach ($langs as $lang) {
             foreach ($items as $i => $it) {
-                $ins->execute([':lang' => (string) $lang, ':t' => $it[0], ':u' => $it[1], ':o' => $i, ':u2' => $it[1], ':lang2' => (string) $lang]);
+                $ins->execute([':lang' => (string) $lang, ':t' => Lang::t($it[0], (string) $lang), ':u' => $it[1], ':o' => $i, ':u2' => $it[1], ':lang2' => (string) $lang]);
                 $c['menu'] += $ins->rowCount();
             }
         }

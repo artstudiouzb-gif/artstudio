@@ -41,6 +41,13 @@ return [
     'Введите не менее двух символов.' => 'Enter at least two characters.',
     'Ваш e-mail' => 'Your e-mail',
 
+    // Меню (демо-набор)
+    'О нас' => 'About us',
+    'Направления' => 'Focus areas',
+    'Аналитика' => 'Analytics',
+    'Пресс-центр' => 'Press centre',
+    'Контакты' => 'Contacts',
+
     // Хлебные крошки / разделы
     'Главная' => 'Home',
     'Новости' => 'News',
