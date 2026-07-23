@@ -467,7 +467,7 @@ final class BlockController
                 $images = [];
                 foreach ((array) ($_POST['images'] ?? []) as $image) {
                     $url = trim((string) ($image['url'] ?? ''));
-                    if ($url === '') {
+                    if ($url === '' || !\App\Core\UrlGuard::isSafeMedia($url)) {
                         continue;
                     }
                     $images[] = [

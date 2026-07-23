@@ -7,9 +7,11 @@ namespace App\Core;
 /**
  * Проверка пользовательских URL. Две задачи:
  *
- *  1. isSafeLink()   — URL для вывода в href/src разметки: только http/https,
- *     mailto/tel или относительный путь; javascript:/data: и прочее отсекается.
- *  2. isSafeRemote() — URL, по которому СЕРВЕР будет делать исходящий запрос:
+ *  1. isSafeLink()   — URL для вывода в href: только http/https, mailto/tel
+ *     или относительный путь; javascript:/data: и прочее отсекается.
+ *  2. isSafeMedia()  — более строгий URL для src: только http/https или
+ *     локальный путь, без mailto/tel/data.
+ *  3. isSafeRemote() — URL, по которому СЕРВЕР будет делать исходящий запрос:
  *     дополнительно резолвит хост и запрещает приватные/loopback/link-local
  *     диапазоны (защита от SSRF).
  *
@@ -24,7 +26,7 @@ final class UrlGuard
     public static function isSafeLink(string $url): bool
     {
         $url = trim($url);
-        if ($url === '') {
+        if ($url === '' || preg_match('/[\x00-\x1F\x7F]/', $url)) {
             return false;
         }
 
@@ -35,6 +37,27 @@ final class UrlGuard
 
         $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
         return in_array($scheme, ['http', 'https', 'mailto', 'tel'], true);
+    }
+
+    /**
+     * URL безопасен для изображения/видео: локальный путь либо http(s).
+     * Схемы mailto/tel допустимы для ссылок, но не для медиа; data: намеренно
+     * запрещена, чтобы SVG/HTML не попадали в src в обход медиабиблиотеки.
+     */
+    public static function isSafeMedia(string $url): bool
+    {
+        $url = trim($url);
+        if (!self::isSafeLink($url)) {
+            return false;
+        }
+
+        if (str_starts_with($url, '/')) {
+            return true;
+        }
+
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        return in_array($scheme, ['http', 'https'], true);
     }
 
     /**
