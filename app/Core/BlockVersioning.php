@@ -21,7 +21,8 @@ final class BlockVersioning
         ?string $title,
         array $data,
         string $customCss,
-        ?int $userId
+        ?int $userId,
+        ?int $expectedLockVersion = null
     ): void {
         $blockId = (int) ($current['id'] ?? 0);
         if ($blockId <= 0) {
@@ -40,7 +41,8 @@ final class BlockVersioning
             $title,
             $data,
             $customCss,
-            $userId
+            $userId,
+            $expectedLockVersion
         ): void {
             BlockRevision::snapshot(
                 $blockId,
@@ -50,7 +52,7 @@ final class BlockVersioning
                 $userId
             );
 
-            Block::update($blockId, $title, $data, $customCss);
+            Block::update($blockId, $title, $data, $customCss, $expectedLockVersion);
         });
     }
 }

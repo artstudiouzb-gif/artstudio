@@ -12,6 +12,7 @@ use App\Core\BlockData\SubscribeBlockNormalizer;
 use App\Core\BlockTypeRegistry;
 use App\Core\BlockVersioning;
 use App\Core\BlockVisibility;
+use App\Core\ConcurrencyException;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\View;
@@ -184,13 +185,26 @@ final class BlockController
             Flash::error('Условия показа: дата окончания не позже даты начала — блок не будет показан. Проверьте даты.');
         }
 
-        BlockVersioning::updateWithSnapshot(
-            $block,
-            $title !== '' ? $title : null,
-            $data,
-            $customCss,
-            Auth::id()
-        );
+        $expectedVersion = (int) ($_POST['expected_lock_version'] ?? 0);
+        try {
+            BlockVersioning::updateWithSnapshot(
+                $block,
+                $title !== '' ? $title : null,
+                $data,
+                $customCss,
+                Auth::id(),
+                $expectedVersion
+            );
+        } catch (ConcurrencyException) {
+            $block = Block::findById((int) $block['id']) ?? $block;
+            View::render('admin/pages/block_form', [
+                'block' => $block,
+                'data' => json_decode((string) $block['data'], true) ?: [],
+                'forms' => $block['type'] === 'form' ? FormDef::all() : [],
+                'error' => 'Блок уже был изменён в другой вкладке или другим пользователем. Текущие данные перезагружены; восстановите локальный черновик и проверьте изменения.',
+            ]);
+            return;
+        }
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок сохранён.');
@@ -208,7 +222,7 @@ final class BlockController
         ])) {
             Flash::error('Блок пока пуст и на сайте не показывается — заполните его поля.');
         }
-        header('Location: ' . $this->pageEditUrl($block));
+        header('Location: ' . $this->pageEditUrl($block) . '&draft_saved=block%3A' . (int) $block['id']);
         exit;
     }
 
@@ -254,13 +268,21 @@ final class BlockController
             ? ($rev['custom_css'] !== null ? (string) $rev['custom_css'] : '')
             : (string) ($block['custom_css'] ?? '');
 
-        BlockVersioning::updateWithSnapshot(
-            $block,
-            $rev['title'] !== null ? (string) $rev['title'] : null,
-            json_decode((string) $rev['data'], true) ?: [],
-            $customCss,
-            Auth::id()
-        );
+        $expectedVersion = (int) ($_POST['expected_lock_version'] ?? ($block['lock_version'] ?? 1));
+        try {
+            BlockVersioning::updateWithSnapshot(
+                $block,
+                $rev['title'] !== null ? (string) $rev['title'] : null,
+                json_decode((string) $rev['data'], true) ?: [],
+                $customCss,
+                Auth::id(),
+                $expectedVersion
+            );
+        } catch (ConcurrencyException) {
+            Flash::error('Блок уже изменился после открытия истории. Проверьте свежую версию и повторите восстановление.');
+            header('Location: /admin/blocks/' . (int) $block['id'] . '/revisions');
+            exit;
+        }
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок восстановлен из выбранной версии.');

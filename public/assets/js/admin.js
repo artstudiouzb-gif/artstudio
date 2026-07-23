@@ -1159,7 +1159,8 @@
             var values = {};
             Array.prototype.forEach.call(form.elements, function (el) {
                 if (!el.name || el.disabled || el.type === 'file' || el.type === 'password'
-                    || el.name === 'csrf_token' || el.name === 'expected_updated_at') { return; }
+                    || el.name === 'csrf_token' || el.name === 'expected_updated_at'
+                    || el.name === 'expected_lock_version') { return; }
                 if ((el.type === 'checkbox' || el.type === 'radio') && !el.checked) { return; }
                 if (values[el.name] !== undefined) {
                     if (!Array.isArray(values[el.name])) { values[el.name] = [values[el.name]]; }

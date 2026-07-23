@@ -50,6 +50,7 @@ $blockName = $block['title'] !== null && $block['title'] !== ''
                           data-confirm="Восстановить блок из этой версии? Текущее состояние сохранится в истории.">
                         <?= Csrf::field() ?>
                         <input type="hidden" name="revision_id" value="<?= (int) $rev['id'] ?>">
+                        <input type="hidden" name="expected_lock_version" value="<?= (int) ($block['lock_version'] ?? 1) ?>">
                         <button class="btn btn--small btn--primary"><?= \App\Core\AdminUi::icon('reset') ?>Восстановить</button>
                     </form>
                 </td>

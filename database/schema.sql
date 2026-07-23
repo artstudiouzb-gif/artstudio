@@ -179,6 +179,7 @@ CREATE TABLE IF NOT EXISTS blocks (
     is_active       TINYINT(1) NOT NULL DEFAULT 1 COMMENT 'блок выводится на сайте (0 — скрыт, но не удалён)',
     created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    lock_version    INT UNSIGNED NOT NULL DEFAULT 1,
     KEY idx_blocks_page (page_id, lang, sort_order),
     KEY idx_blocks_parent (parent_block_id, column_index, sort_order),
     CONSTRAINT fk_blocks_page FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE,
@@ -934,7 +935,8 @@ INSERT INTO migrations (filename) VALUES
     ('2026_07_17_video_translations.sql'),
     ('2026_07_18_menu_per_language.sql'),
     ('2026_07_18_menu_mega.sql'),
-    ('2026_07_19_news_translation_badge.sql')
+    ('2026_07_19_news_translation_badge.sql'),
+    ('2026_07_23_block_locking.sql')
 ON DUPLICATE KEY UPDATE filename = filename;
 
 SET FOREIGN_KEY_CHECKS = 1;
