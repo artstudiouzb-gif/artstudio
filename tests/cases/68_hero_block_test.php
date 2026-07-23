@@ -71,7 +71,8 @@ test('Hero: overlay использует заданный цвет и прозр
         'overlay_color' => '#123456', 'overlay_opacity' => 80,
     ]);
     // #123456 = rgb(18,52,86), 80% => 0.8
-    assert_true(str_contains($html, 'rgba(18,52,86, 0.8)'), 'overlay rgba из цвета и прозрачности');
+    assert_true(str_contains($html, '--hero-scrim-rgb: 18,52,86'), 'overlay RGB из цвета');
+    assert_true(str_contains($html, '--hero-scrim-a: 0.8'), 'overlay alpha из прозрачности');
 });
 
 test('Hero: позиция текста и подложка отражаются в разметке', function () {
