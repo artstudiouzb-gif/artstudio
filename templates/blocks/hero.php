@@ -38,6 +38,7 @@ $hex2rgb = static function (string $hex): string {
     return (int) hexdec(substr($hex, 0, 2)) . ',' . (int) hexdec(substr($hex, 2, 2)) . ',' . (int) hexdec(substr($hex, 4, 2));
 };
 $ovColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['overlay_color'] ?? '')) ? $data['overlay_color'] : '#0b1a30';
+$ovEndColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['overlay_end_color'] ?? '')) ? $data['overlay_end_color'] : '#0b1a30';
 $ovOpacity = max(0, min(100, (int) ($data['overlay_opacity'] ?? 55))) / 100;
 $panelOn = !empty($data['panel_enabled']);
 $panelColor = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['panel_color'] ?? '')) ? $data['panel_color'] : '#0b1a30';
@@ -45,6 +46,23 @@ $panelOpacity = max(0, min(100, (int) ($data['panel_opacity'] ?? 40))) / 100;
 $textPos = in_array($data['text_position'] ?? 'left', ['left', 'center', 'right'], true) ? $data['text_position'] : 'left';
 $heroText = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['text_color'] ?? '')) ? $data['text_color'] : '';
 $heroBtn = preg_match('/^#[0-9a-f]{6}$/i', (string) ($data['button_color'] ?? '')) ? $data['button_color'] : '';
+$overlayDirection = (string) ($data['overlay_direction'] ?? 'auto');
+$overlayAngles = [
+    'to_right' => '90deg',
+    'to_left' => '270deg',
+    'to_bottom' => '180deg',
+    'to_top' => '0deg',
+    'to_bottom_right' => '135deg',
+    'to_bottom_left' => '225deg',
+    'to_top_right' => '45deg',
+    'to_top_left' => '315deg',
+];
+$overlaySolid = $overlayDirection === 'solid';
+if ($overlayDirection === 'auto' || !isset($overlayAngles[$overlayDirection])) {
+    $overlayAngle = $textPos === 'right' ? '270deg' : ($textPos === 'center' ? '0deg' : '90deg');
+} else {
+    $overlayAngle = $overlayAngles[$overlayDirection];
+}
 
 // Инлайн-стиль контейнера текста: подложка + переопределения цветов через CSS-переменные.
 $textStyle = ($panelOn ? 'background: rgba(' . $hex2rgb($panelColor) . ', ' . $panelOpacity . ');' : '')
@@ -119,7 +137,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
     <?php elseif ($bgType === 'image' && $image !== ''): ?>
         <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
     <?php endif; ?>
-    <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="--hero-scrim-rgb: <?= $hex2rgb($ovColor) ?>; --hero-scrim-a: <?= $ovOpacity ?>;"></div><?php endif; ?>
+    <?php if ($hasMedia): ?><div class="block-hero__scrim<?= $overlaySolid ? ' block-hero__scrim--solid' : '' ?>" aria-hidden="true" style="--hero-scrim-rgb: <?= $hex2rgb($ovColor) ?>; --hero-scrim-end-rgb: <?= $hex2rgb($ovEndColor) ?>; --hero-scrim-a: <?= $ovOpacity ?>; --hero-scrim-direction: <?= $overlayAngle ?>;"></div><?php endif; ?>
     <div class="block-hero__inner">
         <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $textStyle !== '' ? ' style="' . $textStyle . '"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
