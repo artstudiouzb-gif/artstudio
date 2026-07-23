@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Core\BlockData;
 
-use App\Core\TextProcessor;
-use App\Core\UrlGuard;
 use App\Core\Video;
 
 /**
@@ -63,12 +61,12 @@ final class HeroBlockNormalizer
         $textPosition = (string) ($input['text_position'] ?? 'left');
 
         return [
-            'title' => TextProcessor::typographPlain(trim((string) ($input['title_field'] ?? '')), $locale),
+            'title' => BlockDataInput::plain($input, 'title_field', $locale),
             'width' => ($input['hero_width'] ?? 'full') === 'standard' ? 'standard' : 'full',
             'height' => $heightMode,
             'custom_height' => self::number($heightValue) . $heightUnit,
-            'eyebrow' => TextProcessor::typographPlain(trim((string) ($input['eyebrow'] ?? '')), $locale),
-            'subtitle' => TextProcessor::typographPlain(trim((string) ($input['subtitle'] ?? '')), $locale),
+            'eyebrow' => BlockDataInput::plain($input, 'eyebrow', $locale),
+            'subtitle' => BlockDataInput::plain($input, 'subtitle', $locale),
             'bg_type' => $bgType,
             'image' => $image,
             'video_url' => $videoUrl,
@@ -79,18 +77,18 @@ final class HeroBlockNormalizer
             'overlay_opacity' => self::percentage($input['overlay_opacity'] ?? null, 55),
             'text_position' => in_array($textPosition, ['left', 'center', 'right'], true) ? $textPosition : 'left',
             'text_width' => $textWidth,
-            'text_color' => self::optionalColor($input, 'text_color'),
-            'button_color' => self::optionalColor($input, 'button_color'),
-            'bg_color' => self::optionalColor($input, 'bg_color'),
+            'text_color' => BlockDataInput::optionalColor($input, 'text_color'),
+            'button_color' => BlockDataInput::optionalColor($input, 'button_color'),
+            'bg_color' => BlockDataInput::optionalColor($input, 'bg_color'),
             'panel_enabled' => !empty($input['panel_enabled']),
             'panel_color' => self::hexOrDefault($input['panel_color'] ?? '', '#0b1a30'),
             'panel_opacity' => self::percentage($input['panel_opacity'] ?? null, 40),
             'button_text' => trim((string) ($input['button_text'] ?? '')),
-            'button_url' => self::safeLink($input['button_url'] ?? ''),
+            'button_url' => BlockDataInput::safeLink($input['button_url'] ?? ''),
             'button2_text' => trim((string) ($input['button2_text'] ?? '')),
-            'button2_url' => self::safeLink($input['button2_url'] ?? ''),
+            'button2_url' => BlockDataInput::safeLink($input['button2_url'] ?? ''),
             'video_button_text' => trim((string) ($input['video_button_text'] ?? '')),
-            'video_button_url' => self::safeLink($input['video_button_url'] ?? ''),
+            'video_button_url' => BlockDataInput::safeLink($input['video_button_url'] ?? ''),
         ];
     }
 
@@ -108,22 +106,5 @@ final class HeroBlockNormalizer
     {
         $value = trim((string) $value);
         return preg_match('/^#[0-9a-fA-F]{6}$/', $value) ? strtolower($value) : $default;
-    }
-
-    /** @param array<string, mixed> $input */
-    private static function optionalColor(array $input, string $field): string
-    {
-        if (!empty($input[$field . '_off'])) {
-            return '';
-        }
-
-        $value = trim((string) ($input[$field] ?? ''));
-        return preg_match('/^#[0-9a-fA-F]{6}$/', $value) ? strtolower($value) : '';
-    }
-
-    private static function safeLink(mixed $value): string
-    {
-        $url = trim((string) $value);
-        return $url !== '' && UrlGuard::isSafeLink($url) ? $url : '';
     }
 }

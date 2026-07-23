@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\Auth;
+use App\Core\BlockData\BannerBlockNormalizer;
+use App\Core\BlockData\CtaBlockNormalizer;
 use App\Core\BlockData\HeroBlockNormalizer;
+use App\Core\BlockData\SubscribeBlockNormalizer;
 use App\Core\BlockTypeRegistry;
 use App\Core\BlockVisibility;
 use App\Core\Csrf;
@@ -409,20 +412,7 @@ final class BlockController
                         : \App\Core\HtmlSanitizer::sanitize($rawHtml),
                 ];
             case 'cta':
-                $buttonUrl = trim((string) ($_POST['button_url'] ?? ''));
-                // Отсекаем javascript:/data: и прочие небезопасные схемы в ссылке.
-                if ($buttonUrl !== '' && !\App\Core\UrlGuard::isSafeLink($buttonUrl)) {
-                    $buttonUrl = '';
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
-                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
-                    'button_url' => $buttonUrl,
-                    'bg_color' => self::color('bg_color'),
-                    'text_color' => self::color('text_color'),
-                    'button_color' => self::color('button_color'),
-                ];
+                return CtaBlockNormalizer::normalize($_POST, $locale);
             case 'advantages':
                 $items = [];
                 foreach ((array) ($_POST['items'] ?? []) as $item) {
@@ -569,27 +559,9 @@ final class BlockController
                     'items' => $items,
                 ];
             case 'subscribe':
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
-                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
-                ];
+                return SubscribeBlockNormalizer::normalize($_POST, $locale);
             case 'banner':
-                $bannerUrl = trim((string) ($_POST['button_url'] ?? ''));
-                if ($bannerUrl !== '' && !\App\Core\UrlGuard::isSafeLink($bannerUrl)) {
-                    $bannerUrl = '';
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'text' => TextProcessor::typographPlain(trim((string) ($_POST['text'] ?? '')), $locale),
-                    'image' => trim((string) ($_POST['image'] ?? '')),
-                    'style' => ($_POST['style'] ?? 'dark') === 'light' ? 'light' : 'dark',
-                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
-                    'button_url' => $bannerUrl,
-                    'bg_color' => self::color('bg_color'),
-                    'text_color' => self::color('text_color'),
-                    'button_color' => self::color('button_color'),
-                ];
+                return BannerBlockNormalizer::normalize($_POST, $locale);
             case 'faq':
                 $items = [];
                 foreach ((array) ($_POST['items'] ?? []) as $item) {
