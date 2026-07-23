@@ -10,6 +10,7 @@ use App\Core\BlockData\CtaBlockNormalizer;
 use App\Core\BlockData\HeroBlockNormalizer;
 use App\Core\BlockData\SubscribeBlockNormalizer;
 use App\Core\BlockTypeRegistry;
+use App\Core\BlockVersioning;
 use App\Core\BlockVisibility;
 use App\Core\Csrf;
 use App\Core\Flash;
@@ -183,16 +184,13 @@ final class BlockController
             Flash::error('Условия показа: дата окончания не позже даты начала — блок не будет показан. Проверьте даты.');
         }
 
-        // История версий (группа 5.1): снимаем текущее состояние ПЕРЕД перезаписью.
-        BlockRevision::snapshot(
-            (int) $block['id'],
-            $block['title'] !== null ? (string) $block['title'] : null,
-            json_decode((string) $block['data'], true) ?: [],
-            $block['custom_css'] !== null ? (string) $block['custom_css'] : null,
+        BlockVersioning::updateWithSnapshot(
+            $block,
+            $title !== '' ? $title : null,
+            $data,
+            $customCss,
             Auth::id()
         );
-
-        Block::update((int) $block['id'], $title !== '' ? $title : null, $data, $customCss);
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
         Flash::success('Блок сохранён.');
@@ -256,20 +254,12 @@ final class BlockController
             ? ($rev['custom_css'] !== null ? (string) $rev['custom_css'] : '')
             : (string) ($block['custom_css'] ?? '');
 
-        // Снимок текущего состояния, затем применяем ревизию.
-        BlockRevision::snapshot(
-            (int) $block['id'],
-            $block['title'] !== null ? (string) $block['title'] : null,
-            json_decode((string) $block['data'], true) ?: [],
-            $block['custom_css'] !== null ? (string) $block['custom_css'] : null,
-            Auth::id()
-        );
-
-        Block::update(
-            (int) $block['id'],
+        BlockVersioning::updateWithSnapshot(
+            $block,
             $rev['title'] !== null ? (string) $rev['title'] : null,
             json_decode((string) $rev['data'], true) ?: [],
-            $customCss
+            $customCss,
+            Auth::id()
         );
         \App\Core\Cache::forgetPrefix('page:' . (int) $block['page_id']);
 
