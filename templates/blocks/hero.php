@@ -119,7 +119,7 @@ if ($heroHeight === 'custom' && preg_match('/^(\d+(?:\.\d+)?)(px|vh|dvh|rem)$/',
     <?php elseif ($bgType === 'image' && $image !== ''): ?>
         <?= Media::picture($image, '', null, null, 'block-hero__image', false, '100vw', true, 'block-hero__media') ?>
     <?php endif; ?>
-    <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="--hero-scrim: rgba(<?= $hex2rgb($ovColor) ?>, <?= $ovOpacity ?>);"></div><?php endif; ?>
+    <?php if ($hasMedia): ?><div class="block-hero__scrim" aria-hidden="true" style="--hero-scrim-rgb: <?= $hex2rgb($ovColor) ?>; --hero-scrim-a: <?= $ovOpacity ?>;"></div><?php endif; ?>
     <div class="block-hero__inner">
         <div class="block-hero__text<?= $panelOn ? ' block-hero__text--panel' : '' ?>"<?= $textStyle !== '' ? ' style="' . $textStyle . '"' : '' ?>>
             <?php if ($eyebrow !== ''): ?><span class="block-hero__eyebrow"><?= htmlspecialchars($eyebrow, ENT_QUOTES) ?></span><?php endif; ?>
