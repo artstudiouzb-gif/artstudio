@@ -33,7 +33,7 @@ final class Media
         string $pictureClass = ''
     ): string {
         $url = trim((string) $url);
-        if ($url === '') {
+        if ($url === '' || !UrlGuard::isSafeMedia($url)) {
             return '';
         }
 
@@ -94,7 +94,7 @@ final class Media
     public static function preloadLink(string $url, string $sizes = '100vw'): string
     {
         $url = trim($url);
-        if ($url === '') {
+        if ($url === '' || !UrlGuard::isSafeMedia($url)) {
             return '';
         }
 
