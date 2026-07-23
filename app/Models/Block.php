@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Core\ConcurrencyException;
 use App\Core\Database;
 
 final class Block
@@ -115,17 +116,32 @@ final class Block
         return (int) Database::pdo()->lastInsertId();
     }
 
-    public static function update(int $id, ?string $title, array $data, string $customCss): void
+    public static function update(
+        int $id,
+        ?string $title,
+        array $data,
+        string $customCss,
+        ?int $expectedLockVersion = null
+    ): void
     {
         $stmt = Database::pdo()->prepare(
-            'UPDATE blocks SET title = :title, data = :data, custom_css = :custom_css WHERE id = :id'
+            'UPDATE blocks
+             SET title = :title, data = :data, custom_css = :custom_css, lock_version = lock_version + 1
+             WHERE id = :id' . ($expectedLockVersion !== null ? ' AND lock_version = :expected_lock_version' : '')
         );
-        $stmt->execute([
+        $params = [
             ':title' => $title,
             ':data' => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             ':custom_css' => $customCss,
             ':id' => $id,
-        ]);
+        ];
+        if ($expectedLockVersion !== null) {
+            $params[':expected_lock_version'] = $expectedLockVersion;
+        }
+        $stmt->execute($params);
+        if ($expectedLockVersion !== null && $stmt->rowCount() !== 1) {
+            throw new ConcurrencyException('Блок был изменён другим пользователем.');
+        }
     }
 
     public static function delete(int $id): void

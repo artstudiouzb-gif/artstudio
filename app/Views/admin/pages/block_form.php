@@ -9,16 +9,20 @@ require __DIR__ . '/../layout/header.php';
 /** @var array $block */
 /** @var array $data */
 /** @var array $forms */
+/** @var string|null $error */
 
 $type = $block['type'];
+$error = $error ?? null;
 $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . urlencode((string) ($block['lang'] ?? ''));
 ?>
+<?php if ($error): ?><div class="alert alert--error"><?= htmlspecialchars($error, ENT_QUOTES) ?></div><?php endif; ?>
 <a href="<?= htmlspecialchars($backUrl, ENT_QUOTES) ?>" class="btn btn--small" style="margin-bottom:16px;">&larr; Назад к странице</a>
 <a href="/admin/blocks/<?= (int) $block['id'] ?>/revisions" class="btn btn--small" style="margin-bottom:16px;">История изменений</a>
 
 <div class="form-card">
-    <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/edit" class="form-grid">
+    <form method="post" action="/admin/blocks/<?= (int) $block['id'] ?>/edit" class="form-grid" data-content-draft="block:<?= (int) $block['id'] ?>" data-record-updated="<?= htmlspecialchars((string) ($block['updated_at'] ?? ''), ENT_QUOTES) ?>">
         <?= Csrf::field() ?>
+        <input type="hidden" name="expected_lock_version" value="<?= (int) ($block['lock_version'] ?? 1) ?>">
 
         <div class="form-field">
             <label for="title">Внутреннее название блока</label>
