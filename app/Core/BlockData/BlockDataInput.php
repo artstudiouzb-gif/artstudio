@@ -21,12 +21,12 @@ final class BlockDataInput
     /** @param array<string, mixed> $input */
     public static function trimmed(array $input, string $field): string
     {
-        return trim((string) ($input[$field] ?? ''));
+        return trim(self::scalarString($input[$field] ?? null));
     }
 
     public static function safeLink(mixed $value): string
     {
-        $url = trim((string) $value);
+        $url = trim(self::scalarString($value));
         return $url !== '' && UrlGuard::isSafeLink($url) ? $url : '';
     }
 
@@ -37,7 +37,12 @@ final class BlockDataInput
             return '';
         }
 
-        $value = trim((string) ($input[$field] ?? ''));
+        $value = self::trimmed($input, $field);
         return preg_match('/^#[0-9a-fA-F]{6}$/', $value) ? strtolower($value) : '';
+    }
+
+    private static function scalarString(mixed $value): string
+    {
+        return is_scalar($value) ? (string) $value : '';
     }
 }

@@ -9,6 +9,7 @@ use App\Core\BlockData\AdvantagesBlockNormalizer;
 use App\Core\BlockData\BannerBlockNormalizer;
 use App\Core\BlockData\BlockPresentationNormalizer;
 use App\Core\BlockData\ContactCardsBlockNormalizer;
+use App\Core\BlockData\CountersBlockNormalizer;
 use App\Core\BlockData\CtaBlockNormalizer;
 use App\Core\BlockData\FaqBlockNormalizer;
 use App\Core\BlockData\HeroBlockNormalizer;
@@ -452,32 +453,7 @@ final class BlockController
             case 'testimonials':
                 return TestimonialsBlockNormalizer::normalize($_POST, $locale);
             case 'counters':
-                $items = [];
-                foreach ((array) ($_POST['items'] ?? []) as $item) {
-                    $value = trim((string) ($item['value'] ?? ''));
-                    $label = trim((string) ($item['label'] ?? ''));
-                    if ($value === '' && $label === '') {
-                        continue;
-                    }
-                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
-                    if ($iconSvg !== '') {
-                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
-                    }
-                    $items[] = [
-                        // Число хранится как целое (для анимации инкремента).
-                        'value' => (int) preg_replace('/\D+/', '', $value),
-                        'suffix' => trim((string) ($item['suffix'] ?? '')),
-                        'label' => TextProcessor::typographPlain($label, $locale),
-                        'icon_svg' => $iconSvg,
-                    ];
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    // Галочка «по умолчанию» сбрасывает цвет (color-input всегда шлёт значение).
-                    'card_bg' => empty($_POST['card_bg_off']) ? self::hexOrEmpty($_POST['card_bg'] ?? '') : '',
-                    'text_color' => empty($_POST['text_color_off']) ? self::hexOrEmpty($_POST['text_color'] ?? '') : '',
-                    'items' => $items,
-                ];
+                return CountersBlockNormalizer::normalize($_POST, $locale);
             case 'team_list':
             case 'projects_list':
             case 'news_latest':
