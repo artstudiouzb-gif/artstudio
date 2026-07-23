@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Csrf;
+use App\Core\BlockTypeRegistry;
 use App\Models\Language;
 
 $isEdit = !empty($page['id']);
@@ -19,46 +20,7 @@ $action = $isEdit ? '/admin/pages/' . (int) $page['id'] . '/edit' : '/admin/page
 $defaultCode = Language::defaultCode();
 $languages = Language::active();
 
-$blockTypeLabels = [
-    'text' => 'Текст',
-    'html' => 'Произвольный HTML',
-    'cta' => 'Призыв к действию (CTA)',
-    'advantages' => 'Преимущества',
-    'slider' => 'Слайдер',
-    'gallery' => 'Галерея',
-    'form' => 'Форма',
-    'columns' => 'Колонки',
-    'testimonials' => 'Отзывы',
-    'counters' => 'Счётчики',
-    'team_list' => 'Список команды',
-    'projects_list' => 'Список проектов',
-    'news_latest' => 'Последние новости',
-    'partners' => 'Партнёры (логотипы)',
-    'banner' => 'Баннер с фоном',
-    'subscribe' => 'Подписка на дайджест',
-    'faq' => 'FAQ / аккордеон',
-    'contact_cards' => 'Контактные карточки',
-    'hero' => 'Герой (титул + фото/видео)',
-    'categories_grid' => 'Сетка категорий',
-    'media_materials' => 'Медиаматериалы',
-    'cards_grid' => 'Карточки-направления (иконка+текст)',
-    'image_cards' => 'Карточки с фото (проекты)',
-    'media_gallery' => 'Медиа-галерея (видео/фото)',
-    'news_feature' => 'Новости и аналитика (крупная + список)',
-    'person_cards' => 'Руководство (карточки персон)',
-    'timeline' => 'История (таймлайн + CTA-карточка)',
-    'news_docs' => 'Новости + документы (2 колонки)',
-    'cta_band' => 'CTA-полоса (обратная связь)',
-    'person_profile' => 'Профиль руководителя',
-    'feature_band' => 'Полоса компетенций (тёмная)',
-    'bio_education' => 'Биография + образование',
-    'anchor_nav' => 'Якорная навигация (вкладки)',
-    'stages' => 'Этапы реализации (таймлайн)',
-    'text_image' => 'Текст + фото (о проекте)',
-    'docs_list' => 'Документы (сетка)',
-    'map_point' => 'Карта с меткой',
-    'org_structure' => 'Структура организации (оргсхема)',
-];
+$blockTypeLabels = BlockTypeRegistry::editorLabels();
 
 // Дочерние блоки колонок (группа 4.1): подгружаем детей каждого columns-блока.
 $columnsChildren = [];

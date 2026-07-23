@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Core\BlockHints;
 use App\Core\BlockRenderer;
 use App\Core\BlockSamples;
+use App\Core\BlockTypeRegistry;
 
 /**
  * Структурные блоки образца не имеют по своей природе: «Колонки» наполняются
@@ -68,7 +69,7 @@ test('Новый блок создаётся с образцом', function () {
     $src = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Controllers/Admin/BlockController.php');
     // Язык блока передаётся, чтобы ссылки образца вели в раздел того же языка.
     assert_contains('BlockSamples::for($type, $lang)', $src);
-    assert_contains('array_merge(\App\Core\BlockRenderer::defaultsFor($type), $sample)', $src);
+    assert_contains('array_merge(BlockTypeRegistry::defaultsFor($type), $sample)', $src);
     // Блок формы получает первую существующую форму, иначе он бесполезен.
     assert_contains('FormDef::all()[0] ?? null', $src);
 });

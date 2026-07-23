@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\Auth;
+use App\Core\BlockTypeRegistry;
 use App\Core\BlockVisibility;
 use App\Core\Csrf;
 use App\Core\Flash;
@@ -19,8 +20,6 @@ use App\Models\Page;
 
 final class BlockController
 {
-    private const TYPES = ['text', 'html', 'cta', 'advantages', 'slider', 'gallery', 'form', 'columns', 'testimonials', 'counters', 'team_list', 'projects_list', 'news_latest', 'partners', 'banner', 'faq', 'subscribe', 'contact_cards', 'hero', 'categories_grid', 'media_materials', 'cards_grid', 'image_cards', 'media_gallery', 'news_feature', 'person_cards', 'timeline', 'news_docs', 'cta_band', 'person_profile', 'feature_band', 'bio_education', 'anchor_nav', 'stages', 'text_image', 'docs_list', 'map_point', 'org_structure'];
-
     public function store(array $params): void
     {
         Auth::requireLogin();
@@ -40,7 +39,7 @@ final class BlockController
             $lang = Language::defaultCode();
         }
 
-        if (!in_array($type, self::TYPES, true)) {
+        if (!BlockTypeRegistry::has($type)) {
             Flash::error('Неизвестный тип блока.');
             header('Location: /admin/pages/' . $pageId . '/edit?block_lang=' . urlencode($lang));
             exit;
@@ -92,7 +91,7 @@ final class BlockController
             $lang,
             $type,
             $title !== '' ? $title : null,
-            array_merge(\App\Core\BlockRenderer::defaultsFor($type), $sample),
+            array_merge(BlockTypeRegistry::defaultsFor($type), $sample),
             '',
             $parentBlockId,
             $columnIndex
