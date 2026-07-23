@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\Auth;
+use App\Core\BlockData\HeroBlockNormalizer;
 use App\Core\BlockTypeRegistry;
 use App\Core\BlockVisibility;
 use App\Core\Csrf;
 use App\Core\Flash;
 use App\Core\View;
 use App\Core\TextProcessor;
-use App\Core\Video;
 use App\Models\Block;
 use App\Models\BlockRevision;
 use App\Models\FormDef;
@@ -632,75 +632,7 @@ final class BlockController
                     'items' => $items,
                 ];
             case 'hero':
-                $safe = static fn (string $u): string => ($u !== '' && \App\Core\UrlGuard::isSafeLink($u)) ? $u : '';
-                // #RRGGBB или пусто; иначе дефолт. Уровень прозрачности 0..100.
-                $hexColor = static fn (string $v, string $def): string => preg_match('/^#[0-9a-fA-F]{6}$/', $v) ? strtolower($v) : $def;
-                $pct = static fn ($v, int $def): int => is_numeric($v) ? max(0, min(100, (int) $v)) : $def;
-                $bgType = (string) ($_POST['bg_type'] ?? 'image');
-                $bgType = in_array($bgType, ['none', 'image', 'video', 'youtube'], true) ? $bgType : 'image';
-                $youtubeUrl = trim((string) ($_POST['youtube_url'] ?? ''));
-                $videoUrl = trim((string) ($_POST['video_url'] ?? ''));
-                // Редактор загрузил фото, но список «Фон секции» остался на
-                // «Без фона» — и снимок молча пропадал. Загруженное фото и есть
-                // явное намерение: включаем фон-изображение сами.
-                if ($bgType === 'none' && Video::youtubeId($youtubeUrl) !== null) {
-                    $bgType = 'youtube';
-                } elseif ($bgType === 'none' && $videoUrl !== '') {
-                    $bgType = 'video';
-                } elseif ($bgType === 'none' && trim((string) ($_POST['image'] ?? '')) !== '') {
-                    $bgType = 'image';
-                }
-                $heightMode = (string) ($_POST['hero_height'] ?? 'regular');
-                $heightMode = in_array($heightMode, ['regular', 'full', 'custom'], true) ? $heightMode : 'regular';
-                $heightUnit = (string) ($_POST['hero_height_unit'] ?? 'px');
-                $heightUnit = in_array($heightUnit, ['px', 'vh', 'dvh', 'rem'], true) ? $heightUnit : 'px';
-                $heightValue = is_numeric($_POST['hero_height_value'] ?? null) ? (float) $_POST['hero_height_value'] : 720.0;
-                $heightLimits = $heightUnit === 'px' ? [160.0, 2000.0]
-                    : ($heightUnit === 'rem' ? [10.0, 120.0] : [20.0, 150.0]);
-                $heightValue = max($heightLimits[0], min($heightLimits[1], $heightValue));
-                $heightNumber = rtrim(rtrim(number_format($heightValue, 1, '.', ''), '0'), '.');
-                $overlayDirection = (string) ($_POST['overlay_direction'] ?? 'auto');
-                $overlayDirections = ['auto', 'solid', 'to_right', 'to_left', 'to_bottom', 'to_top', 'to_bottom_right', 'to_bottom_left', 'to_top_right', 'to_top_left'];
-                $overlayDirection = in_array($overlayDirection, $overlayDirections, true) ? $overlayDirection : 'auto';
-                // Ширина текстовой колонки: пусто — по теме; px 200–2000, %/vw 10–100.
-                $textWidth = '';
-                if (is_numeric($_POST['text_width_value'] ?? null)) {
-                    $twUnit = (string) ($_POST['text_width_unit'] ?? 'px');
-                    $twUnit = in_array($twUnit, ['px', '%', 'vw'], true) ? $twUnit : 'px';
-                    $twLimits = $twUnit === 'px' ? [200.0, 2000.0] : [10.0, 100.0];
-                    $twValue = max($twLimits[0], min($twLimits[1], (float) $_POST['text_width_value']));
-                    $textWidth = rtrim(rtrim(number_format($twValue, 1, '.', ''), '0'), '.') . $twUnit;
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'width' => ($_POST['hero_width'] ?? 'full') === 'standard' ? 'standard' : 'full',
-                    'height' => $heightMode,
-                    'custom_height' => $heightNumber . $heightUnit,
-                    'eyebrow' => TextProcessor::typographPlain(trim((string) ($_POST['eyebrow'] ?? '')), $locale),
-                    'subtitle' => TextProcessor::typographPlain(trim((string) ($_POST['subtitle'] ?? '')), $locale),
-                    'bg_type' => $bgType,
-                    'image' => trim((string) ($_POST['image'] ?? '')),
-                    'video_url' => $videoUrl,
-                    'youtube_url' => $youtubeUrl,
-                    'overlay_direction' => $overlayDirection,
-                    'overlay_color' => $hexColor(trim((string) ($_POST['overlay_color'] ?? '')), '#0b1a30'),
-                    'overlay_end_color' => $hexColor(trim((string) ($_POST['overlay_end_color'] ?? '')), '#0b1a30'),
-                    'overlay_opacity' => $pct($_POST['overlay_opacity'] ?? null, 55),
-                    'text_position' => in_array($textPosition = (string) ($_POST['text_position'] ?? 'left'), ['left', 'center', 'right'], true) ? $textPosition : 'left',
-                    'text_width' => $textWidth,
-                    'text_color' => empty($_POST['text_color_off']) ? self::hexOrEmpty($_POST['text_color'] ?? '') : '',
-                    'button_color' => empty($_POST['button_color_off']) ? self::hexOrEmpty($_POST['button_color'] ?? '') : '',
-                    'bg_color' => empty($_POST['bg_color_off']) ? self::hexOrEmpty($_POST['bg_color'] ?? '') : '',
-                    'panel_enabled' => !empty($_POST['panel_enabled']),
-                    'panel_color' => $hexColor(trim((string) ($_POST['panel_color'] ?? '')), '#0b1a30'),
-                    'panel_opacity' => $pct($_POST['panel_opacity'] ?? null, 40),
-                    'button_text' => trim((string) ($_POST['button_text'] ?? '')),
-                    'button_url' => $safe(trim((string) ($_POST['button_url'] ?? ''))),
-                    'button2_text' => trim((string) ($_POST['button2_text'] ?? '')),
-                    'button2_url' => $safe(trim((string) ($_POST['button2_url'] ?? ''))),
-                    'video_button_text' => trim((string) ($_POST['video_button_text'] ?? '')),
-                    'video_button_url' => $safe(trim((string) ($_POST['video_button_url'] ?? ''))),
-                ];
+                return HeroBlockNormalizer::normalize($_POST, $locale);
             case 'cards_grid':
             case 'image_cards':
             case 'media_gallery':

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Core\BlockRenderer;
+use App\Core\BlockData\HeroBlockNormalizer;
 
 // Hero: фон видео/YouTube/фото, overlay с цветом и прозрачностью, позиция
 // текста и подложка под текстом.
@@ -112,12 +113,19 @@ test('Hero: форма и сохранение содержат настройк
     assert_contains('value="solid"', $form);
     assert_contains('name="overlay_end_color"', $form);
 
-    $controller = (string) file_get_contents($root . '/app/Controllers/Admin/BlockController.php');
-    assert_contains("'overlay_direction' => \$overlayDirection", $controller);
-    assert_contains("'overlay_end_color' => \$hexColor", $controller);
+    $normalizer = (string) file_get_contents($root . '/app/Core/BlockData/HeroBlockNormalizer.php');
+    assert_contains("'overlay_direction' => \$overlayDirection", $normalizer);
+    assert_contains("'overlay_end_color' => self::hexOrDefault", $normalizer);
 
     assert_same('auto', BlockRenderer::DEFAULTS['hero']['overlay_direction']);
     assert_same('#0b1a30', BlockRenderer::DEFAULTS['hero']['overlay_end_color']);
+});
+
+test('Hero: контроллер передаёт данные формы отдельному нормализатору', function () {
+    $controller = (string) file_get_contents(dirname(__DIR__, 2) . '/app/Controllers/Admin/BlockController.php');
+
+    assert_contains('HeroBlockNormalizer::normalize($_POST, $locale)', $controller);
+    assert_not_contains("case 'hero':\n                \$safe =", $controller);
 });
 
 test('Hero: позиция текста и подложка отражаются в разметке', function () {
