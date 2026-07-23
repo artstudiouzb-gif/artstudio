@@ -65,14 +65,59 @@ test('Hero: сохранённый MP4 включает фон даже при �
     assert_contains("command('setLoop', [true])", $js);
 });
 
-test('Hero: overlay использует заданный цвет и прозрачность', function () {
+test('Hero: overlay использует начальный и конечный цвета, направление и прозрачность', function () {
     $html = render_hero([
         'title' => 'X', 'bg_type' => 'image', 'image' => '/uploads/public/x.jpg',
-        'overlay_color' => '#123456', 'overlay_opacity' => 80,
+        'overlay_color' => '#123456', 'overlay_end_color' => '#abcdef',
+        'overlay_direction' => 'to_bottom_right', 'overlay_opacity' => 80,
     ]);
-    // #123456 = rgb(18,52,86), 80% => 0.8
+    // #123456 = rgb(18,52,86), #abcdef = rgb(171,205,239), 80% => 0.8
     assert_true(str_contains($html, '--hero-scrim-rgb: 18,52,86'), 'overlay RGB из цвета');
+    assert_true(str_contains($html, '--hero-scrim-end-rgb: 171,205,239'), 'конечный RGB overlay');
     assert_true(str_contains($html, '--hero-scrim-a: 0.8'), 'overlay alpha из прозрачности');
+    assert_true(str_contains($html, '--hero-scrim-direction: 135deg'), 'направление градиента');
+});
+
+test('Hero: overlay поддерживает сплошную заливку без градиента', function () {
+    $html = render_hero([
+        'title' => 'X', 'bg_type' => 'image', 'image' => '/uploads/public/x.jpg',
+        'overlay_direction' => 'solid', 'overlay_color' => '#123456',
+    ]);
+
+    assert_contains('block-hero__scrim--solid', $html);
+
+    $css = (string) file_get_contents(dirname(__DIR__, 2) . '/public/assets/css/gov-theme.css');
+    assert_contains('.block-hero__scrim--solid { background: rgba(var(--hero-scrim-rgb), var(--hero-scrim-a)); }', $css);
+});
+
+test('Hero: автоматическое направление overlay следует за положением текста', function () {
+    $right = render_hero([
+        'title' => 'X', 'bg_type' => 'image', 'image' => '/uploads/public/x.jpg',
+        'overlay_direction' => 'auto', 'text_position' => 'right',
+    ]);
+    assert_contains('--hero-scrim-direction: 270deg', $right);
+
+    $invalid = render_hero([
+        'title' => 'X', 'bg_type' => 'image', 'image' => '/uploads/public/x.jpg',
+        'overlay_direction' => '90deg;background:red', 'text_position' => 'center',
+    ]);
+    assert_contains('--hero-scrim-direction: 0deg', $invalid);
+    assert_not_contains('background:red', $invalid);
+});
+
+test('Hero: форма и сохранение содержат настройки градиента overlay', function () {
+    $root = dirname(__DIR__, 2);
+    $form = (string) file_get_contents($root . '/app/Views/admin/pages/block_form.php');
+    assert_contains('name="overlay_direction"', $form);
+    assert_contains('value="solid"', $form);
+    assert_contains('name="overlay_end_color"', $form);
+
+    $controller = (string) file_get_contents($root . '/app/Controllers/Admin/BlockController.php');
+    assert_contains("'overlay_direction' => \$overlayDirection", $controller);
+    assert_contains("'overlay_end_color' => \$hexColor", $controller);
+
+    assert_same('auto', BlockRenderer::DEFAULTS['hero']['overlay_direction']);
+    assert_same('#0b1a30', BlockRenderer::DEFAULTS['hero']['overlay_end_color']);
 });
 
 test('Hero: позиция текста и подложка отражаются в разметке', function () {

@@ -660,6 +660,9 @@ final class BlockController
                     : ($heightUnit === 'rem' ? [10.0, 120.0] : [20.0, 150.0]);
                 $heightValue = max($heightLimits[0], min($heightLimits[1], $heightValue));
                 $heightNumber = rtrim(rtrim(number_format($heightValue, 1, '.', ''), '0'), '.');
+                $overlayDirection = (string) ($_POST['overlay_direction'] ?? 'auto');
+                $overlayDirections = ['auto', 'solid', 'to_right', 'to_left', 'to_bottom', 'to_top', 'to_bottom_right', 'to_bottom_left', 'to_top_right', 'to_top_left'];
+                $overlayDirection = in_array($overlayDirection, $overlayDirections, true) ? $overlayDirection : 'auto';
                 // Ширина текстовой колонки: пусто — по теме; px 200–2000, %/vw 10–100.
                 $textWidth = '';
                 if (is_numeric($_POST['text_width_value'] ?? null)) {
@@ -680,7 +683,9 @@ final class BlockController
                     'image' => trim((string) ($_POST['image'] ?? '')),
                     'video_url' => $videoUrl,
                     'youtube_url' => $youtubeUrl,
+                    'overlay_direction' => $overlayDirection,
                     'overlay_color' => $hexColor(trim((string) ($_POST['overlay_color'] ?? '')), '#0b1a30'),
+                    'overlay_end_color' => $hexColor(trim((string) ($_POST['overlay_end_color'] ?? '')), '#0b1a30'),
                     'overlay_opacity' => $pct($_POST['overlay_opacity'] ?? null, 55),
                     'text_position' => in_array($textPosition = (string) ($_POST['text_position'] ?? 'left'), ['left', 'center', 'right'], true) ? $textPosition : 'left',
                     'text_width' => $textWidth,

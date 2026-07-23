@@ -496,12 +496,38 @@ $backUrl = '/admin/pages/' . (int) $block['page_id'] . '/edit?block_lang=' . url
                 <input type="text" id="youtube_url" name="youtube_url" value="<?= htmlspecialchars($data['youtube_url'] ?? '', ENT_QUOTES) ?>" placeholder="https://www.youtube.com/watch?v=…">
                 <span class="form-hint">После вставки корректной ссылки фон автоматически переключается на YouTube. Ролик проигрывается без звука и зациклено.</span>
             </div>
-            <div class="form-field"><label for="overlay_color">Затемнение фона (overlay) — цвет</label>
-                <input type="color" id="overlay_color" name="overlay_color" value="<?= htmlspecialchars($data['overlay_color'] ?? '#0b1a30', ENT_QUOTES) ?>">
+            <?php
+            $overlayDirection = (string) ($data['overlay_direction'] ?? 'auto');
+            $overlayDirection = in_array($overlayDirection, ['auto', 'solid', 'to_right', 'to_left', 'to_bottom', 'to_top', 'to_bottom_right', 'to_bottom_left', 'to_top_right', 'to_top_left'], true)
+                ? $overlayDirection
+                : 'auto';
+            ?>
+            <div class="form-field"><label for="overlay_direction">Направление градиента overlay</label>
+                <select id="overlay_direction" name="overlay_direction">
+                    <option value="auto" <?= $overlayDirection === 'auto' ? 'selected' : '' ?>>Автоматически — от текста к краю</option>
+                    <option value="solid" <?= $overlayDirection === 'solid' ? 'selected' : '' ?>>Без градиента — сплошной overlay</option>
+                    <option value="to_right" <?= $overlayDirection === 'to_right' ? 'selected' : '' ?>>Слева направо →</option>
+                    <option value="to_left" <?= $overlayDirection === 'to_left' ? 'selected' : '' ?>>Справа налево ←</option>
+                    <option value="to_bottom" <?= $overlayDirection === 'to_bottom' ? 'selected' : '' ?>>Сверху вниз ↓</option>
+                    <option value="to_top" <?= $overlayDirection === 'to_top' ? 'selected' : '' ?>>Снизу вверх ↑</option>
+                    <option value="to_bottom_right" <?= $overlayDirection === 'to_bottom_right' ? 'selected' : '' ?>>По диагонали вправо вниз ↘</option>
+                    <option value="to_bottom_left" <?= $overlayDirection === 'to_bottom_left' ? 'selected' : '' ?>>По диагонали влево вниз ↙</option>
+                    <option value="to_top_right" <?= $overlayDirection === 'to_top_right' ? 'selected' : '' ?>>По диагонали вправо вверх ↗</option>
+                    <option value="to_top_left" <?= $overlayDirection === 'to_top_left' ? 'selected' : '' ?>>По диагонали влево вверх ↖</option>
+                </select>
+                <span class="form-hint">Автоматический режим сохраняет прежнее поведение: затемнение начинается со стороны текста. В режиме без градиента используется только начальный цвет.</span>
+            </div>
+            <div class="colorfield-row">
+                <div class="form-field"><label for="overlay_color">Начальный цвет overlay</label>
+                    <input type="color" id="overlay_color" name="overlay_color" value="<?= htmlspecialchars($data['overlay_color'] ?? '#0b1a30', ENT_QUOTES) ?>">
+                </div>
+                <div class="form-field"><label for="overlay_end_color">Конечный цвет overlay</label>
+                    <input type="color" id="overlay_end_color" name="overlay_end_color" value="<?= htmlspecialchars($data['overlay_end_color'] ?? '#0b1a30', ENT_QUOTES) ?>">
+                </div>
             </div>
             <div class="form-field"><label for="overlay_opacity">Прозрачность overlay: <output data-range-output="overlay_opacity"><?= (int) ($data['overlay_opacity'] ?? 55) ?></output>%</label>
                 <input type="range" min="0" max="100" id="overlay_opacity" name="overlay_opacity" value="<?= (int) ($data['overlay_opacity'] ?? 55) ?>" data-range-input="overlay_opacity">
-                <span class="form-hint">0% — фон виден полностью, 100% — сплошная заливка. Помогает читаемости текста.</span>
+                <span class="form-hint">0% — overlay отключён, 100% — максимальная плотность. Помогает читаемости текста.</span>
             </div>
             <div class="colorfield-row">
                 <?= \App\Core\AdminUi::colorField('bg_color', $data['bg_color'] ?? '', 'Цвет фона под текстом (градиент)', '#0b1a30', 'Нет (по теме)') ?>
