@@ -27,7 +27,7 @@ final class BlockRevision
         $stmt->execute([
             ':block_id' => $blockId,
             ':title' => $title,
-            ':data' => json_encode($data, JSON_UNESCAPED_UNICODE),
+            ':data' => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             ':custom_css' => $customCss,
             ':created_by' => $userId,
         ]);

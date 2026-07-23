@@ -122,7 +122,7 @@ final class Block
         );
         $stmt->execute([
             ':title' => $title,
-            ':data' => json_encode($data, JSON_UNESCAPED_UNICODE),
+            ':data' => json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             ':custom_css' => $customCss,
             ':id' => $id,
         ]);
