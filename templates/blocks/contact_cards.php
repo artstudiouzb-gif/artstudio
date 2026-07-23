@@ -23,8 +23,9 @@ $items = $data['items'] ?? [];
                         <?php $line = trim($line); if ($line === '') { continue; } ?>
                         <p class="contact-card__line"><?= htmlspecialchars($line, ENT_QUOTES) ?></p>
                     <?php endforeach; ?>
-                    <?php if (!empty($item['link_url']) && !empty($item['link_text'])): ?>
-                        <a class="contact-card__link" href="<?= htmlspecialchars((string) $item['link_url'], ENT_QUOTES) ?>"><?= htmlspecialchars((string) $item['link_text'], ENT_QUOTES) ?> →</a>
+                    <?php $linkUrl = trim((string) ($item['link_url'] ?? '')); ?>
+                    <?php if ($linkUrl !== '' && \App\Core\UrlGuard::isSafeLink($linkUrl) && !empty($item['link_text'])): ?>
+                        <a class="contact-card__link" href="<?= htmlspecialchars($linkUrl, ENT_QUOTES) ?>"><?= htmlspecialchars((string) $item['link_text'], ENT_QUOTES) ?> →</a>
                     <?php endif; ?>
                 </div>
             <?php endforeach; ?>

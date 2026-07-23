@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace App\Controllers\Admin;
 
 use App\Core\Auth;
+use App\Core\BlockData\AdvantagesBlockNormalizer;
 use App\Core\BlockData\BannerBlockNormalizer;
+use App\Core\BlockData\ContactCardsBlockNormalizer;
 use App\Core\BlockData\CtaBlockNormalizer;
+use App\Core\BlockData\FaqBlockNormalizer;
 use App\Core\BlockData\HeroBlockNormalizer;
 use App\Core\BlockData\SubscribeBlockNormalizer;
+use App\Core\BlockData\TestimonialsBlockNormalizer;
 use App\Core\BlockTypeRegistry;
 use App\Core\BlockVersioning;
 use App\Core\BlockVisibility;
@@ -426,30 +430,7 @@ final class BlockController
             case 'cta':
                 return CtaBlockNormalizer::normalize($_POST, $locale);
             case 'advantages':
-                $items = [];
-                foreach ((array) ($_POST['items'] ?? []) as $item) {
-                    $itemTitle = trim((string) ($item['title'] ?? ''));
-                    $itemText = trim((string) ($item['text'] ?? ''));
-                    if ($itemTitle === '' && $itemText === '') {
-                        continue;
-                    }
-                    // SVG-иконка кодом (группа 4.3): сохраняем уже очищенную
-                    // версию (вырезаем <script>, on*-обработчики, внешние ссылки).
-                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
-                    if ($iconSvg !== '') {
-                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
-                    }
-                    $items[] = [
-                        'icon' => trim((string) ($item['icon'] ?? '')),
-                        'icon_svg' => $iconSvg,
-                        'title' => TextProcessor::typographPlain($itemTitle, $locale),
-                        'text' => TextProcessor::typographPlain($itemText, $locale),
-                    ];
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'items' => $items,
-                ];
+                return AdvantagesBlockNormalizer::normalize($_POST, $locale);
             case 'slider':
                 $slides = [];
                 foreach ((array) ($_POST['slides'] ?? []) as $slide) {
@@ -496,25 +477,7 @@ final class BlockController
                     ? (string) $_POST['gap'] : 'medium';
                 return ['columns' => $cols, 'gap' => $gap];
             case 'testimonials':
-                $items = [];
-                foreach ((array) ($_POST['items'] ?? []) as $item) {
-                    $quote = trim((string) ($item['quote'] ?? ''));
-                    $name = trim((string) ($item['name'] ?? ''));
-                    if ($quote === '' && $name === '') {
-                        continue;
-                    }
-                    $photo = trim((string) ($item['photo'] ?? ''));
-                    $items[] = [
-                        'quote' => TextProcessor::typographPlain($quote, $locale),
-                        'name' => TextProcessor::typographPlain($name, $locale),
-                        'company' => TextProcessor::typographPlain(trim((string) ($item['company'] ?? '')), $locale),
-                        'photo' => \App\Core\UrlGuard::isSafeLink($photo) ? $photo : '',
-                    ];
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'items' => $items,
-                ];
+                return TestimonialsBlockNormalizer::normalize($_POST, $locale);
             case 'counters':
                 $items = [];
                 foreach ((array) ($_POST['items'] ?? []) as $item) {
@@ -575,46 +538,9 @@ final class BlockController
             case 'banner':
                 return BannerBlockNormalizer::normalize($_POST, $locale);
             case 'faq':
-                $items = [];
-                foreach ((array) ($_POST['items'] ?? []) as $item) {
-                    $q = trim((string) ($item['question'] ?? ''));
-                    $a = trim((string) ($item['answer'] ?? ''));
-                    if ($q === '' && $a === '') {
-                        continue;
-                    }
-                    $items[] = [
-                        'question' => TextProcessor::typographPlain($q, $locale),
-                        'answer' => TextProcessor::process($a, $locale),
-                    ];
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'items' => $items,
-                ];
+                return FaqBlockNormalizer::normalize($_POST, $locale);
             case 'contact_cards':
-                $items = [];
-                foreach ((array) ($_POST['items'] ?? []) as $item) {
-                    $itemTitle = trim((string) ($item['title'] ?? ''));
-                    $lines = trim((string) ($item['lines'] ?? ''));
-                    if ($itemTitle === '' && $lines === '') {
-                        continue;
-                    }
-                    $iconSvg = trim((string) ($item['icon_svg'] ?? ''));
-                    if ($iconSvg !== '') {
-                        $iconSvg = \App\Core\Uploader::sanitizeSvgString($iconSvg);
-                    }
-                    $items[] = [
-                        'icon_svg' => $iconSvg,
-                        'title' => TextProcessor::typographPlain($itemTitle, $locale),
-                        'lines' => $lines,
-                        'link_url' => trim((string) ($item['link_url'] ?? '')),
-                        'link_text' => trim((string) ($item['link_text'] ?? '')),
-                    ];
-                }
-                return [
-                    'title' => TextProcessor::typographPlain(trim((string) ($_POST['title_field'] ?? '')), $locale),
-                    'items' => $items,
-                ];
+                return ContactCardsBlockNormalizer::normalize($_POST, $locale);
             case 'hero':
                 return HeroBlockNormalizer::normalize($_POST, $locale);
             case 'cards_grid':
