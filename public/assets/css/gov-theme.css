@@ -2364,30 +2364,7 @@ body:has(.site-header--transparent) .cms-block--hero:first-child .block-hero--h-
     background: radial-gradient(circle at 90% 90%, color-mix(in srgb, var(--gov-teal) 12%, transparent) 0%, transparent 65%);
 }
 
-/* Asymmetric Hero layout */
-@media (min-width: 768px) {
-    .block-hero__inner {
-        display: grid !important;
-        grid-template-columns: 1.25fr 0.75fr !important;
-        gap: 40px !important;
-        align-items: center !important;
-    }
-    .block-hero__text {
-        grid-column: 1 !important;
-        text-align: left !important;
-    }
-    .block-hero--pos-right .block-hero__text {
-        grid-column: 2 !important;
-    }
-    .block-hero--pos-center .block-hero__inner {
-        grid-template-columns: 1fr !important;
-    }
-    .block-hero--pos-center .block-hero__text {
-        grid-column: 1 !important;
-        margin-inline: auto !important;
-        text-align: center !important;
-    }
-}
+
 
 /* 2. Overlap layout for integrated counters (adjacent to Hero) */
 .cms-block--hero:has(+ .cms-block--counters) .block-hero--media {
