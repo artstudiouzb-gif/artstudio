@@ -7,6 +7,7 @@ namespace App\Controllers\Admin;
 use App\Core\Auth;
 use App\Core\BlockData\AdvantagesBlockNormalizer;
 use App\Core\BlockData\BannerBlockNormalizer;
+use App\Core\BlockData\BlockPresentationNormalizer;
 use App\Core\BlockData\ContactCardsBlockNormalizer;
 use App\Core\BlockData\CtaBlockNormalizer;
 use App\Core\BlockData\FaqBlockNormalizer;
@@ -15,7 +16,6 @@ use App\Core\BlockData\SubscribeBlockNormalizer;
 use App\Core\BlockData\TestimonialsBlockNormalizer;
 use App\Core\BlockTypeRegistry;
 use App\Core\BlockVersioning;
-use App\Core\BlockVisibility;
 use App\Core\ConcurrencyException;
 use App\Core\Csrf;
 use App\Core\Flash;
@@ -154,38 +154,11 @@ final class BlockController
             : (string) ($block['custom_css'] ?? '');
         $locale = ((string) $block['lang'] === 'en') ? 'en' : 'ru';
         $data = $this->collectData($block['type'], $locale);
+        $data = array_merge($data, BlockPresentationNormalizer::normalize($_POST));
 
-        // Дизайн-система (общие для всех типов): пресет отступов и анимация.
-        $data['_spacing'] = in_array($_POST['spacing'] ?? 'premium', ['none', 'small', 'premium', 'max'], true)
-            ? $_POST['spacing'] : 'premium';
-        // Анимация появления (группа 4.2): {enabled, type}. Пустой тип = выключено.
-        $revealType = (string) ($_POST['reveal_type'] ?? '');
-        $allowedReveal = ['fade', 'slide-up', 'slide-left', 'slide-right', 'zoom-in'];
-        $data['_reveal'] = in_array($revealType, $allowedReveal, true)
-            ? ['enabled' => true, 'type' => $revealType]
-            : ['enabled' => false, 'type' => 'fade'];
-
-        // Фон секции и её ширина (полноширинная подложка), а также независимые
-        // отступы сверху/снизу — общие оформительские опции для любого блока.
-        $bg = (string) ($_POST['bg'] ?? 'none');
-        $data['_bg'] = in_array($bg, ['none', 'light', 'tint', 'navy'], true) ? $bg : 'none';
-        $data['_fullwidth'] = !empty($_POST['fullwidth']);
-        $padOptions = ['default', 'none', 'small', 'medium', 'large'];
-        $padTop = (string) ($_POST['pad_top'] ?? 'default');
-        $padBottom = (string) ($_POST['pad_bottom'] ?? 'default');
-        $data['_pad_top'] = in_array($padTop, $padOptions, true) ? $padTop : 'default';
-        $data['_pad_bottom'] = in_array($padBottom, $padOptions, true) ? $padBottom : 'default';
-
-        // Условия показа: окно дат (считается на сервере) и устройство (CSS).
-        $data['_visible_from'] = BlockVisibility::normalize($_POST['visible_from'] ?? '');
-        $data['_visible_to'] = BlockVisibility::normalize($_POST['visible_to'] ?? '');
-        $device = (string) ($_POST['visible_device'] ?? '');
-        $data['_visible_device'] = in_array($device, ['desktop', 'mobile'], true) ? $device : '';
         // Перевёрнутое окно молча не чиним: блок и правда не покажется никогда —
         // честнее предупредить, чем угадывать намерение редактора.
-        $vFrom = BlockVisibility::parse($data['_visible_from']);
-        $vTo = BlockVisibility::parse($data['_visible_to']);
-        if ($vFrom !== null && $vTo !== null && $vTo <= $vFrom) {
+        if (BlockPresentationNormalizer::hasInvalidVisibilityWindow($data)) {
             Flash::error('Условия показа: дата окончания не позже даты начала — блок не будет показан. Проверьте даты.');
         }
 
